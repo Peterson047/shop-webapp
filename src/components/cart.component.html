@@ -20,6 +20,10 @@
             --select-padding-left: var(--app-double-space);
       }
 
+      .tile {
+            justify-content: space-between;
+      }
+
       #empty {
             flex-grow: 1;
             display: flex;
@@ -80,12 +84,9 @@
       }
 
       app-button {
+            margin-top: auto;
             background-color: var(--app-validation-color);
             color: var(--app-white);
-      }
-
-      a {
-            margin-top: auto;
       }
 
       @media (min-width: 500px) {

@@ -94,6 +94,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             var onFinish = function() {
                   document.body.removeChild(layer);
                   document.body.classList.remove('no-overflow');
+                  document.body.querySelector('my-app').showModal('disclaimer-modal');
             }
             layer.addEventListener('transitionend', onFinish);
             layer.style.opacity = 0;
@@ -204,6 +205,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       .no-overflow {
+            height: 100vh;
             overflow: hidden;
       }
 

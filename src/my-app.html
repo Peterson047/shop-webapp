@@ -260,12 +260,6 @@ Polymer({
             window.onpopstate = function(event) {
                   if(event.state && !event.state.message) window.preventScrollTop = true;
             }
-
-            // Testing phase disclaimer for all !
-            this.addEventListener('app-ready', function showDisclaimer(e) {
-                  this.showModal('disclaimer-modal');
-                  this.removeEventListener('app-ready', showDisclaimer);
-            });
       },
 
       _networkStateChanged: function(state) {

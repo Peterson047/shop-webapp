@@ -28,7 +28,7 @@
             width: 100%;
       }
       </style>
-      
+
       <template is="dom-if" if="[[loading]]">
             <paper-progress indeterminate></paper-progress>
       </template>
@@ -53,7 +53,7 @@ Polymer({
 
       show: function(cb) {
             var _this = this;
-            document.body.style.overflow = 'hidden';
+            document.body.classList.add('no-overflow');
             if(cb && typeof cb === 'function') {
                   var onFinish = function() {
                         _this.removeEventListener('transitionend', onFinish);
@@ -70,7 +70,7 @@ Polymer({
             var fromTap = e instanceof Event;
             var _this = this;
             if(fromTap) this._notifySubs();
-            document.body.style.overflow = 'auto';
+            document.body.classList.remove('no-overflow');
             requestAnimationFrame(function(){
                   _this.style.opacity = 0;
                   _this.style.pointerEvents = 'none';

@@ -1,0 +1,258 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../bower_components/paper-material/paper-material.html">
+
+<link rel="import" href="loading-layer.component.html">
+<link rel="import" href="data-source.component.html">
+<link rel="import" href="api-call.component.html">
+
+<link rel="import" href="../behaviors/list-animation.behavior.html">
+<link rel="import" href="../behaviors/modal.behavior.html">
+<link rel="import" href="../behaviors/data-pipe.behavior.html">
+<link rel="import" href="../behaviors/toaster-control.behavior.html">
+
+<link rel="import" href="../styles/modal.style.html">
+<link rel="import" href="../styles/shop-input.style.html">
+<link rel="import" href="../styles/list.style.html">
+
+<dom-module id="stock-modal">
+      <template>
+      <style include="modal-style shop-input list-style">
+      :host {
+            display: block;
+      }
+
+      shop-input {
+            width: 65px;
+      }
+
+      #content {
+            display: block !important;
+      }
+
+      .capsule {
+            padding: 5px;
+            box-sizing: border-box;
+            height: 35px;
+            display: flex;
+            color: var(--app-white);
+            justify-content: center;
+            align-items: center;
+            box-shadow: var(--app-shadow);
+      }
+
+      .inputContainer {
+            display: flex;
+            align-items: center;
+      }
+
+      #items {
+            display: flex;
+            min-height: 70%;
+            width: 100%;
+            flex-direction: column;
+      }
+
+
+      .item {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            width: 100%;
+            justify-content: space-between;
+      }
+
+      .item:not(:last-of-type) {
+            margin-bottom: var(--app-space);
+      }
+
+      .name {
+            display: block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-align: center;
+            background-color: var(--app-primary-color);
+            width: 100%;
+            margin-bottom: var(--app-space);
+      }
+
+      paper-progress {
+            width: 100%;
+      }
+
+      .qty {
+            min-width: 50px;
+            background-color: var(--app-secondary-color);
+      }
+
+      .add {
+            color: var(--app-validation-color);
+      }
+
+      .remove {
+            color: var(--app-error-color);
+      }
+      </style>
+
+      <data-source path="/standards" output="{{standards}}"></data-source>
+
+      <api-call id="updateCall" uri="[[appData.backend]]/stocks/update" method="PUT" on-response="_stockUpdated"></api-call>
+
+      <paper-material id="container" tabable-container>
+            <div id="content">
+                  <paper-icon-button  tabable id="close" on-tap="hide" icon="close"></paper-icon-button>
+                  <div id="title">[[title]]</div>
+                  <div id="items">
+                        <template id="list" is="dom-repeat" items="[[productStock]]">
+                              <div class="item">
+                                    <div class="capsule name">[[_getStandardName(item.$key)]]</div>
+                                    <div class="capsule qty">[[item.quantity]]</div>
+                                    <div class="inputContainer">
+                                          <shop-input>
+                                                <input min="1" tabable type="number" id="add[[index]]" required="" placeholder="Ajouter">
+                                                <shop-md-decorator error-message="Champs requis" aria-hidden="true">
+                                                      <label>Ajouter</label>
+                                                      <shop-underline></shop-underline>
+                                                </shop-md-decorator>
+                                          </shop-input>
+                                          <paper-icon-button class="add" on-tap="_updateStock" icon="add" data-index="[[index]]" data-standard="[[item.$key]]" data-action="add"></paper-icon-button>
+                                    </div>
+                                    <div class="inputContainer">
+                                          <shop-input>
+                                                <input min="1" tabable type="number" id="remove[[index]]" required="" placeholder="Retirer">
+                                                <shop-md-decorator error-message="Champs requis" aria-hidden="true">
+                                                      <label>Retirer</label>
+                                                      <shop-underline></shop-underline>
+                                                </shop-md-decorator>
+                                          </shop-input>
+                                          <paper-icon-button class="remove" on-tap="_updateStock" icon="remove" data-index="[[index]]" data-standard="[[item.$key]]" data-action="remove"></paper-icon-button>
+                                    </div>
+                              </div>
+                        </template>
+                  </div>
+            </div>
+            <loading-layer show="[[loading]]"></loading-layer>
+      </paper-material>
+
+</template>
+<script>
+Polymer({
+      is: 'stock-modal',
+      behaviors: [window.ModalBehavior, window.ToasterControlBehavior, window.DataPipeBehavior, window.ListAnimationBehavior],
+      listeners: {
+            'notif': '_stockChanged',
+            'animation-done': '_templateDone'
+      },
+      properties: {
+            loading: {
+                  type: Boolean,
+                  value: false
+            },
+            standards: {
+                  type: Object,
+                  observer: '_standardsChanged'
+            },
+            productStock: {
+                  type: Array
+            },
+            delayFocus: {
+                  type: Boolean,
+                  value: true
+            }
+      },
+
+      _templateDone: function() {
+            this.focus = this.$$('input').focus;
+            this._handleFocus(true);
+      },
+
+      _onShow: function() {
+            this.title = this.params.name;
+            if(this.standards && Object.keys(this.standards).length) this.productStock = this.toArray(this.params.stock);
+      },
+
+      _onHide: function() {
+            this.reset();
+      },
+
+      reset: function() {
+            this.productStock = null;
+      },
+
+      _standardsChanged: function(newVal) {
+            var _this = this;
+            if(newVal && Object.keys(newVal).length && this.params && this.visible){
+                  this.debounce('stdChange', function() {
+                        _this.productStock = this.toArray(this.params.stock);
+                  })
+
+            }
+      },
+
+      _getStandardName: function(key) {
+            return this.standards[key].name;
+      },
+
+      _showNoEntry: function(stock) {
+            return stock !== null && !stock.length;
+      },
+
+      _getQuantity: function(action, index) {
+            var input = this.$$('#'+action+''+index);
+            var valid = input.checkValidity();
+            if(!valid) {
+                  input.setAttribute('aria-invalid', true);
+                  return false;
+            }
+            input.setAttribute('aria-invalid', false);
+            return parseInt(input.value)
+      },
+
+      _stockChanged: function(e) {
+            e.stopPropagation();
+            if(!this.visible) return;
+            this.productStock = this.toArray(e.detail.stock);
+      },
+
+      _updateStock: function(e) {
+
+            var target = e.currentTarget;
+            var action = target.getAttribute('data-action');
+            var standard = target.dataStandard;
+            var index = target.dataIndex;
+
+            var quantity = this._getQuantity(action, index);
+            if(!quantity) return;
+
+            var payload = {
+                  productId: this.params.id,
+                  standard: standard,
+                  quantity: quantity,
+                  action: action
+            };
+            this.$.updateCall.request(payload);
+            this.loading = true;
+      },
+
+      _stockUpdated: function(response) {
+            this.loading = false;
+            if(response.detail.success) {
+                  this.showToaster({
+                        text: 'Stock mis à jour',
+                        state: true,
+                        actions: []
+                  })
+            } else {
+                  this.showToaster({
+                        text: response.detail.error,
+                        state: false,
+                        actions: []
+                  })
+            }
+      }
+
+
+});
+</script>
+</dom-module>

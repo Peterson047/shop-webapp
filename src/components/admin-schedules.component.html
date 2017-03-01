@@ -1,0 +1,132 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+
+<link rel="import" href="schedule.component.html">
+<link rel="import" href="button.component.html">
+<link rel="import" href="loading-layer.component.html">
+<link rel="import" href="data-source.component.html">
+
+<link rel="import" href="../data/days.data.html">
+
+<link rel="import" href="../behaviors/data-pipe.behavior.html">
+<link rel="import" href="../behaviors/toaster-control.behavior.html">
+
+<link rel="import" href="../styles/checkbox-toggle.style.html">
+<link rel="import" href="../styles/tile.style.html">
+<link rel="import" href="../styles/colors.style.html">
+
+<dom-module id="admin-schedules">
+      <template>
+      <style include="tile-style colors-style checkbox-toggle iron-flex iron-flex-alignment">
+      :host {
+            display: block;
+      }
+
+      .tile {
+            justify-content: space-between;
+            box-shadow: none;
+      }
+
+      #days {
+            margin-bottom: var(--app-space);
+      }
+      </style>
+
+      <data-source path="/schedules" once="true" cache-key="schedules" fetching="{{loading}}" output="{{schedules}}"></data-source>
+
+      <days-data id="days" days="{{days}}"></days-data>
+
+      <div class="tile keepMinimalSpace">
+            <div class="layout horizontal justified wrap" id="days">
+                  <template is="dom-repeat" items="[[days]]" as="day">
+                        <paper-checkbox data-day$="[[day]]" checked="[[_isChecked(schedules, day)]]" on-iron-change="_update">[[day]]</paper-checkbox>
+                  </template>
+            </div>
+
+            <template is="dom-repeat" items="[[toArray(schedules, 'day')]]" as="schedule">
+                  <app-schedule data="[[schedule]]"></app-schedule>
+            </template>
+
+            <app-button online="[[online]]" disabled$="[[!online]]" raised icon="check" class="color-white bg-validation" on-tap="_submit">Mettre à jour</app-button>
+            <loading-layer show="[[loading]]"></loading-layer>
+      </div>
+
+
+</template>
+<script>
+'use strict';
+Polymer({
+      is: 'admin-schedules',
+      properties: {
+            schedules: {
+                  type: Object,
+                  value: {}
+            }
+      },
+
+      behaviors: [window.DataPipeBehavior, window.ToasterControlBehavior],
+
+      _isChecked: function(schedules, day) {
+            if(!schedules) return;
+            return schedules[day];
+      },
+
+      _update: function(e) {
+            e.stopPropagation();
+            this.async(function() {
+                  var checkbox = Polymer.dom(e).rootTarget;
+                  if(!checkbox) return;
+                  var day = checkbox.dataset.day;
+
+                  if(checkbox.checked) {
+                        if(!this.schedules[day]) {
+                              this.schedules[day] = {
+                                    slices: []
+                              };
+                        }
+                  } else {
+                        delete this.schedules[day];
+                  }
+                  this.schedules = Object.assign({}, this.schedules);
+            }.bind(this));
+      },
+
+      _submit: function() {
+            var schedules = this.root.querySelectorAll('app-schedule');
+
+            for(var i = 0; i < schedules.length; i++) {
+                  if(!schedules[i].validate()) return false;
+            }
+
+            var updates = {
+                  "schedules": this.schedules
+            };
+
+            this.loading = true;
+
+            var _this = this;
+
+            firebase.database().ref().update(updates)
+            .then(function() {
+                  _this.loading = false;
+                  _this.showToaster({
+                        state: true,
+                        text: 'Horaires mis à jour',
+                        actions: []
+                  })
+            })
+            .catch(function(err) {
+                  _this.loading = false;
+                  _this.showToaster({
+                        state: false,
+                        text: err,
+                        actions: []
+                  })
+            })
+
+      }
+
+});
+</script>
+</dom-module>

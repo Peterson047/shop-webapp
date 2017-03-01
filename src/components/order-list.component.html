@@ -1,0 +1,88 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../bower_components/iron-list/iron-list.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../bower_components/paper-tooltip/paper-tooltip.html">
+
+<link rel="import" href="../behaviors/list-animation.behavior.html">
+<link rel="import" href="../behaviors/data-pipe.behavior.html">
+
+<link rel="import" href="button.component.html">
+<link rel="import" href="date.component.html">
+
+<link rel="import" href="../styles/list.style.html">
+<link rel="import" href="../styles/text-list.style.html">
+<link rel="import" href="../styles/colors.style.html">
+<link rel="import" href="../styles/list-animation.style.html">
+
+<dom-module id="order-list">
+	<template>
+	<style include="list-style colors-style text-list">
+
+	paper-icon-button {
+		color: var(--app-action-color);
+	}
+
+	.item {
+		opacity: 1 !important;
+	}
+
+	.tile {
+		flex-grow: 1;
+	}
+
+	iron-list, #noEntry{
+		min-height: 346px !important;
+		height: var(--order-list-height);
+	}
+	</style>
+
+	<div id="list" class="iron" hidden$="[[noEntry]]">
+		<iron-list items="[[orders]]" as="order">
+			<template>
+				<div class="item">
+					<div>[[order.user.displayName]] / <app-date timestamp="[[order.time.create]]"></app-date> / [[toFixed(order.cart.sum)]]€</div>
+					<a href="/order/[[order.$key]][[_computeOrderUrlParams(order, cacheKey)]]">
+						<paper-icon-button id="see[[index]]" icon="visibility"></paper-icon-button>
+						<paper-tooltip for="see[[index]]" offset="0" position="left">Voir</paper-tooltip>
+					</a>
+				</div>
+			</template>
+		</iron-list>
+	</div>
+
+	<div id="noEntry" hidden$="[[!noEntry]]">Pas de commandes</div>
+	<loading-layer show="[[loading]]"></loading-layer>
+
+</template>
+<script>
+'use strict';
+Polymer({
+	is: 'order-list',
+
+	properties: {
+		cacheKey: String,
+		orders: {
+			type: Array
+		},
+		noEntry: {
+			type: Boolean,
+			value: false
+		},
+		loading: {
+			type: Boolean,
+			value: false
+		},
+	},
+
+	behaviors: [window.ListAnimationBehavior, window.DataPipeBehavior],
+
+	_computeOrderUrlParams: function(order, cacheKey) {
+		var params = '?';
+		if(order.status.state === 'cancelled') params += 'archived=true';
+		if(cacheKey) params += 'cachekey='+cacheKey;
+		return params;
+	},
+});
+</script>
+</dom-module>

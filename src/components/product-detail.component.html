@@ -1,0 +1,331 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-tooltip/paper-tooltip.html">
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+
+<link rel="import" href="../behaviors/data-pipe.behavior.html">
+<link rel="import" href="../behaviors/cart.behavior.html">
+
+<link rel="import" href="../styles/tile.style.html">
+<link rel="import" href="../styles/font.style.html">
+<link rel="import" href="../styles/colors.style.html">
+
+<link rel="import" href="dashed-title.component.html">
+<link rel="import" href="capsule.component.html">
+<link rel="import" href="loading-layer.component.html">
+<link rel="import" href="carousel.component.html">
+<link rel="import" href="button.component.html">
+<link rel="import" href="product-choices.component.html">
+<link rel="import" href="product-quantity.component.html">
+<link rel="import" href="data-source.component.html">
+
+<dom-module id="product-detail">
+	<template>
+	<style include="tile-style colors-style font-style iron-flex iron-flex-alignment iron-flex-reverse">
+
+	:host {
+		min-height: var(--app-section-min-height);
+		display: flex;
+		flex-direction: column;
+	}
+
+	#container {
+		display: flex;
+		flex-direction: column;
+		position: relative;
+		will-change: opacity;
+		opacity: 0;
+		flex-wrap: wrap;
+		transition: none;
+	}
+
+	ul {
+		margin: 0;
+	}
+
+	.show {
+		opacity: 1 !important;
+		transition: opacity 300ms ease-in !important;
+	}
+
+	.title {
+		margin: 10px 0 10px 0;
+	}
+
+	.separator {
+		height: 1px;
+		background-color: var(--app-light-grey);
+		width: 100%;
+		margin: var(--app-space) 0 var(--app-space) 0;
+	}
+
+	app-carousel {
+		height: 250px;
+		width: 100%;
+		--carousel-border-radius: 3px;
+		box-shadow: var(--app-shadow);
+	}
+
+	#visual {
+		position: relative;
+		padding: 10px;
+		box-sizing: border-box;
+		display: flex;
+		flex-direction: column;
+		width: 100%;
+	}
+
+	.tile {
+		box-sizing: border-box;
+	}
+
+	.content {
+		margin-top: 10px;
+		margin-bottom: 10px;
+	}
+
+	#infos {
+		width: 100%;
+
+		box-sizing: border-box;
+		padding: 0 10px 10px 10px;
+	}
+
+	#infos > .tile {
+		min-height: 320px;
+	}
+
+	#description {
+		flex-grow: 1;
+		padding: 0 10px;
+	}
+
+	product-choices {
+		margin-bottom: var(--app-space);
+	}
+
+	product-quantity {
+
+	}
+
+	app-button {
+		margin-top: auto;
+		color: var(--app-white);
+		background-color: var(--app-validation-color);
+	}
+
+	.priceTag {
+		margin-bottom: var(--app-space);
+	}
+
+	.unitText {
+		font-size: 20px;
+		line-height: 26px;
+	}
+
+	.inMyCart {
+		font-size: 12px;
+		line-height: 14px;
+	}
+
+	.price {
+		font-size: 40px;
+		line-height: 40px;
+		margin-right: 8px;
+		color: var(--app-primary-color);
+	}
+
+	.txtNotOnline {
+		flex-grow: 1;
+	}
+
+	@media (min-width: 900px) {
+		#visual {
+			width: 65%;
+		}
+
+		#infos {
+			width: 35%;
+		}
+	}
+
+	@media (max-width: 899px) and (min-width: 760px) {
+		#visual {
+			width: 60%;
+		}
+
+		#infos {
+			width: 40%;
+		}
+	}
+
+	@media (min-width: 760px) {
+		#container {
+			flex-direction: row;
+			justify-content: space-around;
+		}
+
+		app-carousel {
+			height: 320px;
+			width: 100%;
+		}
+
+		#infos {
+			padding: 10px 10px 10px 0;
+		}
+	}
+
+	</style>
+
+	<data-source path="/active_products/[[productId]]" cache-key="active-products" cache-prop="[[productId]]" empty="{{empty}}" fetching="{{loading}}" output="{{data}}"></data-source>
+
+	<div id="container">
+		<div id="visual">
+			<app-carousel items="[[pictures]]"></app-carousel>
+		</div>
+
+		<div id="infos" class="layout-vertical">
+			<div class="tile layout vertical">
+				<template is="dom-if" if="[[online]]">
+
+					<div class="priceTag layout horizontal">
+						<div class="price bottom">[[price]]€</div>
+						<div class="placementStyle layout vertical-reverse">
+							<div class="unitText"> les [[grammage]] [[unit]]</div>
+							<div class="inMyCart">[[_inCart(cart, standard)]]</div>
+						</div>
+					</div>
+
+					<div class="layout horizontal justified">
+						<label class="font-bold">Format</label>
+						<iron-icon id="helper" class="color-accent" icon="help"></iron-icon>
+					</div>
+					<product-choices
+					product-standards="[[data.standards]]"
+					product-stock="[[data.stock]]"
+					unit="{{unit}}" price="{{price}}"
+					standard="{{standard}}"
+					standard-name="{{standardName}}"
+					grammage="{{grammage}}"
+					description="{{description}}"
+					></product-choices>
+					<paper-tooltip for="helper" position="left">[[description]]</paper-tooltip>
+
+
+
+					<label class="font-bold">Quantité</label>
+					<product-quantity class="full" out-of-stock="{{outOfStock}}" product-stock="[[_getStock(data.stock, standard)]]" product-standard="[[standard]]" quantity="{{quantity}}"></product-quantity>
+				</template>
+
+				<template is="dom-if" if="[[!online]]">
+					<div class="txtNotOnline color-disabled">
+						Impossible de récupérer les informations de stocks et de prix tant que vous n'êtes pas connecté à Internet.
+					</div>
+				</template>
+
+				<app-button raised online="[[online]]" icon="icons:add-shopping-cart" disabled$="[[_computeButtonState(online, outOfStock)]]" on-tap="_addToCart">Ajouter [[quantity]] au panier</app-button>
+			</div>
+		</div>
+
+		<div id="description">
+			<div class="tile">
+				<dashed-title icon="subject">Détails du produit</dashed-title>
+				<div class="content">[[data.description]]</div>
+
+				<div class="title font-bold">Les ingrédients utilisés :</div>
+				<div class="layout horizontal wrap">
+					<template is="dom-repeat" items="[[toArrayFromKey(data.ingredients)]]">
+						<app-capsule>[[item]]</app-capsule>
+					</template>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<loading-layer transparent show="[[loading]]"></loading-layer>
+
+</template>
+<script>
+'use strict';
+Polymer({
+	is: 'product-detail',
+	properties: {
+		productId: {
+			type: String
+		},
+		loading: {
+			type: Boolean,
+			observer: '_onLoadingChange'
+		},
+		pictures: {
+			type: Array,
+			value: []
+		},
+		outOfStock: {
+			type: Boolean,
+			value: null,
+		},
+	},
+
+	behaviors: [window.DataPipeBehavior, window.CartBehavior],
+
+	observers: ['_dataChanged(data)'],
+
+	_computeButtonState: function(online, outOfStock) {
+		return !online || outOfStock ;
+	},
+
+	_onLoadingChange: function(loading) {
+		if(loading) {
+			this.fire('update-heading', {heading: 'Chargement'});
+			this.$.container.classList.remove('show');
+		}
+
+	},
+
+	_dataChanged: function(data) {
+		if(!data) return;
+		this._shapePictures();
+		this.fire('update-heading', {heading: data.name});
+		this.$.container.classList.add('show');
+	},
+
+	reset: function() {
+		this.pictures = [];
+	},
+
+	_shapePictures: function() {
+		var buf = [];
+		if(!this.data.pictures) return this.pictures = buf;
+		for(var key in this.data.pictures) {
+			var temp = {
+				id: key,
+				base64: this.data.pictures[key].base64,
+				src: this.data.pictures[key].url
+			}
+			buf.push(temp);
+		}
+		this.pictures = buf;
+	},
+
+	_getStock: function(stocks, standard) {
+		return stocks[standard];
+	},
+
+	_inCart: function(cart, standard) {
+		var msg = '';
+		if(!cart || !cart.items || !standard) return msg;
+		if(cart.items[this.productId+'|'+standard]) {
+			msg = '('+ cart.items[this.productId+'|'+standard].quantity +' dans le panier)';
+		}
+		return msg;
+	},
+
+	_addToCart: function () {
+		// refactor call (too many args)
+		this.addItems(this.productId, this.data.name, this.standard, this.standardName, this.data.stock[this.standard], this.grammage, this.quantity, this.price);
+	},
+
+});
+</script>
+</dom-module>

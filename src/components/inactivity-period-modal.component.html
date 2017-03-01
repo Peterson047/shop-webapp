@@ -1,0 +1,97 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-form/iron-form.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../bower_components/paper-material/paper-material.html">
+
+<link rel="import" href="./button.component.html">
+<link rel="import" href="./loading-layer.component.html">
+<link rel="import" href="./date-input.component.html">
+
+<link rel="import" href="../behaviors/modal.behavior.html">
+<link rel="import" href="../behaviors/toaster-control.behavior.html">
+<link rel="import" href="../behaviors/form.behavior.html">
+
+<link rel="import" href="../styles/modal.style.html">
+<link rel="import" href="../styles/form.style.html">
+
+<dom-module id="inactivity-period-modal">
+      <template>
+      <style include="modal-style form-style">
+      :host {
+            display: block;
+      }
+
+      #form {
+            width: 100%;
+      }
+
+      app-button {
+            color: var(--app-white);
+            background-color: var(--app-validation-color);
+      }
+
+      </style>
+
+      <paper-material id="container" tabable-container>
+            <div id="content">
+                  <paper-icon-button tabable id="close" on-tap="hide" icon="close"></paper-icon-button>
+                  <div id="title">Créer une période</div>
+                  <form is="iron-form" id="form">
+                        <div class="input-row row">
+                              <date-input tabable-container value="{{start}}" lt="[[end]]" label="Début" future-only="true" id="start" name="start"></date-input>
+                        </div>
+                        <div class="input-row row">
+                              <date-input tabable-container value="{{end}}" gt="[[start]]" label="Fin" future-only="true" id="end" name="end"></date-input>
+                        </div>
+                        <div id="buttons">
+                              <app-button raised icon="add" tabable on-tap="_submit">Créer</app-button>
+                        </div>
+                  </form>
+                  <div class="filler"></div>
+            </div>
+            <loading-layer show="[[loading]]"></loading-layer>
+      </paper-material>
+
+</template>
+<script>
+Polymer({
+      is: 'inactivity-period-modal',
+      behaviors: [window.ModalBehavior, window.FormBehavior, window.ToasterControlBehavior],
+
+      focus: function() {
+            this.$.start.focus();
+      },
+
+      _submit: function() {
+            var ok = this.validateForm();
+            if(ok) {
+                  var _this = this;
+                  var data = this.$.form.serialize();
+                  var key = firebase.database().ref().child('inactivity_periods').push().key;
+                  var updates = {};
+                  updates['/inactivity_periods/' + key] = data;
+                  this.loading = true;
+                  return firebase.database().ref().update(updates)
+                  .then(function(){
+                        _this.$.form.reset();
+                        _this.showToaster({
+                              text: 'Période créée',
+                              state: true,
+                              actions: []
+                        })
+                        _this.hide(true);
+                  })
+                  .catch(function(err) {
+                        _this.showToaster({
+                              text: err,
+                              state: false,
+                              actions: []
+                        })
+                        _this.hide(true);
+                  })
+            }
+      }
+
+});
+</script>
+</dom-module>

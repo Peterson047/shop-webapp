@@ -1,0 +1,73 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="app-title">
+  <template>
+
+  <style>
+  #title {
+        text-transform: uppercase;
+        color: var(--app-white);
+
+        height: 50px;
+        width: 100%;
+        margin-right: 10px;
+        margin-left: -65px;
+        padding-left: 70px;
+
+        max-width: 220px;
+
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+  }
+
+  #title_first {
+        font-size: 0.6em;
+        line-height: 0.6em;
+
+  }
+
+  #title_second {
+        font-size: 0.9em;
+        line-height: 0.9em;
+  }
+
+  @media (min-width: 700px) {
+        #title {
+              background-color: var(--app-background-color);
+              color: var(--app-accent-color);
+              margin-right: 40px;
+        }
+  }
+
+  @media (min-width: 840px) {
+        #title {
+              display: block;
+              max-width: 410px;
+              line-height: 50px;
+        }
+
+        #title_first, #title_second {
+              font-size: 1.1em;
+              display: inline-block;
+        }
+  }
+  </style>
+
+  <div id="title">
+    <div id="title_first">Un p'tit coin&nbsp;</div>
+    <div id="title_second">d'savonnerie</div>
+  </div>
+
+  </template>
+  <script>
+  'use strict';
+
+  Polymer({
+    is: 'app-title',
+    properties: {
+
+    },
+  });
+  </script>
+</dom-module>

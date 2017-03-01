@@ -1,0 +1,139 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="checkbox-toggle.style.html">
+
+<dom-module id="form-style">
+	<template>
+	<style include="checkbox-toggle">
+
+	form {
+		display: flex;
+		flex-direction: column;
+		padding: var(--app-space);
+		box-sizing: border-box;
+		width: 100%;
+	}
+
+	form.no-padding {
+		padding: 0 !important;
+	}
+
+	paper-textarea {
+		--paper-input-container-color: var(--app-light-grey);
+		--paper-input-container-focus-color: var(--app-dark-grey);
+		--paper-input-container-input-color: var(--app-input-color);
+
+		--paper-input-container-label: {
+			font-size: 17px;
+			color: var(--app-label-color);
+			opacity: 0.5;
+		};
+
+		--paper-input-container-label-floating: {
+			opacity: 1;
+		};
+
+		--paper-input-container-input: {
+			font-size: 1em;
+			font-weight: 300;
+		};
+	}
+
+	paper-textarea > paper-input-container {
+		background: red;
+	}
+
+	.outsideLabel {
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		font-family: 'Roboto', 'Noto', sans-serif;
+		-webkit-font-smoothing: antialiased;
+		font-size: 12.8px;
+		font-weight: 400;
+		line-height: 24px;
+		color: var(--app-label-color);
+	}
+
+	.outsideLabel.space {
+		margin-bottom: var(--app-space);
+	}
+
+	.title {
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		font-family: 'Roboto', 'Noto', sans-serif;
+		-webkit-font-smoothing: antialiased;
+		font-size: 18px;
+		font-weight: 400;
+		line-height: 24px;
+		color: var(--app-accent-color);
+	}
+
+	.row {
+		@apply(--layout-horizontal);
+		@apply(--layout-end);
+		margin-bottom: 40px;
+		min-height: 24px;
+	}
+
+	.row.noMargin {
+		margin: 0 !important;
+	}
+
+	.column {
+		@apply(--layout-vertical);
+	}
+
+	.row > .flex,
+	.input-row > * {
+		@apply(--layout-flex);
+	}
+
+	.input-row > *:not(:first-child) {
+		margin-left: 8px;
+	}
+
+	.separator {
+		height: 1px;
+		background-color: var(--app-light-grey);
+		margin-top: 10px;
+		margin-bottom: 10px;
+	}
+
+	#buttons {
+		width: 100%;
+		display: flex;
+		flex-direction: column-reverse;
+		justify-content: space-between;
+	}
+
+	#buttons > app-button {
+		width: 100%;
+		margin-right: 0;
+	}
+
+	#buttons > app-button:not(:first-of-type) {
+		margin-bottom: 10px;
+	}
+
+	@media (min-width: 785px) {
+		#buttons {
+			flex-direction: row;
+			justify-content: space-between;
+		}
+
+		#buttons > app-button {
+			flex-grow: 1;
+			margin-bottom: 0 !important;
+		}
+
+		#buttons > app-button:not(:last-of-type) {
+			margin-right: var(--app-space) !important;
+		}
+	}
+
+	</style>
+	</template>
+</dom-module>

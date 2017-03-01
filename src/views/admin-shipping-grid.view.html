@@ -1,0 +1,45 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../components/shipping-grid.component.html">
+
+<link rel="import" href="../behaviors/page.behavior.html">
+
+<dom-module id="shipping-grid-view">
+	<template>
+	<style>
+	:host {
+		display: block;
+	}
+	</style>
+
+	<shipping-grid id="target" online="[[online]]"></shipping-grid>
+
+	</template>
+	<script>
+	'use strict';
+	Polymer({
+		is: 'shipping-grid-view',
+
+		properties: {
+			pageData: {
+				type: Object,
+				value: {
+					category: "Grille de tarifs des envois",
+					topic: null,
+					path: "shipping-grid"
+				}
+			},
+			
+			user: Object,
+			appData: Object
+		},
+
+		_onSelected: function() {
+			this.fire('update-button', {icon: 'add'});
+		},
+
+		behaviors: [window.PageBehavior],
+
+	});
+	</script>
+</dom-module>

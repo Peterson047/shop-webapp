@@ -1,0 +1,100 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-form/iron-form.html">
+<link rel="import" href="../../bower_components/iron-a11y-keys/iron-a11y-keys.html">
+<link rel="import" href="../../bower_components/iron-icons/social-icons.html">
+<link rel="import" href="button.component.html">
+<link rel="import" href="double-check-input.component.html">
+<link rel="import" href="../behaviors/tabindex.behavior.html">
+<link rel="import" href="../behaviors/form.behavior.html">
+<link rel="import" href="../styles/form.style.html">
+<link rel="import" href="../styles/shop-input.style.html">
+
+<dom-module id="sign-up">
+      <template>
+      <style include="form-style shop-input">
+      :host {
+            display: block;
+            width: 100%;
+      }
+
+      app-button {
+            color: var(--app-white);
+      }
+
+      #signup {
+            background-color: var(--app-validation-color);
+      }
+
+      #cancel {
+            background-color: var(--app-error-color);
+      }
+
+      </style>
+
+      <iron-a11y-keys target="[[target]]" keys="enter"
+      on-keys-pressed="_signUp"></iron-a11y-keys>
+
+      <form id="form" is="iron-form">
+
+            <div class="row input-row">
+                  <shop-input>
+                        <input tabable id="mail" type="email" name="email" required="" placeholder="Email" autocomplete="email">
+                        <shop-md-decorator error-message="Champs requis" aria-hidden="true">
+                              <label>Email</label>
+                              <shop-underline></shop-underline>
+                        </shop-md-decorator>
+                  </shop-input>
+            </div>
+
+            <div class="row input-row">
+                  <shop-input>
+                        <input tabable type="text" name="name" required="" pattern=".{2,}" placeholder="Nom & prénom" autocomplete="name">
+                        <shop-md-decorator error-message="Champs requis" aria-hidden="true">
+                              <label>Nom & prénom</label>
+                              <shop-underline></shop-underline>
+                        </shop-md-decorator>
+                  </shop-input>
+            </div>
+
+            <div class="row input-row">
+                  <double-check-input type="password" error-message="6 caractères minimum" label="Mot de passe" name="password" pattern=".{6,}"></double-check-input>
+            </div>
+            <div id="buttons">
+                  <app-button icon="social:person-add" raised id="signup" tabable on-tap="_signUp">Créer votre compte</app-button>
+            </div>
+      </form>
+
+
+</template>
+<script>
+Polymer({
+      is: 'sign-up',
+      behaviors: [window.TabindexBehavior, window.FormBehavior],
+
+      properties: {
+            target: {
+                  type: Object,
+                  value: function() {
+                        return this.$.password;
+                  }
+            },
+      },
+
+      focus: function() {
+            this.$.mail.focus();
+      },
+      _cancel: function() {
+            this.fire('cancel-registration');
+      },
+      _signUp: function(){
+            var ok = this.validateForm();
+            if(ok) this.fire('register', this.$.form.serialize());
+      },
+
+      reset: function(){
+            this.$.form.reset();
+      }
+
+});
+</script>
+</dom-module>

@@ -1,0 +1,77 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+
+<dom-module id="dashed-title">
+      <template>
+      <style>
+      :host {
+            width: 100%;
+            height: 50px;
+            flex-shrink: 0;
+            font-size: 18px;
+            font-weight: 400;
+            color: var(--app-white);
+            display: flex;
+            align-items: center;
+            text-transform: uppercase;
+            margin-top: 10px;
+            margin-bottom: 10px;
+            padding: 5px 10px 5px 10px;
+            box-sizing: border-box;
+            border-radius: 2px;
+            box-shadow: var(--app-shadow);
+            background-color: var(--dashed-title-background-color, --app-accent-color);
+      }
+
+      .dash {
+            height: 1px;
+            background-color: var(--app-white);
+            display: none;
+      }
+
+      .dash.left {
+            width: 5%;
+            margin-right: 10px;
+      }
+
+      .dash.right {
+            flex-grow: 1;
+      }
+
+      .text {
+            margin: 0 10px 0 10px;
+      }
+
+      @media (min-width: 600px) {
+            .dash{
+                  display: block;
+            }
+      }
+
+      iron-icon {
+      }
+      </style>
+
+      <div class="dash left"></div>
+      <template is="dom-if" if="[[icon]]">
+            <iron-icon icon="[[icon]]"></iron-icon>
+      </template>
+      <div class="text">
+            <content></content>
+      </div>
+      <div class="dash right"></div>
+
+</template>
+<script>
+Polymer({
+      is: 'dashed-title',
+
+      properties: {
+            icon: {
+                  type: String,
+                  value: null,
+            }
+      }
+});
+</script>
+</dom-module>

@@ -1,0 +1,91 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../bower_components/paper-material/paper-material.html">
+
+<link rel="import" href="./loading-layer.component.html">
+<link rel="import" href="./sign-in-credentials.component.html">
+
+<link rel="import" href="../behaviors/modal.behavior.html">
+<link rel="import" href="../behaviors/toaster-control.behavior.html">
+
+<link rel="import" href="../styles/modal.style.html">
+
+<dom-module id="reauth-modal">
+	<template>
+	<style include="modal-style">
+	:host {
+		display: block;
+	}
+
+	sign-in-credentials {
+		width: 100%;
+	}
+
+	#title, sign-in-credentials, .filler {
+			margin-top: auto;
+	}
+
+	</style>
+
+	<paper-material id="container" tabable-container>
+		<div id="content" class="large">
+			<paper-icon-button  tabable id="close" on-tap="hide" icon="close"></paper-icon-button>
+			<div id="title">Veuillez vous réauthentifier</div>
+			<sign-in-credentials register-button="[[registerButton]]" on-sign-in="_reauth" tabable-container id="credentials"></sign-in-credentials>
+			<div class="filler"></div>
+		</div>
+		<loading-layer show="[[loading]]"></loading-layer>
+	</paper-material>
+
+</template>
+<script>
+Polymer({
+	is: 'reauth-modal',
+	behaviors: [window.ModalBehavior, window.ToasterControlBehavior],
+	properties: {
+		registerButton: {
+			type: Boolean,
+			value: false,
+		}
+	},
+
+	focus: function() {
+		this.$.credentials.focus();
+	},
+
+	_reauth: function(e) {
+		var _this = this;
+
+		var user = firebase.auth().currentUser;
+
+		var credential = firebase.auth.EmailAuthProvider.credential(
+			e.detail.credentials.email,
+			e.detail.credentials.password
+		);
+
+		this.loading = true;
+
+		user.reauthenticate(credential).then(function() {
+			_this.loading = false;
+			_this.params.onReauth();
+			_this.hide(true);
+			_this.showToaster({
+				text: 'Vous êtes réauthentifié',
+				state: true,
+				actions: []
+			})
+		}, function(err) {
+			_this.loading = false;
+			_this.hide(true);
+			_this.showToaster({
+				text: err,
+				state: false,
+				actions: []
+			})
+		});
+	}
+
+
+});
+</script>
+</dom-module>

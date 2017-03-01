@@ -1,0 +1,170 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-card/paper-card.html">
+
+<link rel="import" href="../behaviors/data-pipe.behavior.html">
+<link rel="import" href="../behaviors/navigation.behavior.html">
+
+<link rel="import" href="../styles/colors.style.html">
+
+<link rel="import" href="button.component.html">
+
+<dom-module id="product-tile">
+	<template>
+	<style include="colors-style">
+	:host {
+		display: block;
+		max-width: 460px;
+		min-width: 360px;
+		width: 90%;
+		margin-bottom: var(--app-space);
+	}
+
+	:host([filler]) {
+		opacity: 0;
+		pointer-events: none;
+		height: 0px;
+		margin-top: 0;
+		margin-bottom: 0;
+	}
+
+	paper-card {
+		width: 100%;
+		overflow: hidden;
+	}
+
+	#itemTitle {
+		font-weight: bold;
+		margin-top: 180px;
+	}
+
+	#itemDesc {
+		display: block;
+		font-size: 14px;
+		height: 55px;
+
+	}
+
+	.card-content {
+		position: relative;
+	}
+
+	iron-image {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 170px;
+	}
+
+	.noPicture {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 170px;
+		background-color: var(--app-light-grey);
+
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+
+	.noImageIcon {
+		color: var(--app-white);
+		height: 50px;
+		width: 50px;
+	}
+
+	@media (min-width: 940px) {
+		:host {
+			width: 45%;
+		}
+	}
+
+	@media (min-width: 1450px) {
+		:host {
+			width: 30%;
+		}
+	}
+	</style>
+
+	<paper-card>
+		<div class="card-content">
+			<template is="dom-if" if="[[_hasPicture(data)]]">
+				<iron-image
+				placeholder="[[_grabDisplayPic(data, 'base64')]]"
+				sizing="cover"
+				preload src="[[_grabDisplayPic(data, 'url')]]"
+				fade>
+			</iron-image>
+		</template>
+		<template is="dom-if" if="[[!_hasPicture(data)]]">
+			<div class="noPicture"><iron-icon class="noImageIcon" icon="visibility-off"></iron-icon></div>
+		</template>
+
+		<div id="itemTitle">[[data.name]]</div>
+		<div id="itemDesc"></div>
+	</div>
+	<div class="card-actions">
+		<app-button id="seeButton" on-tap="_goToProduct" class="color-action" icon="visibility">Voir le produit</app-button>
+	</div>
+</paper-card>
+
+</template>
+<script>
+'use strict';
+Polymer({
+	is: 'product-tile',
+	properties: {
+		data: {
+			type: Object,
+		}
+	},
+
+	behaviors: [window.DataPipeBehavior, window.NavigationBehavior],
+
+	attached: function() {
+		var _this = this;
+		if(this.data) {
+			window.addEventListener('resize', function() {
+				if(_this.offsetParent) {
+					_this.debounce(_this.data.$key, _this._ellipsizeTextBox, 500);
+				}
+			})
+			Polymer.RenderStatus.afterNextRender(this.$.itemDesc, this._ellipsizeTextBox.bind(this));
+		}
+		else if (this.hasAttribute('filler')) {
+			this.$.seeButton.setAttribute('tabindex', '-1');
+		}
+	},
+
+	_grabDisplayPic: function (data, type) {
+		if(!data) return;
+		if (!data.pictures) return "";
+		var arrayPic = this.toArray(data.pictures);
+		return arrayPic[0][type];
+	},
+
+	_hasPicture: function (data) {
+		if(!data) return;
+		if (!data.pictures) return false;
+		return true;
+	},
+
+	_ellipsizeTextBox: function () {
+		var el = this.$.itemDesc;
+		el.innerHTML = this.data.description;
+		var wordArray = el.innerHTML.split(' ');
+		while(el.scrollHeight > el.offsetHeight) {
+			wordArray.pop();
+			el.innerHTML = wordArray.join(' ') + '...';
+		}
+	},
+
+	_goToProduct: function() {
+		this.goTo('/product-detail/'+this.data.$key);
+	}
+
+});
+</script>
+</dom-module>

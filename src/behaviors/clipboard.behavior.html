@@ -1,0 +1,61 @@
+<link rel="import" href="toaster-control.behavior.html">
+
+<script>
+'use strict';
+
+var canCopy;
+
+window.ClipboardBehaviorImpl = {
+
+	attached: function() {
+	  this.canCopy = canCopy;
+	},
+
+	clipboardCopy: function(node) {
+		try {
+			if(canCopy === false) return;
+			this._selectText(node);
+			var successful = document.execCommand('copy');
+			if(!successful) throw new Error('Votre navigateur ne supporte pas cette fonctionnalité');
+			this.showToaster({
+				text: 'Copié !',
+				state: true,
+				actions: []
+			})
+			this._unselectText();
+		} catch(err) {
+			canCopy = false;
+			this.canCopy = canCopy;
+			this.showToaster({
+				text: err,
+				state: false,
+				actions: []
+			})
+		}
+	},
+
+	_selectText: function(node) {
+		if ( document.selection ) {
+			var range = document.body.createTextRange();
+			range.moveToElementText(node);
+			range.select();
+		} else if ( window.getSelection ) {
+			var range = document.createRange();
+			range.selectNodeContents(node);
+			window.getSelection().removeAllRanges();
+			window.getSelection().addRange(range);
+		}
+	},
+
+	_unselectText: function() {
+		if ( document.selection ) {
+			document.selection.empty();
+		} else if ( window.getSelection ) {
+			window.getSelection().removeAllRanges();
+		}
+	},
+}
+
+window.ClipboardBehavior = [window.ClipboardBehaviorImpl, window.ToasterControlBehavior]
+
+</script>

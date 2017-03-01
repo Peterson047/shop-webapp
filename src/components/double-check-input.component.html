@@ -1,0 +1,114 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-validatable-behavior/iron-validatable-behavior.html">
+<link rel="import" href="../../bower_components/iron-form-element-behavior/iron-form-element-behavior.html">
+<link rel="import" href="../styles/shop-input.style.html">
+
+<dom-module id="double-check-input">
+	<template>
+	<style include="shop-input">
+	:host {
+		display: block;
+	}
+
+	div {
+		display: flex;
+	}
+
+	shop-input {
+		width: 100%;
+	}
+
+	shop-input:first-of-type {
+		margin-bottom: 40px;
+	}
+
+	</style>
+	<shop-input>
+		<input id="a" tabable type="[[type]]" pattern="[[pattern]]" required="" placeholder="[[label]]">
+		<shop-md-decorator error-message$="[[errorMessage]]" aria-hidden="true">
+			<label>[[label]]</label>
+			<shop-underline></shop-underline>
+		</shop-md-decorator>
+	</shop-input>
+
+	<shop-input>
+		<input id="b" tabable type="[[type]]" required="" placeholder="[[label]]">
+		<shop-md-decorator error-message$="[[error]]" aria-hidden="true">
+			<label>[[label]] - confirmation</label>
+			<shop-underline></shop-underline>
+		</shop-md-decorator>
+	</shop-input>
+
+</template>
+<script>
+Polymer({
+	is: 'double-check-input',
+	properties: {
+		value: {
+			type: String,
+			value: null,
+			observer: 'resetWatcher'
+		},
+		error: {
+			type: String,
+			value: 'Les deux champs doivent être identiques'
+		},
+		errorMessage: {
+			type: String,
+			value: 'Champs requis'
+		}
+	},
+
+	behaviors: [Polymer.IronFormElementBehavior, Polymer.IronValidatableBehavior],
+
+	attached: function() {
+		this.value = '';
+		this.addEventListener('keyup', this.validate.bind(this));
+	},
+
+	resetWatcher: function(newVal, oldVal) {
+		if(newVal === null && typeof oldVal !== 'undefined') this.reset();
+	},
+
+	focus: function() {
+		this.$.a.focus();
+	},
+
+	_setAriaInvalid: function(input, invalid) {
+		if(invalid) {
+			input.setAttribute('aria-invalid', true);
+			input.setCustomValidity("Invalid field.");
+		} else {
+			input.removeAttribute('aria-invalid');
+		}
+
+	},
+
+	reset: function() {
+		this.value = '';
+		this.$.a.value = '';
+		this.$.b.value = '';
+		this._setAriaInvalid(this.$.a, false);
+		this._setAriaInvalid(this.$.b, false);
+	},
+
+	validate: function() {
+		this.$.a.setCustomValidity("");
+		this.$.b.setCustomValidity("");
+
+		var a = this.$.a.checkValidity();
+		this._setAriaInvalid(this.$.a, !a);
+		var match = this.$.a.value === this.$.b.value;
+		if(!match && a) {
+			this._setAriaInvalid(this.$.b, true);
+		} else {
+			this._setAriaInvalid(this.$.b, false);
+		}
+		var ok = a && match;
+		if(ok) this.value = this.$.a.value;
+		return ok;
+	}
+
+});
+</script>
+</dom-module>

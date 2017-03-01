@@ -1,0 +1,67 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="fix-tap-style">
+  <template>
+  <style>
+
+  /* paper-button */
+
+  paper-button::shadow paper-ripple {
+    pointer-events: none;
+  }
+
+  paper-button::shadow iron-icon {
+    pointer-events: none;
+  }
+
+  /* paper-icon-button */
+
+  paper-icon-button::shadow paper-ripple {
+    pointer-events: none;
+  }
+
+  paper-icon-button::shadow iron-icon {
+    pointer-events: none;
+  }
+
+  /* iron-icon */
+
+  iron-icon::shadow svg {
+    pointer-events: none;
+  }
+
+  iron-icon::shadow paper-ripple {
+    pointer-events: none;
+  }
+
+  /* paper-tab */
+
+  paper-tab::shadow .tab-content {
+    pointer-events: none;
+  }
+
+  paper-tab::shadow iron-icon {
+    pointer-events: none;
+  }
+
+  paper-tab::shadow paper-ripple {
+    pointer-events: none;
+  }
+
+  /* paper-fab */
+
+  paper-fab::shadow span {
+    pointer-events: none;
+  }
+
+  paper-fab::shadow iron-icon {
+    pointer-events: none;
+  }
+
+  paper-fab::shadow paper-ripple {
+    pointer-events: none;
+  }
+
+  </style>
+  </template>
+</dom-module>

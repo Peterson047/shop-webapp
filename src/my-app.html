@@ -1,0 +1,375 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/app-layout/app-drawer/app-drawer.html">
+<link rel="import" href="../bower_components/app-layout/app-drawer-layout/app-drawer-layout.html">
+<link rel="import" href="../bower_components/app-layout/app-header/app-header.html">
+<link rel="import" href="../bower_components/app-layout/app-header-layout/app-header-layout.html">
+<link rel="import" href="../bower_components/app-layout/app-scroll-effects/app-scroll-effects.html">
+<link rel="import" href="../bower_components/app-layout/app-toolbar/app-toolbar.html">
+<link rel="import" href="../bower_components/app-route/app-location.html">
+<link rel="import" href="../bower_components/app-route/app-route.html">
+<link rel="import" href="../bower_components/app-storage/app-network-status-behavior.html">
+<link rel="import" href="../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../bower_components/iron-selector/iron-selector.html">
+<link rel="import" href="../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../bower_components/iron-icons/social-icons.html">
+<link rel="import" href="../bower_components/iron-icons/editor-icons.html">
+<link rel="import" href="../bower_components/iron-icons/maps-icons.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/paper-tooltip/paper-tooltip.html">
+<link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../bower_components/paper-tabs/paper-tab.html">
+<link rel="import" href="../bower_components/polymerfire/polymerfire.html">
+
+<link rel="import" href="./components/loader.component.html">
+<link rel="import" href="./components/toaster-container.component.html">
+<link rel="import" href="./components/user-menu-button.component.html">
+<link rel="import" href="./components/modal-container.component.html">
+<link rel="import" href="./components/overlay.component.html">
+<link rel="import" href="./components/footer.component.html">
+<link rel="import" href="./components/highlighted-icon.component.html">
+<link rel="import" href="./components/api-call.component.html">
+<link rel="import" href="./components/logo-savonnerie.component.html">
+<link rel="import" href="./components/app-title.component.html">
+<link rel="import" href="./components/separator.component.html">
+
+<link rel="import" href="./behaviors/navigation.behavior.html">
+<link rel="import" href="./behaviors/page-transition.behavior.html">
+<link rel="import" href="./behaviors/toaster-control.behavior.html">
+<link rel="import" href="./behaviors/cart.behavior.html">
+<link rel="import" href="./behaviors/modal.behavior.html">
+
+<link rel="import" href="./styles/app.style.html">
+<link rel="import" href="./styles/transition-block.style.html">
+<link rel="import" href="./styles/tabs.style.html">
+<link rel="import" href="./styles/drawer.style.html">
+
+<link rel="import" href="./data/menu.data.html">
+
+<link rel="import" href="app-icons.html">
+
+<dom-module id="my-app">
+      <template>
+      <style include="app-style drawer-style transition-block-style tabs-style">
+      :host {
+            --app-primary-color: #009688;
+            --app-secondary-color: #004446;
+            --app-accent-color: #00796B;
+            --app-action-color: #C2185B;
+            --app-white: #fff;
+            --app-black: #000;
+            --app-dark-grey: #455A64;
+            --app-light-grey: #ccc;
+            --app-validation-color: var(--paper-green-500);
+            --app-error-color: var(--paper-red-500);
+
+            --app-disabled-color: #a8a8a8;
+            --app-disabled-bg: #eaeaea;
+
+            --app-menu-icon-color: var(--app-secondary-color);
+
+            --app-background-color: #f5f5f5;
+            --app-section-fill-color: var(--app-background-color);
+            --app-section-header-background-color: var(--app-primary-color);
+            --app-link-color: var(--app-primary-color);
+            --app-input-color: var(--app-secondary-color);
+            --app-label-color: var(--app-primary-color);
+
+            --app-section-min-height: calc(100vh - 450px);
+            --app-space: 20px;
+            --app-double-space: calc(var(--app-space) * 2);
+            --app-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
+            --app-max-width: 1400px;
+      }
+
+      [hidden] {
+            display: none !important;
+      }
+
+      </style>
+
+      <!-- FIREBASE -->
+      <firebase-app
+      api-key="AIzaSyA8644jA0nIptc9fvg-n-TVqM0DAuvLXM4"
+      auth-domain="savon-1df9a.firebaseapp.com"
+      database-url="https://savon-1df9a.firebaseio.com"
+      storage-bucket="savon-1df9a.appspot.com"
+      messaging-sender-id="167729941627"
+      app-name="savon"></firebase-app>
+      <firebase-auth id="auth" user="{{user}}"></firebase-auth>
+      <firebase-messaging id="messaging" on-message="_onMessage"></firebase-messaging>
+
+      <!-- ROUTING -->
+      <app-location route="{{route}}"></app-location>
+      <app-route route="{{route}}" pattern="/:page" data="{{routeData}}" tail="{{subroute}}"></app-route>
+
+      <!-- API AND DATA -->
+      <api-call id="roleCall" uri="[[appData.backend]]/users/role" method="GET" on-response="_roleResponse"></api-call>
+      <menu-data pages="{{pages}}"></menu-data>
+
+      <!-- CONTAINERS -->
+      <app-overlay></app-overlay>
+      <toaster-container></toaster-container>
+      <modal-container app-data="[[appData]]" user="[[user]]"></modal-container>
+
+      <!-- LAYOUT -->
+      <app-drawer-layout narrow="{{narrow}}" fullbleed>
+            <!-- Drawer content -->
+            <app-drawer opened="{{drawerOpened}}" id="drawer" hidden$="[[!narrow]]">
+                  <app-toolbar id="drawerHeader">
+                        <app-title></app-title>
+                  </app-toolbar>
+
+                  <div id="drawerMenu">
+                        <iron-selector id="mobileMenu" selected="[[page]]" attr-for-selected="name" class="drawer-list" role="navigation">
+                              <template is="dom-repeat" items="[[pages]]" as="onePage">
+                                    <a class="mobileMenuLink" name="[[onePage.name]]" drawer-toggle href="[[onePage.href]]">
+                                          <iron-icon class="mobileMenuIcon" icon="[[onePage.icon]]"></iron-icon>
+                                          [[onePage.display]]
+                                    </a>
+                              </template>
+                        </iron-selector>
+                  </div>
+
+                  <div id="drawerFooter">
+                        <app-separator></app-separator>
+                        <logo-savonnerie class="logo"></logo-savonnerie>
+                  </div>
+            </app-drawer>
+
+            <!-- Main content -->
+            <app-header-layout>
+
+                  <app-header id="header" reveals effects="fade-background waterfall">
+                        <div class="center">
+                              <app-toolbar id="topToolbar">
+                                    <div class="left-bar-item" hidden$="[[!narrow]]">
+                                          <paper-icon-button id="burger" icon="menu" drawer-toggle></paper-icon-button>
+                                    </div>
+
+                                    <app-title></app-title>
+
+                                    <div class="right-bar-item">
+                                          <div id="tabsContainer" hidden$="[[narrow]]">
+                                                <paper-tabs selected="[[page]]" attr-for-selected="name">
+                                                      <template is="dom-repeat" items="[[pages]]" as="page">
+                                                            <paper-tab disabled$="[[navigating]]" link name="[[page.name]]">
+                                                                  <a href="[[page.href]]">[[page.display]]</a>
+                                                            </paper-tab>
+                                                      </template>
+                                                </paper-tabs>
+                                          </div>
+
+                                          <a id="seeCart" href="/cart" tabindex="-1">
+                                                <highlighted-icon class="icon" badge="[[cart.itemCount]]" highlighted-on="cart" current-page=[[page]] icon="shopping-cart"></highlighted-icon>
+                                          </a>
+
+                                          <paper-tooltip for="seeCart" position="bottom">Mon panier</paper-tooltip>
+                                          <user-menu-button page="[[page]]" user="{{user}}"></user-menu-button>
+                                    </div>
+                              </app-toolbar>
+                        </div>
+                  </app-header>
+
+                  <section id="loadingBackground" tabindex="-1">
+                        <app-loader id="loader"></app-loader>
+                  </section>
+
+                  <section id="transitionBlock">
+
+                        <iron-pages selected="[[page]]"
+                        attr-for-selected="name"
+                        fallback-selection="404"
+                        id="pages"
+                        role="main">
+                        <home-view name="home"></home-view>
+                        <customer-product-list-view app-data="[[appData]]" user="[[user]]" name="customer-product-list"></customer-product-list-view>
+                        <order-view app-data="[[appData]]" user="[[user]]" name="order"></order-view>
+                        <product-detail-view app-data="[[appData]]" user="[[user]]" name="product-detail"></product-detail-view>
+                        <product-form-view app-data="[[appData]]" user="[[user]]" name="product-form"></product-form-view>
+                        <cart-view app-data="[[appData]]" user="[[user]]" name="cart"></cart-view>
+                        <checkout-view app-data="[[appData]]" user="[[user]]" name="checkout"></checkout-view>
+                        <contact-view app-data="[[appData]]" name="contact"></contact-view>
+                        <user-view app-data="[[appData]]" user="[[user]]" name="user"></user-view>
+                        <admin-view app-data="[[appData]]" user="[[user]]" name="admin"></admin-view>
+                        <error-404-view name="404"></error-404-view>
+                  </iron-pages>
+
+                  <app-footer></app-footer>
+            </section>
+
+      </app-header-layout>
+</app-drawer-layout>
+
+</template>
+<script>
+'use strict';
+Polymer({
+      is: 'my-app',
+
+      properties: {
+            defaultPage: {
+                  type: String,
+                  value: 'home'
+            },
+
+            viewsPath: {
+                  type: String,
+                  value: './views/'
+            },
+
+            user: {
+                  type: Object,
+                  value: null,
+                  observer: '_userChanged'
+            },
+
+            drawerOpened: {
+                  type: Boolean,
+                  observer: "_handleDrawerTabindexes",
+            },
+
+            appData: {
+                  type: Object,
+                  value: {
+                        name: "Un p'tit coin d'savonnerie",
+                        backend: 'https://api.ptitcoinsavonnerie.fr',
+                        domain: 'ptitcoinsavonnerie.fr'
+                  }
+            },
+
+            previousNetworkState: {
+                  type: Boolean
+            },
+      },
+
+      behaviors: [Polymer.AppNetworkStatusBehavior, window.PageTransitionBehavior, window.CartBehavior, window.ToasterControlBehavior, window.NavigationBehavior, window.ModalControlBehavior],
+
+      observers: ['_networkStateChanged(online)'],
+
+      attached: function() {
+            window.onpopstate = function(event) {
+                  if(event.state && !event.state.message) window.preventScrollTop = true;
+            }
+
+            // Testing phase disclaimer for all !
+            this.addEventListener('app-ready', function showDisclaimer(e) {
+                  this.showModal('disclaimer-modal');
+                  this.removeEventListener('app-ready', showDisclaimer);
+            });
+      },
+
+      _networkStateChanged: function(state) {
+            if(state && this.previousNetworkState === false) {
+                  this.showToaster({
+                        text: "Connexion internet rétablie",
+                        icon: 'cloud-queue',
+                        state: true,
+                        actions: []
+                  })
+            } else if(!state) {
+                  this.showToaster({
+                        text: "Connexion internet perdue, application en mode hors ligne",
+                        icon: 'cloud-off',
+                        state: true,
+                        actions: []
+                  })
+            }
+            this.previousNetworkState = state;
+      },
+
+      swInstalled: function() {
+            this.showToaster({
+                  icon: "info",
+                  autoClose: false,
+                  text: "Certaines parties de l'application sont disponibles hors ligne !",
+                  state: true,
+                  actions: []
+            })
+      },
+
+      newVersionAvailable: function() {
+            this.showToaster({
+                  text: "Une nouvelle version est disponible !",
+                  state: true,
+                  icon: "refresh",
+                  autoClose: false,
+                  actions: [{
+                        text: 'Rafraichir',
+                        fn: function() {window.location.reload();},
+                  }],
+            })
+      },
+
+      _onMessage: function(e, data) {
+            var notif = data.message.notification;
+            this.showToaster({
+                  text: notif.title,
+                  state: true,
+                  icon: "social:notifications-active",
+                  autoClose: false,
+                  actions: [{
+                        text: 'Voir',
+                        fn: function() {this.goTo(notif.click_action.split('.fr')[1])}.bind(this),
+                  }],
+            })
+      },
+
+      _userChanged: function(){
+            if(!this.user || this.user.role) return;
+            var _this = this;
+
+            if(this.online === false) {
+                  var storedRole = window.localStorage.getItem(_this.user.uid);
+                  _this._setRole(storedRole);
+            } else {
+                  var currentUser = firebase.auth().currentUser;
+                  if(!currentUser) return;
+                  currentUser
+                  .getToken(true)
+                  .then(function(token){
+                        _this.user.fbt = token;
+                        _this._getUserRole();
+                  });
+            }
+      },
+
+      _getUserRole: function() {
+            this.$.roleCall.request(null, this.user.fbt);
+      },
+
+      _roleResponse: function(response) {
+            var res = response.detail;
+            if(res.success) {
+                  var role = res.data;
+                  this._setRole(role);
+                  window.localStorage.setItem(this.user.uid, role);
+            }
+      },
+
+      _setRole: function(role) {
+            this.user = Object.assign({}, this.user, {role: role});
+            var evt = new Event('role-is-set');
+            document.dispatchEvent(evt);
+      },
+
+      _handleDrawerTabindexes: function(newVal) {
+            if(this.narrow) {
+                  var tabindex = newVal ? "0" : "-1";
+                  this.$.mobileMenu.items.forEach(function(item) {
+                        item.setAttribute('tabindex', tabindex);
+                  })
+            }
+      }
+});
+</script>
+</dom-module>

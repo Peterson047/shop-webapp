@@ -1,0 +1,60 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="app-date">
+      <template>
+      <style>
+      :host {
+            display: inline-block;
+            color: var(--app-accent-color);
+      }
+
+      span {
+            color: inherit;
+      }
+      </style>
+
+      <div>[[date]]</div>
+
+</template>
+<script>
+Polymer({
+      is: 'app-date',
+      properties: {
+            json: {
+                  type: Object,
+                  value: {empty: true}
+            },
+            timestamp: {
+                  type: Number,
+                  value: 0
+            },
+            string: {
+                  type: String,
+                  value: ''
+            },
+            months: {
+                  type: Array,
+                  value: ['janv.', 'févr.', 'mars', 'avr.', 'mai', 'juin', 'juil.', 'août', 'sept.', 'oct.', 'nov.', 'déc.']
+            },
+            date: String
+      },
+
+      observers: [
+            '_computeDate(json, timestamp, string, months)'
+      ],
+
+      _computeDate: function(json, timestamp, string, months) {
+            if(!json.empty) {
+                  this.date = ' '+parseInt(json.day)+' '+this.months[parseInt(json.month) - 1]+' '+json.year+' ';
+            } else if(timestamp !== 0) {
+                  var a = new Date(timestamp);
+                  this.date = ' '+a.getDate()+' '+this.months[a.getMonth()]+' '+a.getFullYear()+' ';
+            } else if(string !== '') {
+                  this.date = ' '+string+' ';
+            }
+      }
+
+
+});
+</script>
+</dom-module>

@@ -1,0 +1,98 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+
+<link rel="import" href="../styles/shop-input.style.html">
+<link rel="import" href="../styles/colors.style.html">
+<link rel="import" href="../styles/font.style.html">
+<link rel="import" href="../styles/fix-tap.style.html">
+
+<dom-module id="app-schedule">
+	<template>
+	<style include="shop-input iron-flex iron-flex-alignment colors-style font-style fix-tap-style">
+	:host {
+		display: block;
+	}
+
+	.day {
+		margin-bottom: var(--app-space);
+	}
+
+	.slice {
+		margin-bottom: 40px;
+	}
+	</style>
+
+	<div class="layout horizontal center day">
+		<span class="font-bold color-primary">[[data.day]]</span>
+		<paper-icon-button class="color-secondary" on-tap="_add" icon="add"></paper-icon-button>
+	</div>
+
+	<template is="dom-repeat" items="[[data.slices]]">
+
+		<div class="layout horizontal slice">
+			<shop-input>
+				<input type="text" pattern=".{2,}" required="" placeholder="De" value="{{item.start::input}}">
+				<shop-md-decorator error-message="Champs requis" aria-hidden="true">
+					<label>De</label>
+					<shop-underline></shop-underline>
+				</shop-md-decorator>
+			</shop-input>
+
+			<shop-input>
+				<input type="text" pattern=".{2,}" required="" placeholder="à" value="{{item.end::input}}">
+				<shop-md-decorator error-message="Champs requis" aria-hidden="true">
+					<label>à</label>
+					<shop-underline></shop-underline>
+				</shop-md-decorator>
+			</shop-input>
+			<div>
+				<paper-icon-button class="color-secondary" index="[[index]]" on-tap="_removeSlice" icon="close"></paper-icon-button>
+			</div>
+
+		</div>
+	</template>
+
+</template>
+<script>
+'use strict';
+Polymer({
+	is: 'app-schedule',
+
+	properties: {
+		data: Object,
+		day: String
+	},
+
+	_add: function() {
+		this.push('data.slices', {
+			start: '',
+			end: ''
+		})
+	},
+
+	_removeSlice: function(e) {
+		var index = Polymer.dom(e).rootTarget.index;
+		this.splice('data.slices', index, 1);
+	},
+
+	validate: function() {
+		var inputs = this.root.querySelectorAll('input');
+
+		for(var i = 0; i < inputs.length; i++) {
+			var input = inputs[i];
+			var ok = input.checkValidity();
+			if(ok) {
+				input.removeAttribute('aria-invalid');
+			} else {
+				input.setAttribute('aria-invalid', true);
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+});
+</script>
+</dom-module>

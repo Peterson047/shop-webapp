@@ -1,0 +1,125 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../bower_components/iron-icons/social-icons.html">
+
+<link rel="import" href="button.component.html">
+
+<link rel="import" href="../behaviors/modal-control.behavior.html">
+<link rel="import" href="../styles/tile.style.html">
+
+
+<dom-module id="force-sign-in">
+	<template>
+	<style include="tile-style">
+	:host {
+		display: block;
+	}
+
+	iron-icon {
+		color: var(--app-accent-color);
+		height: 200px;
+		width: 200px;
+	}
+
+	.title {
+		color: var(--app-accent-color);
+		font-size: 18px;
+	}
+
+	#container {
+		margin-top: var(--app-space);
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+	}
+
+	.item {
+		width: 100%;
+		box-sizing: border-box;
+		max-width: 350px;
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;;
+		align-items: center;
+	}
+
+	.item > .title {
+		color: var(--app-primary-color);
+	}
+
+	.separator {
+		width: 90%;
+		height: 1px;
+		margin: var(--app-space) 0 var(--app-space) 0;
+		background-color: var(--app-light-grey);
+	}
+
+	app-button {
+		color: var(--app-white);
+		background-color: var(--app-validation-color);
+		width: 100%;
+	}
+
+	@media (min-width: 740px) {
+		#container {
+			flex-direction: row;
+			justify-content: space-around;
+		}
+
+		.item {
+			width: 45%;
+		}
+
+		.separator {
+			width: 1px;
+			height: 270px;
+			background-color: var(--app-light-grey);
+			margin: 0;
+		}
+	}
+
+	</style>
+
+	<div class="keepMinimalSpace">
+
+		<div class="tile">
+
+			<div class="title">Vous devez être connecté pour pouvoir finaliser votre commande.</div>
+
+			<div id="container">
+
+
+				<div class="item">
+					<div class="title">Déjà inscrit ?</div>
+					<iron-icon icon="social:person"></iron-icon>
+					<app-button online="[[online]]" disabled$="[[!online]]" raised modal="sign-in-modal" on-tap="_openModal">Se connecter</app-button>
+				</div>
+
+				<div class="separator"></div>
+
+				<div class="item">
+					<div class="title">Pas de compte ?</div>
+					<iron-icon icon="social:person-add"></iron-icon>
+					<app-button online="[[online]]" disabled$="[[!online]]" raised modal="sign-up-modal" on-tap="_openModal">Créer son compte</app-button>
+				</div>
+			</div>
+		</div>
+
+	</div>
+
+</template>
+<script>
+'use strict';
+Polymer({
+	is: 'force-sign-in',
+
+	behaviors: [window.ModalControlBehavior],
+
+	_openModal: function(e) {
+		var modal = Polymer.dom(e).rootTarget.getAttribute('modal');
+		this.showModal(modal);
+	}
+
+});
+</script>
+</dom-module>

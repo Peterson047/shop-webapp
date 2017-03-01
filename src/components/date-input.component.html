@@ -1,0 +1,326 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../behaviors/complex-input.behavior.html">
+<link rel="import" href="../behaviors/tabindex.behavior.html">
+<link rel="import" href="../styles/shop-input.style.html">
+<link rel="import" href="../styles/form.style.html">
+
+<dom-module id="date-input">
+	<template>
+	<style include="shop-input form-style">
+
+	:host {
+		display: block;
+	}
+
+	.spacer {
+		flex: 0 !important;
+		height: 36px;
+		display: flex;
+		align-items: flex-end;
+	}
+
+	input {
+		background-color: var(--input-background, --app-white) !important;
+		color: var(--label-color, --app-input-color) !important;
+	}
+
+	label {
+		color: var(--label-color, --app-label-color) !important;
+	}
+
+	.row {
+		margin-bottom: 0 !important;
+	}
+
+	</style>
+	<form class="no-padding">
+		<label class="outsideLabel space">[[label]]</label>
+		<div class="row input-row">
+			<template is="dom-if" if="[[!disableDay]]">
+				<shop-input>
+					<input tabable autocomplete$="[[dayAutocomplete]]" type="number" maxlength="2" size="2" id="day" placeholder="jour" required="" value="{{data.day::input}}">
+					<shop-md-decorator error-message="" aria-hidden="true">
+						<label>Jour</label>
+						<shop-underline></shop-underline>
+					</shop-md-decorator>
+				</shop-input>
+				<div class="spacer">/</div>
+			</template>
+
+			<shop-input>
+				<input tabable type="number" autocomplete$="[[monthAutocomplete]]" id="month" maxlength="2" size="2" placeholder="mois" required="" value="{{data.month::input}}">
+				<shop-md-decorator error-message="" aria-hidden="true">
+					<label>Mois</label>
+					<shop-underline></shop-underline>
+				</shop-md-decorator>
+			</shop-input>
+			<div class="spacer">/</div>
+			<shop-input>
+				<input tabable type="number" autocomplete$="[[yearAutocomplete]]" id="year" maxlength="4" size="4" placeholder="année" required="" value="{{data.year::input}}">
+				<shop-md-decorator error-message="" aria-hidden="true">
+					<label>Année</label>
+					<shop-underline></shop-underline>
+				</shop-md-decorator>
+			</shop-input>
+		</div>
+	</form>
+
+</template>
+<script>
+Polymer({
+	is: 'date-input',
+	properties: {
+		isReady: {
+			type: Boolean,
+			value: false
+		},
+		label: String,
+		timestamp: {
+			type: Number,
+			observer: '_timestampChanged'
+		},
+		disableDay: {
+			type: Boolean,
+			value: false
+		},
+		futureOnly: {
+			type: Boolean,
+			value: false
+		},
+		gt: {
+			type: Object,
+			value: null
+		},
+		lt: {
+			type: Object,
+			value: null
+		},
+		date: {
+			type: String,
+			observer: '_reflectDate'
+		},
+		dayAutocomplete: {
+			type: String,
+			value: 'off'
+		},
+		monthAutocomplete: {
+			type: String,
+			value: 'off'
+		},
+		yearAutocomplete:{
+			type: String,
+			value: 'off'
+		},
+	},
+	behaviors: [window.ComplexInputBehavior, window.TabindexBehavior],
+	attached: function() {
+		this.isReady = true;
+	},
+
+	_timestampChanged: function(timestamp) {
+		this.data = this._timestampToJson(timestamp);
+	},
+
+	_daysInMonth: function(year, month){
+		var d = new Date(year, month, 0);
+		return d.getDate();
+	},
+	_prefixZero: function(val) {
+		if(parseInt(val) < 10 && val[0] !== "0") return "0"+val;
+		else return val;
+	},
+	_checkVal: function(val) {
+		return val !== null && typeof val !== 'undefined' && val.trim() !== '';
+	},
+	_isNumber: function(val) {
+		return !isNaN(val);
+	},
+	_setError: function(el, err) {
+		var invalid = err !== null;
+		el.parentNode.querySelector('shop-md-decorator').setAttribute('error-message', err);
+		el.setAttribute('aria-invalid', invalid);
+		var str = err !== null ? "Invalid field." : "";
+		el.setCustomValidity(str);
+		if(invalid) el.focus();
+	},
+	focus: function() {
+		if(this.disableDay) this.$.month.focus();
+		else this.$$('#day').focus();
+	},
+	_reflectDate: function(newVal) {
+		var parts = newVal.split('/');
+		if(!this.disableDay) this.data.day = parts[0];
+		this.data.month = parts[1];
+		this.data.year = parts[2];
+	},
+	_checkDayExists: function() {
+		if(this._checkVal(this.data.month) && this._checkVal(this.data.year)) {
+			var limit = this._daysInMonth(this.data.year, this.data.month);
+			return this.data.day > 0 && this.data.day <= limit;
+		} else return (this.data.day > 0 && this.data.day <= 31);
+	},
+	_checkDay: function() {
+		if(!this.isReady) return;
+		if(!this.disableDay) {
+			var el = this.$$('#day');
+			if(!this._checkVal(this.data.day)) {
+				this._setError(el, 'Jour requis');
+				return false;
+			}
+			if(!this._isNumber(this.data.day)) {
+				this._setError(el, 'Le jour doit être un chiffre');
+				return false;
+			}
+			if(!this._checkDayExists()) {
+				this._setError(el, "Ce jour n'existe pas dans ce mois");
+				return false
+			}
+			this._setError(el, null);
+			this._checkFuture();
+			return true;
+		} else return true;
+	},
+	_checkMonth: function() {
+		if(!this.isReady) return;
+		if(!this._checkVal(this.data.month)) {
+			this._setError(this.$.month, 'Mois requis');
+			return false;
+		}
+		if(!this._isNumber(this.data.month)) {
+			this._setError(this.$.month, 'Le mois doit être un chiffre');
+			return false;
+		}
+		var numericMonth = parseInt(this.data.month);
+		if( numericMonth > 12 || numericMonth < 1) {
+			this._setError(this.$.month, "Mois non valide");
+			return false;
+		}
+		this._setError(this.$.month, null);
+		this._checkFuture();
+		return true;
+	},
+	_checkYear: function() {
+		if(!this.isReady) return;
+		if(!this._checkVal(this.data.year)) {
+			this._setError(this.$.year, 'Année requise');
+			return false;
+		}
+		if(!this._isNumber(this.data.year)) {
+			this._setError(this.$.year, "L'année doit être un chiffre");
+			return false;
+		}
+		this._setError(this.$.year, null);
+		this._checkFuture();
+		return true;
+	},
+	_checkFuture: function() {
+		if(!this.isReady) return;
+		if(this.futureOnly) {
+
+			try {
+				var now = new Date();
+				var nowTS = now.getTime();
+
+				var currentYear = parseInt(now.getFullYear());
+				var currentMonth = parseInt(now.getMonth());
+				var currentDay = parseInt(now.getDate());
+
+				var dataDay = (this.disableDay) ? '01' : this._prefixZero(this.data.day);
+				var checkTS = new Date(this.data.year, parseInt(this.data.month) -1, dataDay).getTime();
+
+				if(nowTS > checkTS) {
+					if(currentYear > this.data.year) {
+						this._setError(this.$.year, "L'année est passée");
+						return false;
+					} else if(currentMonth + 1 > this.data.month) {
+						this._setError(this.$.month, "Le mois est passé");
+						return false;
+					} else if(currentDay > dataDay ) {
+						this._setError(this.$$('#day'), "Le jour est passé");
+						return false;
+					}
+				}
+				else {
+					return true;
+				}
+			} catch(err) {
+				return false;
+			}
+
+
+		} else return true;
+	},
+
+	_jsonToTimestamp: function(json) {
+		if(this.disableDay) {
+			return new Date(json.year, parseInt(json.month) -1).getTime();
+		} else {
+			return new Date(json.year, parseInt(json.month) -1, json.day).getTime();
+		}
+	},
+
+	_timestampToJson: function(timestamp) {
+		var date = new Date(timestamp);
+		return {
+			year: parseInt(date.getFullYear()),
+			month: parseInt(date.getMonth()),
+			day: parseInt(date.getDate())
+		}
+	},
+
+	_checkMagnitude: function(type) {
+		if(!this.isReady) return;
+		if(!this[type]) return true;
+
+		var toCheck = this._jsonToTimestamp(this.data);
+
+		if( ( type === 'lt' && this[type] < toCheck ) || ( type === 'gt' && this[type] > toCheck ) ) {
+			this._setError(this.$.year, "");
+			this._setError(this.$.month, "");
+			if(!this.disableDay) this._setError(this.$$('#day'), "");
+			return false;
+		} else return true;
+	},
+
+	_checkDate: function() {
+		return this._checkDay() && this._checkMonth() && this._checkYear() && this._checkFuture() && this._checkMagnitude('gt') && this._checkMagnitude('lt');
+	},
+	_changeHook: function(change) {
+		var splitted = change.path.split('.');
+		if(splitted.length < 2) return;
+		switch (splitted[1]) {
+			case 'day':
+			this._checkDay();
+			break;
+			case 'month':
+			this._checkMonth();
+			break;
+			case 'year':
+			this._checkYear();
+			break;
+		}
+	},
+	reset: function() {
+		if(!this.disableDay) {
+			var dayEl = this.$$('#day');
+			dayEl.value = '';
+			this._setError(dayEl, null);
+		}
+		this.$.month.value = '';
+		this._setError(this.$.month, null);
+		this.$.year.value = '';
+		this._setError(this.$.year, null);
+		this.data = {};
+	},
+
+	_transformData: function(data) {
+		return this._jsonToTimestamp(data);
+	},
+
+	validate: function() {
+		if(this.value === null) this.value = {};
+		return this._checkDate();
+	}
+});
+</script>
+</dom-module>

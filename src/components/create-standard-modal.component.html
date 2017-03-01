@@ -1,0 +1,128 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../bower_components/iron-form/iron-form.html">
+<link rel="import" href="../../bower_components/paper-input/paper-textarea.html">
+<link rel="import" href="../../bower_components/paper-material/paper-material.html">
+
+<link rel="import" href="./button.component.html">
+<link rel="import" href="./loading-layer.component.html">
+
+<link rel="import" href="../behaviors/modal.behavior.html">
+<link rel="import" href="../behaviors/form.behavior.html">
+<link rel="import" href="../behaviors/toaster-control.behavior.html">
+
+<link rel="import" href="../styles/form.style.html">
+<link rel="import" href="../styles/modal.style.html">
+<link rel="import" href="../styles/shop-input.style.html">
+<link rel="import" href="../styles/shop-select.style.html">
+
+
+<dom-module id="create-standard-modal">
+      <template>
+      <style include="modal-style form-style shop-input shop-select">
+      :host {
+            display: block;
+      }
+
+      app-button {
+            color: var(--app-white);
+            background-color: var(--app-validation-color);
+      }
+
+      </style>
+
+      <paper-material id="container" tabable-container>
+            <div id="content">
+                  <paper-icon-button tabable id="close" on-tap="hide" icon="close"></paper-icon-button>
+                  <div id="title">Créer un standard</div>
+                  <form is="iron-form" id="form">
+                        <div class="row input-row">
+                              <shop-input>
+                                    <input tabable id="name" type="text" name="name" pattern=".{3,}" required="" placeholder="Nom du produit">
+                                    <shop-md-decorator error-message="Champs requis" aria-hidden="true">
+                                          <label for="name">Nom du standard</label>
+                                          <shop-underline></shop-underline>
+                                    </shop-md-decorator>
+                              </shop-input>
+                        </div>
+
+                        <div class="row input-row">
+
+                              <shop-input>
+                                    <input tabable id="value" type="number" min="1" name="value" required="" placeholder="Poids">
+                                    <shop-md-decorator error-message="Champs requis" aria-hidden="true">
+                                          <label for="value">Poids</label>
+                                          <shop-underline></shop-underline>
+                                    </shop-md-decorator>
+                              </shop-input>
+
+                              <div class="column">
+                                    <label class="outsideLabel" for="ccExpMonth">Unité</label>
+                                    <shop-select>
+                                          <select tabable id="unit" name="unit" required="">
+                                                <option selected value="grammes">grammes</option>
+                                          </select>
+                                          <shop-md-decorator aria-hidden="true">
+                                                <shop-underline></shop-underline>
+                                          </shop-md-decorator>
+                                    </shop-select>
+                              </div>
+                        </div>
+
+                        <div class="row input-row">
+                              <paper-textarea max-rows="3" error-message="Champs requis" auto-validate name="description" label="Description" required=""></paper-textarea>
+                        </div>
+
+                        <div id="buttons">
+                              <app-button icon="add" raised tabable on-tap="_submit">Créer</app-button>
+                        </div>
+                  </form>
+                  <div class="filler"></div>
+            </div>
+            <loading-layer show="[[loading]]"></loading-layer>
+      </paper-material>
+
+</template>
+<script>
+Polymer({
+      is: 'create-standard-modal',
+      behaviors: [window.ModalBehavior, window.FormBehavior, window.ToasterControlBehavior],
+
+      focus: function() {
+            this.$.name.focus();
+      },
+
+      _submit: function() {
+            var ok = this.validateForm();
+            if(ok) {
+                  var _this = this;
+                  var data = this.$.form.serialize();
+                  var key = firebase.database().ref().child('standards').push().key;
+                  var updates = {};
+                  updates['/standards/' + key] = data;
+                  this.loading = true;
+                  return firebase.database().ref().update(updates)
+                  .then(function(){
+                        _this.showToaster({
+                              text: 'Standard créé',
+                              state: true,
+                              actions: []
+                        })
+                        _this.hide(true);
+                        _this.$.form.reset();
+                  })
+                  .catch(function(err) {
+                        _this.showToaster({
+                              text: err,
+                              state: false,
+                              actions: []
+                        })
+                        _this.hide(true);
+                  })
+            }
+      }
+
+
+});
+</script>
+</dom-module>

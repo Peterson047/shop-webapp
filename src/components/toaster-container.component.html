@@ -1,0 +1,133 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="toaster.component.html">
+
+<dom-module id="toaster-container">
+	<template>
+	<style>
+	:host {
+		display: flex;
+		flex-direction: column-reverse;
+		pointer-events: none;
+		position: fixed;
+		top: var(--app-space);
+		bottom: var(--app-space);
+		left: var(--app-space);
+		right: var(--app-space);
+		z-index: 13
+	}
+
+	:host > ::content > app-toaster:not(:first-of-type), app-toaster:not(:first-of-type) {
+		margin-bottom: var(--app-space);
+	}
+
+	</style>
+
+	<content id="content"></content>
+
+</template>
+<script>
+Polymer({
+	is: 'toaster-container',
+
+	properties: {
+		max: {
+			type: Number,
+			value: 3
+		},
+		toasters: {
+			type: Array,
+			value: []
+		},
+		removeQueue: {
+			type: Array,
+			value: []
+		},
+		addQueue: {
+			type: Array,
+			value: []
+		},
+		removing: {
+			type: Boolean,
+			value: false
+		}
+	},
+
+	_instanciateToaster: function(data) {
+		var toaster = document.createElement('app-toaster');
+		toaster.addEventListener('remove', this._remove.bind(this));
+		toaster.data = data;
+		return toaster;
+	},
+
+	add: function(toaster) {
+		if((this.toasters.length >= this.max || this.removing) && !~this.addQueue.indexOf(toaster)) {
+			this.addQueue.push(toaster);
+			if(!this.removeQueue.length && !this.removing) this.toasters[0].remove();
+		} else {
+			this.toasters.push(this._instanciateToaster(toaster));
+			var container = Polymer.Settings.useNativeShadow ? Polymer.dom(this.$.content) : this;
+			container.appendChild(this.toasters[this.toasters.length - 1]);
+			if(this.addQueue.length) this.add(this.addQueue.shift());
+		}
+	},
+
+	_remove: function(e) {
+		e.stopPropagation();
+		if(this.removing) {
+			if(!~this.removeQueue.indexOf(e)) this.removeQueue.push(e)
+		} else {
+			this.removing = true;
+
+			var target = Polymer.dom(e).rootTarget;
+			var index = this.toasters.indexOf(target);
+			var above = this.toasters.slice(index+1);
+
+			this.removeTransitionEventDebouncer = 0;
+
+			target.addEventListener('transitionend', this._repositionAboveToasters.bind(this, target, index, above));
+			target.classList.add('remove');
+		}
+
+	},
+
+	_repositionAboveToasters: function(target, index, above, e) {
+		e.stopPropagation();
+		if(this.removeTransitionEventDebouncer > 0) return;
+		this.removeTransitionEventDebouncer++;
+		var targetHeight = target.getBoundingClientRect().height;
+		if(above.length) {
+			this.onRepositionedCb = this._onAboveToastersRepositioned.bind(this, target, index, above);
+			above[0].addEventListener('transitionend', this.onRepositionedCb);
+			above.forEach(function(toaster) {
+				toaster.classList.add('transition');
+				toaster.style.transform = 'translateY('+(targetHeight+ 20)+'px)';
+			})
+		} else this._removeFromDom(target,index, above);
+	},
+
+	_onAboveToastersRepositioned: function(target, index, above, e) {
+		e.stopPropagation();
+		above[0].removeEventListener('transitionend', this.onRepositionedCb);
+		this._removeFromDom(target, index, above);
+	},
+
+	_removeFromDom: function(target, index, above) {
+		var container = Polymer.Settings.useNativeShadow ? Polymer.dom(this.$.content) : this;
+		container.removeChild(target);
+		this.toasters.splice(index, 1);
+		if(above.length) {
+			above.forEach(function(toaster) {
+				toaster.classList.remove('transition');
+				toaster.style.transform = 'none';
+			})
+		}
+		Polymer.RenderStatus.afterNextRender(this, function() {
+			this.removing = false;
+			if(this.addQueue.length && !this.removeQueue.length) this.add(this.addQueue.shift());
+			if(this.removeQueue.length) this._remove(this.removeQueue.shift());
+		})
+	},
+});
+</script>
+</dom-module>

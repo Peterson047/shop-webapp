@@ -1,0 +1,55 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../components/product-form.component.html">
+<link rel="import" href="../components/section.component.html">
+
+<link rel="import" href="../behaviors/page.behavior.html">
+
+<link rel="import" href="../styles/page.style.html">
+
+<dom-module id="product-form-view">
+  <template>
+  <style include="page-style">
+  :host {
+    display: block;
+  }
+  </style>
+
+  <app-section back="true" main-background="--app-section-header-background-color" fill-background="--app-section-fill-color">
+    <product-form id-product="[[idProduct]]" user="[[user]]" app-data="[[appData]]"></product-form>
+  </app-section>
+
+  </template>
+  <script>
+  Polymer({
+    is: 'product-form-view',
+
+    properties: {
+      idProduct : {
+        type: String,
+        value: null,
+      },
+
+      pageData: {
+        type: Object,
+        value: {
+          category: "Produit",
+          topic: null,
+        }
+      },
+
+      user: Object,
+      appData: Object,
+    },
+
+    behaviors: [window.PageBehavior],
+
+    _onSelected: function () {
+      if(!this.user || this.user.role !== 'admin') this.goTo('/');
+      // change item
+      this.idProduct = this.route.path.slice(1);
+    },
+
+  });
+  </script>
+</dom-module>

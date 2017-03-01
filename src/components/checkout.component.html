@@ -1,0 +1,213 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-form/iron-form.html">
+
+<link rel="import" href="../../bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../../bower_components/iron-icons/maps-icons.html">
+<link rel="import" href="../behaviors/form.behavior.html">
+<link rel="import" href="../behaviors/cart.behavior.html">
+<link rel="import" href="../behaviors/toaster-control.behavior.html">
+<link rel="import" href="../behaviors/navigation.behavior.html">
+
+<link rel="import" href="button.component.html">
+<link rel="import" href="dashed-title.component.html">
+<link rel="import" href="loading-layer.component.html">
+<link rel="import" href="cart-recap.component.html">
+<link rel="import" href="notification-registerer.component.html">
+<link rel="import" href="address-input.component.html">
+<link rel="import" href="payment-input.component.html">
+<link rel="import" href="credit-card-input.component.html">
+<link rel="import" href="api-call.component.html">
+
+<link rel="import" href="../styles/form.style.html">
+<link rel="import" href="../styles/tile.style.html">
+
+<dom-module id="app-checkout">
+      <template>
+      <style include="form-style tile-style">
+      :host {
+            display: block;
+            min-height: calc(100vh - 443px);
+      }
+
+      #container {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            margin-bottom: var(--app-space);
+      }
+
+      cart-recap {
+            margin-top: var(--app-space);
+      }
+
+      .column {
+            width: 100%;
+      }
+
+      #submit {
+            margin-top: auto;
+            background-color: var(--app-validation-color);
+            color: var(--app-white);
+      }
+
+      @media (min-width: 840px) {
+            #container {
+                  flex-direction: row;
+            }
+
+            .column {
+                  width: calc(50% - var(--app-space));
+            }
+      }
+
+      </style>
+
+      <api-call id="placeCall" uri="[[appData.backend]]/order/place" method="POST" on-response="_handleResponse"></api-call>
+
+      <notification-registerer id="notif" backend="[[appData.backend]]" user="[[user]]"></notification-registerer>
+
+      <form class="tile keepMinimalSpace" id="form" is="iron-form">
+            <loading-layer show="[[loading]]"></loading-layer>
+            <div id="container">
+                  <div class="column">
+
+                        <div class="row">
+                              <dashed-title icon="maps:place">Adresse de livraison</dashed-title>
+                        </div>
+                        <address-input name="shippingAddress"></address-input>
+
+                        <div class="row">
+                              <paper-checkbox checked="{{billingAddress}}">Utiliser une adresse de facturation</paper-checkbox>
+                        </div>
+
+                        <template is="dom-if" if="[[billingAddress]]">
+                              <div class="row">
+                                    <dashed-title icon="maps:place">Adresse de facturation</dashed-title>
+                              </div>
+                              <address-input disabled="[[!billingAddress]]" name="billingAddress"></address-input>
+                        </template>
+                  </div>
+
+                  <div class="column">
+                        <div class="row">
+                              <dashed-title icon="payment">Paiement</dashed-title>
+                        </div>
+
+                        <template is="dom-if" if="[[displayCc]]">
+                              <credit-card-input name="ccInfos" disabled="[[!displayCc]]"></credit-card-input>
+                        </template>
+
+                        <div class="row">
+                              <payment-input display-cc="{{displayCc}}" method="{{paymentMethod}}"></payment-input>
+                        </div>
+
+                        <dashed-title icon="shopping-basket">Récapitulatif</dashed-title>
+                        <cart-recap cart="[[cart]]"></cart-recap>
+                  </div>
+            </div>
+            <app-button online="[[online]]" disabled$="[[!online]]" raised id="submit" icon="check" on-tap="_submit">Passer la commande</app-button>
+      </form>
+
+</template>
+<script>
+'use strict';
+Polymer({
+      is: 'app-checkout',
+
+      behaviors: [window.FormBehavior, window.CartBehavior, window.ToasterControlBehavior, window.NavigationBehavior],
+      properties: {
+            loading: {
+                  type: Boolean,
+                  value: false
+            },
+            user: Object,
+            appData: Object,
+            selected: {
+                  type: Boolean,
+                  value: false
+            },
+      },
+
+      _checkUserEmail: function() {
+            if(!this.user.emailVerified) {
+
+                  var _this = this;
+                  var send = function() {
+                        firebase.auth().currentUser.sendEmailVerification().then(function() {
+                              _this.showToaster({
+                                    text: 'Email de confirmation envoyé',
+                                    state: true,
+                                    actions: []
+                              });
+                        }, function(err) {
+                              _this.showToaster({
+                                    text: "Erreur lors de l'envoi de l'email de confirmation",
+                                    state: false,
+                                    actions: []
+                              });
+                        });
+                  };
+
+                  this.showToaster({
+                        text: "L'adresse email "+this.user.email+" n'est pas vérifiée.",
+                        state: false,
+                        actions: [
+                              {
+                                    text: "Changer mon email",
+                                    icon: "mail",
+                                    fn: this.goTo.bind(this, '/user/infos')
+                              },
+                              {
+                                    text: "Renvoyer un email de confirmation",
+                                    icon: "send",
+                                    fn: send
+                              }
+                        ]
+                  });
+
+                  return false;
+            } else return true;
+      },
+
+      _submit: function() {
+            var ok = this.validateForm();
+            if(!this._checkUserEmail()) return;
+            if(ok && this.user) {
+                  var data = this.$.form.serialize();
+                  data.cart = this.cart;
+                  this.loading = true;
+                  this.$.placeCall.request(data);
+            }
+      },
+
+      _handleResponse: function(callRes) {
+            var response = callRes.detail;
+            if(response.success) {
+                  this.showToaster({
+                        text: 'Commande créee',
+                        state: true,
+                        actions: []
+                  });
+
+                  var data = response.data;
+                  if ('goto' == data.type) {
+                        this.clearCart();
+                        this.goTo(data.link);
+                        this.loading = false;
+                  }
+                  else {
+                        window.location.replace(data.link);
+                  }
+            } else {
+                  this.loading = false;
+                  this.showToaster({
+                        text: response.error,
+                        state: false,
+                        actions: []
+                  })
+            }
+      },
+
+});
+</script>
+</dom-module>

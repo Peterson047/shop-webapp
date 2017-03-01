@@ -1,0 +1,15 @@
+# Modules & libs
+bower_components/
+node_modules/
+
+# Build & tools generations
+build/
+
+# Logs & stuff
+npm-debug.log
+
+# OS generated files
+.DS_Store
+ehthumbs.db
+Icon?
+Thumbs.db

@@ -1,0 +1,122 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/polymerfire/polymerfire.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+
+<link rel="import" href="price-input.component.html">
+
+<link rel="import" href="../behaviors/data-pipe.behavior.html">
+
+<link rel="import" href="../styles/shop-input.style.html">
+<link rel="import" href="../styles/shop-select.style.html">
+<link rel="import" href="../styles/form.style.html">
+<link rel="import" href="../styles/colors.style.html">
+
+<dom-module id="standard-selector">
+      <template>
+      <style include="form-style shop-input shop-select colors-style">
+      :host {
+            display: block;
+      }
+
+      .one-liner {
+            display: flex;
+      }
+
+      .one-liner > .row {
+            flex-grow: 1;
+      }
+
+      .one-liner > paper-icon-button {
+            height: 76px;
+            margin-left: var(--app-space);
+      }
+      </style>
+
+      <div class="one-liner">
+            <div class="row input-row">
+                  <price-input value="{{value.price}}" id="price" data="[[value.price]]" label="Prix unitaire (€)"></price-input>
+
+                  <div class="column">
+                        <label for="standards" class="outsideLabel">Standard</label>
+                        <shop-select>
+                              <select id="standards" required="" aria-label="Type d'unité" value="{{value.std::change}}">
+                                    <template is="dom-repeat" id="standardsTemplate" items="[[listStd]]" as="oneStd">
+                                          <option selected$="[[(value.std == oneStd.key) || (index === 0)]]" value="[[oneStd.$key]]">[[oneStd.name]] - [[oneStd.value]] [[oneStd.unit]]</option>
+                                    </template>
+                              </select>
+                              <shop-md-decorator error-message="Champs requis" aria-hidden="true">
+                                    <shop-underline></shop-underline>
+                              </shop-md-decorator>
+                        </shop-select>
+                  </div>
+            </div>
+
+            <paper-icon-button class="color-action" icon="close" on-tap="_removeMe"></paper-icon-button>
+      </div>
+
+</template>
+<script>
+'use strict';
+Polymer({
+      is: 'standard-selector',
+
+      properties: {
+            index: Number,
+
+            value: {
+                  type: Object
+            },
+
+            standards: {
+                  type: Object,
+                  value: {},
+                  observer: '_onStdChanges',
+            },
+
+            listStd: {
+                  type: Array,
+                  value: [],
+            },
+
+      },
+
+      behaviors: [window.DataPipeBehavior],
+
+      observers: [
+            '_onValueChange(value.*)',
+      ],
+
+      attached: function() {
+            this._setDefaultStandard();
+            this.$.standardsTemplate.addEventListener("dom-change", this._setDefaultStandard.bind(this));
+      },
+
+      _setDefaultStandard: function() {
+            if(!this.listStd.length) return;
+            this.$.standards.value = this.value.std || this.listStd[0].$key;
+            this.set('value.std', this.value.std || this.listStd[0].$key);
+      },
+
+      _onStdChanges: function (newStds) {
+            this.set('listStd', this.toArray(newStds));
+      },
+
+      _onValueChange: function (val) {
+            this.fire('update-standard-selector');
+      },
+
+      _removeMe: function () {
+            this.fire('remove-selector', this.index);
+      },
+
+      validate: function () {
+            var std = null !== this.value.std;
+            var price = this.$.price.validate();
+            return std && price;
+
+      },
+
+
+});
+</script>
+</dom-module>

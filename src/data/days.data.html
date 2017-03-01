@@ -1,0 +1,53 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="days-data">
+  <template>
+
+  </template>
+  <script>
+  Polymer({
+    is: 'days-data',
+
+    properties: {
+      days: {
+        type: Array,
+        notify: true,
+        value: ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']
+      },
+
+      json: {
+        type: Object,
+        observer: '_toArray'
+      },
+      
+      array: {
+        type: Array,
+        value: [],
+        notify: true
+      }
+    },
+
+    getDay: function(index) {
+      return this.days[index];
+    },
+
+    _toArray: function(newVal) {
+      var buffer = [];
+      for(var day in newVal) {
+        var index = this.days.indexOf(day);
+        newVal.day = day;
+        buffer[index] = newVal[day];
+      }
+      this.array = this._flattenArray(buffer);
+    },
+
+    _flattenArray: function(arr) {
+      var buffer = [];
+      for(var i = 0; i < arr.length; i++) {
+        if(arr[i]) buffer.push(arr[i]);
+      };
+      return buffer;
+    }
+  });
+  </script>
+</dom-module>

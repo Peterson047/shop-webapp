@@ -1,0 +1,106 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-form/iron-form.html">
+<link rel="import" href="../../bower_components/paper-material/paper-material.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+
+<link rel="import" href="./button.component.html">
+<link rel="import" href="./loading-layer.component.html">
+<link rel="import" href="./date-input.component.html">
+<link rel="import" href="./api-call.component.html">
+
+<link rel="import" href="../behaviors/modal.behavior.html">
+<link rel="import" href="../behaviors/toaster-control.behavior.html">
+<link rel="import" href="../behaviors/form.behavior.html">
+
+<link rel="import" href="../styles/modal.style.html">
+<link rel="import" href="../styles/form.style.html">
+<link rel="import" href="../styles/shop-input.style.html">
+
+<dom-module id="send-order-modal">
+	<template>
+	<style include="modal-style form-style shop-input">
+	:host {
+		display: block;
+	}
+
+	#form {
+		width: 100%;
+	}
+
+	app-button {
+		color: var(--app-white);
+		background-color: var(--app-validation-color);
+	}
+
+	</style>
+
+	<api-call id="sendCall" uri="[[appData.backend]]/order/send" method="PUT" on-response="_handleResponse"></api-call>
+
+	<paper-material id="container" tabable-container>
+		<div id="content">
+			<paper-icon-button tabable id="close" on-tap="hide" icon="close"></paper-icon-button>
+			<div id="title">Envoyer la commande</div>
+			<form is="iron-form" id="form">
+				<div class="input-row row">
+					<date-input id="date" tabable-container label="Date de livraison" future-only="true"  name="plannedDelivery"></date-input>
+				</div>
+				<div class="input-row row">
+					<shop-input>
+						<input tabable type="text" name="code" required="" placeholder="Code">
+						<shop-md-decorator error-message="Champs requis" aria-hidden="true">
+							<label>Code</label>
+							<shop-underline></shop-underline>
+						</shop-md-decorator>
+					</shop-input>
+				</div>
+				<div id="buttons">
+					<app-button raised icon="send" tabable on-tap="_submit">Envoyer</app-button>
+				</div>
+			</form>
+			<div class="filler"></div>
+		</div>
+		<loading-layer show="[[loading]]"></loading-layer>
+	</paper-material>
+
+</template>
+<script>
+'use strict';
+Polymer({
+	is: 'send-order-modal',
+	behaviors: [window.ModalBehavior, window.FormBehavior, window.ToasterControlBehavior],
+
+	focus: function() {
+		this.$.date.focus();
+	},
+
+	_submit: function() {
+		var ok = this.validateForm();
+		if(ok) {
+			this.loading = true;
+			var data = this.$.form.serialize();
+			data.orderId = this.params.orderId;
+			this.$.sendCall.request(data);
+		}
+	},
+
+	_handleResponse: function(response) {
+		var res = response.detail;
+		if(res.success) {
+			this.showToaster({
+				text: 'Commande envoyée',
+				state: true,
+				actions: []
+			});
+			this.hide(true);
+		} else {
+			this.showToaster({
+				text: res.error,
+				state: false,
+				actions: []
+			})
+		}
+	}
+
+});
+</script>
+</dom-module>

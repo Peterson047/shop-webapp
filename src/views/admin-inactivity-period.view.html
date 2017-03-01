@@ -1,0 +1,44 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../components/inactivity-period-list.component.html">
+
+<link rel="import" href="../behaviors/page.behavior.html">
+
+<dom-module id="inactivity-period-view">
+	<template>
+	<style>
+	:host {
+		display: block;
+	}
+	</style>
+
+	<inactivity-period-list id="target" online="[[online]]"></inactivity-period-list>
+
+	</template>
+	<script>
+	'use strict';
+	Polymer({
+		is: 'inactivity-period-view',
+
+		properties: {
+			pageData: {
+				type: Object,
+				value: {
+					category: "Périodes d'inactivité",
+					topic: null,
+					path: "inactivity-period"
+				}
+			},
+
+			user: Object,
+			appData: Object
+		},
+
+		behaviors: [window.PageBehavior],
+
+		_onSelected: function() {
+			this.fire('update-button', {icon: 'add'});
+		},
+	});
+	</script>
+</dom-module>

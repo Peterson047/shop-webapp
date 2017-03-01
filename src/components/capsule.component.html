@@ -1,0 +1,65 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+
+<dom-module id="app-capsule">
+	<template>
+
+	<style>
+
+	:host {
+
+	}
+
+	#container {
+		background-color: var(--capsule-background-color, var(--app-accent-color));
+		color: var(--capsule-color, var(--app-white));
+		position: relative;
+		flex-shrink: 1;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		margin: 0 4px 4px 0;
+		padding: 5px 8px;
+		border-radius: 3px;
+		font-weight: bold;
+	}
+
+	#container[removable] {
+		padding: 5px 0px 5px 8px !important;
+	}
+
+	paper-icon-button {
+		color: var(--app-white);
+		height: 35px;
+		width: 35px;
+	}
+
+	</style>
+
+	<div id="container" removable$="[[removable]]">
+		<content></content>
+		<template is="dom-if" if="[[removable]]">
+			<paper-icon-button tabindex="-1" on-tap="remove" icon="close"></paper-icon-button>
+		</template>
+	</div>
+
+</template>
+<script>
+'use strict';
+
+Polymer({
+	is: 'app-capsule',
+	properties: {
+		removable: {
+			type: Boolean,
+			value: false
+		},
+		index: Number
+	},
+
+	remove: function() {
+		this.fire('remove', {index: this.index});
+	}
+});
+</script>
+</dom-module>

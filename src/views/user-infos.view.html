@@ -1,0 +1,45 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../components/user-infos.component.html">
+
+<link rel="import" href="../behaviors/page.behavior.html">
+<link rel="import" href="../behaviors/navigation.behavior.html">
+
+<link rel="import" href="../styles/tile.style.html">
+
+<dom-module id="user-infos-view">
+	<template>
+	<style include="tile-style">
+	:host {
+		display: block;
+	}
+
+	.tile {
+		box-shadow: none;
+	}
+	</style>
+
+	<div class="tile keepMinimalSpace">
+		<user-infos backend="[[appData.backend]]" user="[[user]]"></user-infos>
+	</div>
+
+	</template>
+	<script>
+	Polymer({
+		is: 'user-infos-view',
+
+		properties: {
+			provider: String,
+			appData: Object,
+			user: Object
+		},
+
+		behaviors: [window.PageBehavior, window.NavigationBehavior],
+
+		_onSelected: function(){
+			if(this.provider !== 'password') this.goTo('/user');
+		},
+
+	});
+	</script>
+</dom-module>

@@ -1,0 +1,30 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../components/admin-schedules.component.html">
+
+<link rel="import" href="../behaviors/page.behavior.html">
+
+<dom-module id="admin-schedules-view">
+  <template>
+  <style>
+  :host {
+    display: block;
+  }
+  </style>
+
+  <admin-schedules online="[[online]]"></admin-schedules>
+
+  </template>
+  <script>
+  'use strict';
+  Polymer({
+    is: 'admin-schedules-view',
+
+    behaviors: [window.PageBehavior],
+
+    _onSelected: function() {
+      this.fire('hide-button');
+    },
+  });
+  </script>
+</dom-module>

@@ -1,0 +1,32 @@
+<link rel="import" href="../../bower_components/app-storage/app-network-status-behavior.html">
+
+<script>
+
+'use strict';
+
+window.PageBehaviorImpl = {
+
+	properties: {
+		disabled : {
+			type: Boolean,
+			value: true,
+		}
+
+	},
+	observers: [
+		'_selected(disabled)'
+	],
+
+	attached: function() {
+		this.fire('page-attached');
+	},
+
+	_selected: function(disabled) {
+		if(typeof this._onSelected === 'function' && !disabled) this._onSelected();
+		if(typeof this._onLeave === 'function' && disabled)  this._onLeave();
+	}
+}
+
+window.PageBehavior = [window.PageBehaviorImpl, Polymer.AppNetworkStatusBehavior];
+
+</script>

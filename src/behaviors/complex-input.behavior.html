@@ -1,0 +1,54 @@
+<link rel="import" href="../../bower_components/iron-validatable-behavior/iron-validatable-behavior.html">
+<link rel="import" href="../../bower_components/iron-form-element-behavior/iron-form-element-behavior.html">
+
+<script>
+
+'use strict';
+
+window.ComplexInputBehaviorImpl = {
+
+      properties: {
+            value: {
+                  type: Object,
+                  value: null,
+                  notify: true,
+                  observer: '_resetWatcher',
+            },
+
+            data: {
+                  type: Object,
+                  observer: '_dataWatcher'
+            }
+      },
+
+      observers: [
+            '_setValue(data.*)'
+      ],
+
+      ready: function(){
+            this.data = {};
+      },
+
+      _setValue: function(newVal) {
+            var _this = this;
+            this.async(function(){
+                  if(Object.keys(newVal.base).length) {
+                        if(typeof _this._transformData === 'function') _this.value = _this._transformData(_this.data);
+                        else _this.value = _this.data;
+
+                        if(typeof _this._changeHook === 'function') _this._changeHook(newVal);
+                  }
+            })
+      },
+
+      _resetWatcher: function(newVal, oldVal) {
+            if(newVal === null && typeof oldVal !== 'undefined') this.reset();
+      },
+
+      _dataWatcher: function(newVal, oldVal){
+            if(typeof newVal !== 'object') this.data = {}
+      }
+}
+
+window.ComplexInputBehavior = [window.ComplexInputBehaviorImpl, Polymer.IronFormElementBehavior, Polymer.IronValidatableBehavior];
+</script>

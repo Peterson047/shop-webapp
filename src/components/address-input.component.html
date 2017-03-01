@@ -1,0 +1,103 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../behaviors/complex-input.behavior.html">
+<link rel="import" href="../data/ship-countries.data.html">
+<link rel="import" href="../styles/shop-input.style.html">
+<link rel="import" href="../styles/shop-select.style.html">
+<link rel="import" href="../styles/form.style.html">
+
+<dom-module id="address-input">
+	<template>
+	<style include="shop-input shop-select form-style">
+	:host {
+		display: block;
+	}
+	</style>
+
+	<ship-countries-data countries="{{countries}}"></ship-countries-data>
+
+	<form class="no-padding">
+		<div class="row input-row">
+			<shop-input>
+				<input type="text" tabable id="streetAddress" pattern=".{5,}" required="true" placeholder="Adresse" autocomplete="street-address" value="{{data.streetAddress::input}}" aria-labelledby="billAddressLabel billAddressHeading">
+				<shop-md-decorator error-message="Adresse invalide" aria-hidden="true">
+					<label id="billAddressLabel">Adresse</label>
+					<shop-underline></shop-underline>
+				</shop-md-decorator>
+			</shop-input>
+		</div>
+		<div class="row input-row">
+			<shop-input>
+				<input type="text" tabable id="city" pattern=".{2,}" placeholder="Ville" required="true" autocomplete="address-level2" value="{{data.city::input}}" aria-labelledby="billCityLabel billAddressHeading">
+				<shop-md-decorator error-message="Ville invalide" aria-hidden="true">
+					<label id="billCityLabel">Ville</label>
+					<shop-underline></shop-underline>
+				</shop-md-decorator>
+			</shop-input>
+		</div>
+		<div class="row input-row">
+			<div class="column">
+				<label class="outsideLabel">Pays</label>
+				<shop-select>
+					<select id="country" tabable autocomplete="country" required="true" value="{{data.country::change}}" aria-labelledby="billCountryLabel billAddressHeading">
+						<template is="dom-repeat" id="countriesTemplate" items="[[countries]]" as="country">
+							<option selected$="[[!index]]" value="[[country]]">[[country]]</option>
+						</template>
+					</select>
+					<shop-md-decorator aria-hidden="true">
+						<shop-underline></shop-underline>
+					</shop-md-decorator>
+				</shop-select>
+			</div>
+			<shop-input>
+				<input type="text" tabable id="zip" pattern=".{4,}" required="true" placeholder="Code postal" value="{{data.zip::input}}" autocomplete="postal-code" aria-labelledby="billZipLabel billAddressHeading">
+				<shop-md-decorator error-message="Code postal invalide" aria-hidden="true">
+					<label id="billZipLabel">Code postal</label>
+					<shop-underline></shop-underline>
+				</shop-md-decorator>
+			</shop-input>
+		</div>
+	</form>
+</template>
+<script>
+Polymer({
+	is: 'address-input',
+	behaviors: [window.ComplexInputBehavior],
+	attached: function() {
+		this._setDefaultCountry();
+		this.$.countriesTemplate.addEventListener("dom-change", this._setDefaultCountry.bind(this))
+	},
+
+	_setDefaultCountry: function() {
+		this.preventValidation = true;
+		this.$.country.value = this.data.country || this.countries[0];
+		this.set('data.country', this.data.country || this.countries[0]);
+	},
+
+	focus: function() {
+		this.$.streetAddress.focus();
+	},
+	_setAriaInvalid: function(billAddress, billCity, billZip) {
+		this.$.streetAddress.setAttribute('aria-invalid', billAddress);
+		this.$.city.setAttribute('aria-invalid', billCity);
+		this.$.zip.setAttribute('aria-invalid', billZip);
+	},
+
+	reset: function() {
+		this.$.streetAddress.value = "";
+		this.$.city.value = "";
+		this.$.zip.value = "";
+		this.$.country.value = this.countries[0];
+		this._setAriaInvalid(false, false, false);
+	},
+	validate: function() {
+
+		var billAddressValid = this.$.streetAddress.checkValidity();
+		var billCityValid = this.$.city.checkValidity();
+		var billZipValid = this.$.zip.checkValidity();
+		this._setAriaInvalid(!billAddressValid, !billCityValid, !billZipValid);
+		if(this.value === null) this.value = {};
+		return billAddressValid && billCityValid && billZipValid;
+	}
+});
+</script>
+</dom-module>

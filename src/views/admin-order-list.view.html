@@ -1,0 +1,43 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../components/admin-order-list.component.html">
+
+<link rel="import" href="../behaviors/page.behavior.html">
+
+<dom-module id="admin-order-list-view">
+  <template>
+  <style>
+  :host {
+    display: block;
+  }
+  </style>
+
+  <admin-order-list user="[[user]]" backend="[[appData.backend]]" online="[[online]]"></admin-order-list>
+
+  </template>
+  <script>
+  'use strict';
+  Polymer({
+    is: 'admin-order-list-view',
+
+    properties: {
+      pageData: {
+        type: Object,
+        value: {
+          category: "Commandes",
+          topic: null
+        }
+      },
+
+      appData: Object,
+      user: Object,
+    },
+
+    behaviors: [window.PageBehavior],
+
+    _onSelected: function() {
+      this.fire('hide-button');
+    },
+  });
+  </script>
+</dom-module>

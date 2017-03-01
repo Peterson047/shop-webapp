@@ -1,0 +1,194 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/app-storage/app-indexeddb-mirror/app-indexeddb-mirror.html">
+<link rel="import" href="../../bower_components/app-storage/app-network-status-behavior.html">
+
+<link rel="import" href="../behaviors/data-pipe.behavior.html">
+
+<dom-module id="data-source">
+	<template>
+
+		<app-indexeddb-mirror id="cache"></app-indexeddb-mirror>
+
+	</template>
+	<script>
+	'use strict';
+
+	Polymer({
+		is: 'data-source',
+
+		properties: {
+			isAttached: {
+				type: Boolean,
+				value: false
+			},
+			autoFetch: {
+				type: Boolean,
+				value: true
+			},
+			fetching: {
+				type: Boolean,
+				value: false,
+				notify: true
+			},
+			empty: {
+				type: Boolean,
+				value: false,
+				notify: true
+			},
+			cacheKey: String,
+			cacheProp: String,
+			path: {
+				type: String,
+				observer: '_onPathChange'
+			},
+			orderByChild: String,
+			equalTo: String,
+			array: String,
+			once: {
+				type: Boolean,
+				value: false
+			},
+			tempData: {
+				type: Object,
+				observer: '_onDataChange'
+			},
+			output: {
+				notify: true
+			}
+		},
+
+		behaviors: [Polymer.AppNetworkStatusBehavior, window.DataPipeBehavior],
+		observers: ['_networkStateChanged(online)'],
+
+		attached: function() {
+			// Ensure that we have all the input variables set before fetching
+			this.isAttached = true;
+			if(this.queuedPathChange) {
+				this._onPathChange(this.queuedPathChange[0], this.queuedPathChange[1]);
+				this.queuedPathChange = null;
+			}
+		},
+
+		_networkStateChanged: function(state) {
+			if(state && this.previousNetworkState === false && this.autoFetch) {
+				firebase.database().ref(this.path).off();
+				this.fetch();
+			}
+			this.previousNetworkState = state;
+		},
+
+		_onPathChange: function(newPath, oldPath) {
+			if(!this.isAttached) return this.queuedPathChange = [newPath, oldPath];
+			if(oldPath) firebase.database().ref(oldPath).off();
+			if(this.autoFetch) this.fetch();
+		},
+
+		_checkPath: function(path) {
+			return path && path[path.length-1] !== '/' && !~path.indexOf("//") && !~path.indexOf("/null") && !~path.indexOf("/undefined");
+		},
+
+		_buildQuery: function() {
+			var query = firebase.database().ref(this.path);
+			if(this.orderByChild) {
+				query = query.orderByChild(this.orderByChild);
+			}
+			if(this.equalTo) {
+				if(this.equalTo === 'true') this.equalTo = true;
+				if(this.equalTo === 'false') this.equalTo = false;
+				query = query.equalTo(this.equalTo);
+			}
+
+			return query;
+		},
+
+		fetch: function() {
+			var _this = this;
+			if( !this._checkPath(this.path) ) return;
+
+			this.autoFetch = true;
+			this.fetching = true;
+
+			if(this.cacheKey) {
+				if(this.online !== false) this._readFromCache();
+				else return this._readFromCache();
+			}
+
+			var query = this._buildQuery();
+			if(this.once) {
+				query.once("value")
+				.then(function(snapshot) {
+					_this.fetching = false;
+					_this.tempData = snapshot.val() || {};
+				}, function(err) {
+					_this.fetching = false;
+					_this.fire('error', err);
+				})
+			} else {
+				query.on("value", function(snapshot) {
+					_this.fetching = false;
+					_this.tempData = snapshot.val() || {};
+				}, function(err) {
+					_this.fetching = false;
+					_this.fire('error', err);
+				})
+			}
+
+		},
+
+		_onDataChange: function(newData) {
+			newData = ( !newData || !Object.keys(newData).length ) ? {} : newData;
+			if(this.cacheKey) this._storeInCache(newData);
+			this._setOutput(newData);
+		},
+
+		_setOutput: function(data) {
+			this.empty = !Object.keys(data).length;
+			if(this.array) this.output = this.toArray(data, this.array);
+			else this.output = data;
+			this.fire('data-source-update', {id: this.id, data: this.output});
+		},
+
+		_storeInCache: function(data) {
+			var _this = this;
+			var cache = this.$.cache;
+			cache.key = this.cacheKey;
+
+			if(this.cacheProp) {
+				cache.getStoredValue()
+				.then(function(cachedData) {
+					if(!cachedData) cachedData = {};
+					cachedData[_this.cacheProp] = data;
+					cache.data = cachedData;
+				}, function(err) {
+					_this.fire('error', err);
+				})
+			} else {
+				cache.data = data;
+			}
+		},
+
+		_readFromCache: function() {
+
+			var _this = this;
+			var cache = this.$.cache;
+			cache.key = this.cacheKey;
+
+			cache.getStoredValue()
+			.then(function(cachedData) {
+				if(_this.cacheProp && cachedData) cachedData = cachedData[_this.cacheProp];
+				if(!cachedData || !Object.keys(cachedData).length) {
+					if(_this.online === false) {
+						_this.fetching = false;
+						_this._setOutput({});
+					}
+				} else {
+					_this.fetching = false;
+					_this._setOutput(cachedData);
+				}
+			}, function(err) {
+				_this.fire('error', err);
+			})
+		}
+	});
+	</script>
+</dom-module>

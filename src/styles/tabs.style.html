@@ -1,0 +1,67 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="fix-tap.style.html">
+
+<dom-module id="tabs-style">
+  <template>
+  <style include="fix-tap-style">
+
+  paper-tabs {
+    --paper-tabs-selection-bar-color: var(--app-white);
+  }
+
+  paper-tabs.sub {
+    height: 68px;
+    background-color: var(--app-secondary-color);
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    --paper-tabs-selection-bar-color: var(--app-white);
+
+    --paper-tabs-selection-bar: {
+      height: 3px;
+    };
+
+    --paper-tabs-content: {
+      height: 85%;
+    };
+
+    --paper-tabs: {
+      color: var(--app-white);
+    };
+  }
+
+  paper-tab.sub a {
+    color: var(--app-white);
+  }
+
+  paper-tab {
+    --paper-tab-ink: var(--app-white);
+  }
+
+  paper-tab.sub {
+    flex: none !important;
+    --paper-tab-ink: var(--app-primary-color);
+  }
+
+  paper-tab a {
+    color: var(--app-secondary-color);
+    padding: 0 12px;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    outline: none;
+    text-transform: uppercase;
+  }
+
+  paper-tab a:focus {
+    font-weight: 600;
+  }
+
+  #tabsContainer {
+    display: flex;
+    align-items: center;
+  }
+  
+  </style>
+  </template>
+</dom-module>

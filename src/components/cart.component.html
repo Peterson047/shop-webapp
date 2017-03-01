@@ -1,0 +1,240 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-icons/maps-icons.html">
+
+<link rel="import" href="product-quantity.component.html">
+<link rel="import" href="button.component.html">
+<link rel="import" href="dashed-title.component.html">
+
+<link rel="import" href="../behaviors/data-pipe.behavior.html">
+<link rel="import" href="../behaviors/navigation.behavior.html">
+<link rel="import" href="../behaviors/list-animation.behavior.html">
+
+<link rel="import" href="../styles/list.style.html">
+<link rel="import" href="../styles/tile.style.html">
+
+<dom-module id="app-cart">
+      <template>
+      <style include="tile-style list-style">
+
+      product-quantity {
+            --select-padding-left: var(--app-double-space);
+      }
+
+      #empty {
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+      }
+
+      .item {
+            display: flex;
+            min-height: 60px;
+            background-color: var(--app-white);
+            align-items: center;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+      }
+
+      #listItems .item:last-of-type {
+            border-top: 1px solid var(--app-light-grey);
+      }
+
+      .name {
+            flex-grow: 1;
+            font-weight: bold;
+      }
+
+      .product {
+            margin-bottom: var(--app-space);
+      }
+
+      .product .name {
+            width: 100%;
+      }
+
+      .details {
+            display: flex;
+            flex-grow: 1;
+            justify-content: space-between;
+            align-items: center;
+      }
+
+      .actions {
+            display: flex;
+            width: 55px;
+            justify-content: flex-end;
+            align-items: center;
+      }
+
+      .solo {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            margin-right: 55px;
+      }
+
+      .actions > paper-icon-button {
+            color: var(--app-action-color);
+      }
+
+      app-button {
+            background-color: var(--app-validation-color);
+            color: var(--app-white);
+      }
+
+      a {
+            margin-top: auto;
+      }
+
+      @media (min-width: 500px) {
+
+            .product {
+                  margin-bottom: 0 !important;
+            }
+
+            .product .name {
+                  width: auto !important;
+            }
+
+            .details {
+                  max-width: 300px !important;
+            }
+      }
+
+      @media (min-width: 600px) {
+            .item {
+                  padding: 0 var(--app-space) 0 var(--app-space);
+            }
+      }
+      </style>
+
+      <div class="tile keepMinimalSpace">
+
+            <template is="dom-if" if="[[!displayItems.length]]">
+                  <div id="empty">Votre panier est vide.</div>
+            </template>
+
+            <template id="list" is="dom-if" if="[[displayItems.length]]">
+
+                  <div id="listItems">
+                        <dashed-title icon="shopping-basket">Produits</dashed-title>
+
+                        <div>
+                              <!-- items -->
+                              <template is="dom-repeat" items="[[displayItems]]" as="oneItem">
+                                    <div class="item product">
+                                          <div class="name">[[oneItem.name]]</div>
+                                          <div class="details">
+                                                <div class="quantity">
+                                                      <product-quantity label="Qte :" out-of-stock="{{outOfStock}}" index="[[index]]" on-quantity-changed="productQuantityChange" product-stock="[[oneItem.stock]]" product-standard="[[oneItem.standard]]" quantity="[[oneItem.quantity]]"></product-quantity>
+                                                </div>
+                                                <div class="standard">[[oneItem.standardName]]</div>
+                                                <div class="price">[[_multiply(oneItem.price, oneItem.quantity)]] €</div>
+                                          </div>
+                                          <div class="actions"><paper-icon-button on-tap="deleteItem" index="[[index]]" icon="clear"></paper-icon-button></div>
+                                    </div>
+                              </template>
+
+                              <!-- fees -->
+                              <div class="item">
+                                    <div class="name">Frais de livraison</div>
+                                    <div class="solo">[[cart.fees]] €</div>
+                              </div>
+
+                              <!-- footer total -->
+                              <div class="item">
+                                    <div class="name">Total</div>
+                                    <div class="solo">[[toFixed(cart.sum)]] €</div>
+                              </div>
+                        </div>
+                  </div>
+
+                  <!-- Weights and shipping informations -->
+                  <div id="shippings">
+                        <dashed-title icon="maps:local-shipping">Livraison</dashed-title>
+
+                        <div class="item">
+                              <div class="name">Poids total</div>
+                              <div class="solo">[[cart.weight]] grammes</div>
+                        </div>
+
+                        <div class="item">
+                              <div class="name">Date estimée</div>
+                              <div class="solo">[[cart.estimateDelivery]]</div>
+                        </div>
+                  </div>
+
+                  <app-button on-tap="_checkout" online="[[online]]" disabled$="[[!online]]" raised icon="arrow-forward">Payer</app-button>
+
+            </template>
+      </div>
+
+</template>
+<script>
+'use strict';
+
+Polymer({
+      is: 'app-cart',
+
+      properties: {
+            displayItems: {
+                  type: Array,
+            },
+
+            shippingFees: {
+                  type: Number,
+                  value: 0,
+            },
+
+            dateDelivery: {
+                  type: String,
+                  value: '',
+            },
+
+            user: {
+                  type: Object,
+            },
+
+            appData: {
+                  type: Object,
+            },
+
+      },
+
+      observers: ['toDisplayItems(cart.items)'],
+
+      behaviors: [window.CartBehavior, window.DataPipeBehavior, window.ListAnimationBehavior, window.NavigationBehavior],
+
+      toDisplayItems: function () {
+            this.displayItems = this.toArray(this.cart.items);
+      },
+
+      _checkout: function() {
+            this.goTo('/checkout');
+      },
+
+      productQuantityChange: function (e) {
+            var target = Polymer.dom(e).rootTarget;
+            if (target) {
+                  var qty = e.detail.value - this.displayItems[target.index].quantity;
+                  var hash = this.displayItems[target.index].$key;
+                  this.setItemQuantity(hash, qty);
+            }
+      },
+
+      deleteItem: function (e) {
+            var target = Polymer.dom(e).rootTarget;
+            if (target) {
+                  var hash = this.displayItems[target.index].$key;
+                  this.setItemQuantity(hash, -this.displayItems[target.index].quantity)
+            }
+      },
+
+      _multiply: function (x, y) {
+            return this.toFixed(parseFloat(x) * parseFloat(y));
+      },
+});
+</script>
+</dom-module>

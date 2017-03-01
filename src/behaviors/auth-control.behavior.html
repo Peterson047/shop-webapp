@@ -1,0 +1,88 @@
+<link rel="import" href="navigation.behavior.html">
+
+<script>
+window.AuthControlBehaviorImpl = {
+
+      listeners: {
+            'sign-in': '_signIn',
+            'sign-out': '_signOut',
+            'forgot-password': '_forgotPassword'
+      },
+
+      _signIn: function(e) {
+            e.stopPropagation();
+            var _this = this;
+
+            var data = e.detail;
+
+            var authEl = document.querySelector('my-app').$.auth;
+            // check we have the auth el;
+            if(typeof authEl === 'undefined' || typeof authEl === null) return console.error('Auth el not defined');
+
+            // If the user tries to sign in via a provider (oAuth)
+            if(typeof data.provider !== 'undefined') {
+                  _this.loading = true;
+                  return authEl.signInWithPopup(data.provider)
+                  .then(function(res) {
+                        _this._signInSuccess(res);
+                  }, function(err) {
+                        _this._signInFailure(err);
+                  })
+            }
+            // No provider, so the user is trying to sign in with credentials
+            // If the event payload has a credentials object
+            else if(typeof data.credentials !== 'undefined') {
+                  var mail = data.credentials.email;
+                  var password = data.credentials.password;
+                  _this.loading = true;
+                  return authEl.signInWithEmailAndPassword(mail, password)
+                  .then(function(res) {
+                        _this._signInSuccess(res);
+                  }, function(err) {
+                        _this._signInFailure(err);
+                  })
+            }
+      },
+
+      _signInFailure: function(err) {
+            console.log(err);
+            this.loading = false;
+            // If the component using this behavior has a _signInFailed method implemented, we call it
+            if(typeof this._signInFailed === 'function') this._signInFailed(err);
+      },
+
+      _signInSuccess: function(res) {
+            this.loading = false;
+            // If the component using this behavior has a _signInSucceed method implemented, we call it
+            if(typeof this._signInSucceed === 'function') this._signInSucceed(res);
+      },
+
+      _signOut: function(e) {
+            e.stopPropagation();
+            var _this = this;
+            // check we have the auth el;
+            var authEl = document.querySelector('my-app').$.auth;
+            if(typeof authEl === 'undefined' || typeof authEl === null) return console.error('Auth el not defined');
+            return authEl.signOut()
+            .then(function(user) {
+                  // Redirect to the home page
+                  _this.goTo('/');
+                  // If the component using this behavior has a _signOutSucceed method implemented, we call it
+                  if(typeof _this._signOutSucceed === 'function') _this._signOutSucceed();
+            });
+      },
+
+      _forgotPassword: function(e) {
+            e.stopPropagation();
+            var _this = this;
+            var mail = e.detail.mail;
+            return firebase.auth().sendPasswordResetEmail(mail).then(function() {
+                  if(typeof _this._mailSent === 'function') _this._mailSent();
+            }, function(error) {
+                  if(typeof _this._mailError === 'function') _this._mailError(error);
+            });
+      }
+};
+// Compose the behavior with its dependency
+window.AuthControlBehavior = [window.AuthControlBehaviorImpl, window.NavigationBehavior];
+</script>

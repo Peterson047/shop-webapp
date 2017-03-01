@@ -1,0 +1,50 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-fab/paper-fab.html">
+
+<link rel="import" href="../behaviors/tabindex.behavior.html">
+
+<link rel="import" href="../styles/fix-tap.style.html">
+<dom-module id="sign-in-provider">
+	<template>
+	<style include="fix-tap-style">
+	:host {
+		display: flex;
+		justify-content: space-around;
+		width: 100%;
+	}
+
+	#google {
+		background-color: #fff;
+	}
+
+	#facebook {
+		background-color: #3B5999;
+	}
+
+	#twitter {
+		background-color: #55ACEE;
+	}
+
+	</style>
+	<template is="dom-repeat" items="[[providers]]" as="provider">
+		<paper-fab tabable id="[[provider]]" provider="[[provider]]" on-tap="_fireSignInEvent" src="../../images/providers/[[provider]].svg"></paper-fab>
+	</template>
+
+</template>
+<script>
+Polymer({
+	is: 'sign-in-provider',
+	properties: {
+		providers: {
+			type: Array,
+			value: ['google', 'facebook']
+		}
+	},
+	behaviors: [window.TabindexBehavior],
+	_fireSignInEvent: function(e) {
+		var provider  = Polymer.dom(e).rootTarget.provider;
+		this.fire('sign-in', {provider: provider});
+	}
+});
+</script>
+</dom-module>

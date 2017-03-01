@@ -1,0 +1,301 @@
+<link rel="import" href="toaster-control.behavior.html">
+<link rel="import" href="data-pipe.behavior.html">
+<link rel="import" href="navigation.behavior.html">
+
+<script>
+
+'use strict';
+
+var subs = [];
+
+function Cart() {
+      this.items = {};
+      this.itemCount = 0;
+      this.sum = 0;
+      this.weight = 0;
+      this.fees = 0;
+      this.error = null;
+}
+
+function notify(prop, value) {
+      subs.forEach(function(sub){
+            sub[prop] = value;
+      })
+}
+
+var cart = JSON.parse(window.localStorage.getItem('cart')) || new Cart();
+var cartInit = false;
+
+window.CartBehaviorImpl = {
+
+      properties: {
+            cart: Object
+      },
+
+      observers: ['_cartChange(items)'],
+
+      attached: function() {
+            subs.push(this);
+            if (cartInit === false) {
+                  cartInit = true;
+                  this._getDeliveryEstimation();
+                  this.attachListeners();
+            }
+            else {
+                  this.cart = subs[0].cart;
+            }
+      },
+
+      computeHash: function (idProduct, idStandard) {
+            return idProduct +'|'+ idStandard;
+      },
+
+      reverseHash: function (hash) {
+            return hash.split('|');
+      },
+
+      addStockListener: function (idProduct, idStandard, hashItem) {
+            firebase.database().ref('/active_products/' + idProduct + '/stock/' + idStandard).on('value', this.stockChanges.bind(this, hashItem));
+      },
+
+      removeStockListener: function(idProduct, idStandard) {
+            firebase.database().ref('/active_products/' + idProduct + '/stock/' + idStandard).off();
+      },
+
+      attachListeners: function () {
+            for (var key in cart.items) {
+                  var reversed = this.reverseHash(key);
+                  this.addStockListener(reversed[0], reversed[1], key);
+            }
+      },
+
+      _cartChange: function () {
+            var count = 0;
+            var sum = parseFloat(cart.fees);
+            var weight = 0;
+            for (var key in cart.items) {
+                  var item = cart.items[key];
+                  count += parseInt(item.quantity);
+                  sum += parseFloat(item.price * item.quantity);
+                  weight += parseInt(item.weight * item.quantity);
+            }
+
+            if(cart.weight !== weight) this._getFees(weight);
+
+            cart.itemCount = count;
+            cart.sum = sum;
+            cart.weight = weight;
+
+            if (cartInit) this._storeCart();
+            cart = this.clone(cart);
+            notify('cart', cart);
+      },
+
+      _storeCart: function () {
+            window.localStorage.setItem('cart', JSON.stringify(cart));
+      },
+
+      _getFees: function (weight) {
+            var _this = this;
+            var req = new XMLHttpRequest();
+            req.open('GET', this.appData.backend+'/shippingfees?weight='+weight, true);
+            req.onreadystatechange = function (aEvt) {
+                  if (req.readyState == 4) {
+                        if(req.status == 200) {
+                              var res = JSON.parse(req.responseText);
+                              if(res.success) {
+                                    cart.fees = res.data;
+                                    _this._cartChange();
+                              } else cart.error = res.error;
+                        }
+                  }
+            };
+            req.send(null);
+
+      },
+
+      _getDeliveryEstimation: function() {
+            var _this = this;
+            var req = new XMLHttpRequest();
+            req.open('GET', this.appData.backend+'/estimatedelivery', true);
+            req.onreadystatechange = function (aEvt) {
+                  if (req.readyState == 4) {
+                        if(req.status == 200) {
+                              var res = JSON.parse(req.responseText);
+                              if(res.success) {
+                                    cart.estimateDelivery = res.data;
+                                    _this._cartChange();
+                              }
+                        }
+                  }
+            };
+            req.send(null);
+      },
+
+      addItems: function (idProduct, nameProduct, idStandard, nameStandard, stock, grammage, quantity, price) {
+            var hashItem = this.computeHash(idProduct, idStandard);
+            quantity = this.parseQuantity(quantity);
+            if (0 == quantity || '' == idStandard || '' == idProduct) return;
+
+            var showToaster = true;
+            var textToaster = '';
+
+            if (cart.items.hasOwnProperty(hashItem)) {
+                  textToaster = 'Quantité ajoutée';
+                  showToaster = this.increaseItems(hashItem, quantity);
+            }
+            else {
+                  textToaster = 'Produit ajouté';
+                  this.createItems(hashItem, idProduct, nameProduct, idStandard, nameStandard, stock, grammage, quantity, price);
+            }
+
+            if(showToaster) {
+                  this.showToaster({
+                        text: textToaster,
+                        state: true,
+                        actions: [{
+                              text: 'Annuler',
+                              fn: this.decreaseItems.bind(this, hashItem, quantity),
+                        },
+                        {
+                              text: 'Payer',
+                              fn: this.checkout.bind(this),
+                        }]
+                  });
+            }
+
+      },
+
+      // Create an item in the cart with all the informations needed
+      createItems: function (hashItem, idProduct, nameProduct, idStandard, nameStandard, stock, grammage, quantity, price) {
+            quantity = this.parseQuantity(quantity);
+            if (0 == quantity || '' == idStandard || '' == idProduct) return;
+            cart.items[hashItem] = {'name': nameProduct, 'quantity': quantity, 'weight': grammage, 'price': price, 'stock': stock, 'standard': idStandard, "standardName": nameStandard};
+            this.addStockListener(idProduct, idStandard, hashItem);
+      },
+
+      // Increase quantity of an existing item in the cart
+      increaseItems: function (hashItem, quantity) {
+            quantity = this.parseQuantity(quantity);
+            if (0 == quantity || '' == hashItem) return;
+
+            if (cart.items[hashItem].stock.quantity < cart.items[hashItem].quantity + quantity) {
+                  this.showToaster({
+                        text: 'Seulement '+ cart.items[hashItem].stock.quantity +' unité(s) disponible(s)',
+                        state: false,
+                        actions: [],
+                  });
+                  return false;
+            } else {
+                  cart.items[hashItem].quantity += quantity;
+                  this._cartChange();
+                  return true;
+            }
+
+      },
+
+      // Decrease quantity of an existing item in the cart
+      decreaseItems: function (hashItem, quantity) {
+            quantity = this.parseQuantity(quantity);
+            if (0 == quantity || '' == hashItem) return;
+
+            var toastText = '';
+
+            if (cart.items[hashItem].quantity - quantity < 1) {
+                  toastText = 'Item supprimé';
+                  delete cart.items[hashItem];
+                  var reversed = this.reverseHash(hashItem);
+                  this.removeStockListener(reversed[0], reversed[1]);
+            }
+            else {
+                  toastText = 'Quantitée retirée';
+                  cart.items[hashItem].quantity -= quantity;
+            }
+
+            this.showToaster({
+                  text: toastText,
+                  state: true,
+                  actions: [],
+            });
+
+            this._cartChange();
+      },
+
+      // Update quantity (add or remove) of an already existing item in the cart
+      setItemQuantity: function (hashItem, quantity) {
+            if (quantity > 0) {
+                  var reversed = this.reverseHash(hashItem);
+                  this.addItems(reversed[0], null, reversed[1], null, null, null, quantity, null);
+            }
+            else if (quantity < 0) {
+                  this.decreaseItems(hashItem, Math.abs(quantity));
+            }
+      },
+
+      parseQuantity: function (quantity) {
+            var newQt = parseInt(quantity);
+            if (isNaN(newQt)) {
+                  console.error('Quantity is not a number');
+                  return 0;
+            }
+
+            return newQt;
+      },
+
+      stockChanges: function (hashItem, snapshot) {
+            var stockQuantity = snapshot.val().quantity;
+
+            // product no longer exists
+            if(typeof stockQuantity === 'undefined') {
+                  var reversed = this.reverseHash(hashItem);
+                  this.removeStockListener(reversed[0], reversed[1]);
+                  return this.setItemQuantity(hashItem, -cart.items[hashItem].quantity);
+            }
+
+            var quantityToRemove = 0;
+            // No more stock
+            if(stockQuantity < 1) {
+                  this.showToaster({
+                        text: 'Rupture de stock de '+ cart.items[hashItem].name,
+                        state: false,
+                        actions: []
+                  });
+
+                  quantityToRemove = cart.items[hashItem].quantity;
+            }
+            // we have a stock
+            // If the user picked a quantity that is no longer available, we notifiy him and set the quantity to the closest qty available
+            else if(stockQuantity < cart.items[hashItem].quantity) {
+                  this.showToaster({
+                        text: 'Stock mis à jour, plus que '+ stockQuantity +' '+ cart.items[hashItem].name +' disponible(s)',
+                        state: false,
+                        actions: []
+                  });
+
+                  quantityToRemove = cart.items[hashItem].quantity - stockQuantity;
+            }
+
+            this.decreaseItems(hashItem, quantityToRemove);
+
+            cart.items[hashItem].stock.quantity = stockQuantity;
+            this._cartChange();
+      },
+
+      clearCart: function() {
+            for(var hash in cart.items) {
+                  var reversed = this.reverseHash(hash);
+                  this.removeStockListener(reversed[0], reversed[1]);
+            }
+            cart = new Cart();
+            localStorage.removeItem('cart');
+            notify('cart', cart);
+      },
+
+      checkout: function () {
+            this.goTo('/checkout');
+      },
+};
+
+// Compose the behavior with its dependencies
+window.CartBehavior = [window.CartBehaviorImpl, window.ToasterControlBehavior, window.DataPipeBehavior, window.NavigationBehavior];
+</script>

@@ -1,0 +1,61 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../components/data-source.component.html">
+
+<dom-module id="highlight-data">
+  <template>
+
+  <data-source
+    path="/active_products"
+    order-by-child="banner/active"
+    equal-to="true"
+    cache-key="highlighted-products"
+    array="$key"
+    output="{{data}}">
+  </data-source>
+
+  </template>
+  <script>
+  'use strict';
+  Polymer({
+    is: 'highlight-data',
+    
+    properties: {
+      items: {
+        type: Array,
+        notify: true
+      }
+    },
+
+    observers: [
+      '_dataChanged(data.length)'
+    ],
+
+    _dataChanged: function(len) {
+      if(!len) return;
+      var _this = this;
+      var buf = [];
+      this.data.forEach(function(item) {
+        var banner = item.banner.pictures ? _this._getBanner(item) : null;
+        if(banner) {
+          buf.push({
+            id: item.$key,
+            src: banner.url,
+            base64: banner.base64,
+            text: item.name,
+            href: 'product-detail/'+item.$key,
+            linkTitle: 'Voir le produit'
+          });
+        }
+      })
+      this.items = buf;
+    },
+
+    _getBanner: function(item) {
+      var keys = Object.keys(item.banner.pictures);
+      if(keys.length < 1) return null;
+      return item.banner.pictures[keys[0]];
+    }
+  });
+  </script>
+</dom-module>

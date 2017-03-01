@@ -1,0 +1,98 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../bower_components/paper-material/paper-material.html">
+
+<link rel="import" href="../behaviors/modal.behavior.html">
+<link rel="import" href="../behaviors/register-control.behavior.html">
+<link rel="import" href="../behaviors/auth-control.behavior.html">
+<link rel="import" href="../behaviors/modal-control.behavior.html">
+<link rel="import" href="../behaviors/toaster-control.behavior.html">
+
+<link rel="import" href="./sign-in-provider.component.html">
+<link rel="import" href="./loading-layer.component.html">
+<link rel="import" href="./sign-up.component.html">
+
+<link rel="import" href="../styles/modal.style.html">
+
+<dom-module id="sign-up-modal">
+      <template>
+      <style include="modal-style">
+      :host {
+            display: block;
+      }
+
+      sign-in-provider {
+            margin-bottom: var(--app-space);
+      }
+
+      sign-in-provider, sign-up {
+                  margin-top: auto;
+      }
+
+      </style>
+
+      <paper-material id="container" tabable-container>
+            <div id="content" class="large">
+                  <paper-icon-button tabable id="close" on-tap="hide" icon="close"></paper-icon-button>
+                  <sign-up tabable-container id="form"></sign-up>
+                  <sign-in-provider tabable-container></sign-in-provider>
+            </div>
+            <loading-layer show="[[loading]]"></loading-layer>
+      </paper-material>
+</template>
+<script>
+Polymer({
+      is: 'sign-up-modal',
+      behaviors: [window.AuthControlBehavior, window.RegisterControlBehavior, window.ModalBehavior, window.ModalControlBehavior, window.ToasterControlBehavior],
+      listeners: {
+            'cancel-registration': '_swap'
+      },
+
+      focus: function() {
+            this.$.form.focus();
+      },
+
+      _swap: function(e){
+            e.stopPropagation();
+            this.swapModals('sign-up-modal', 'sign-in-modal');
+      },
+
+      _userCreated: function(user, data) {
+            this.$.form.reset();
+            this.showToaster({
+                  text: 'Compte créé, un email de confirmation à été envoyé',
+                  state: true,
+                  actions: []
+            })
+            this.hide(true);
+      },
+
+      _userCreationFailed: function(err) {
+            this.showToaster({
+                  text: err,
+                  state: false,
+                  actions: []
+            })
+            this.hide(true);
+      },
+
+      _signInSucceed: function() {
+            this.hide(true);
+            this.showToaster({
+                  text: 'Authentification réussie',
+                  state: true,
+                  actions: []
+            })
+      },
+
+      _signInFailed: function(err) {
+            this.showToaster({
+                  text: err,
+                  state: false,
+                  actions: []
+            })
+      }
+
+});
+</script>
+</dom-module>

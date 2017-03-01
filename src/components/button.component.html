@@ -1,0 +1,139 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/iron-a11y-keys/iron-a11y-keys.html">
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../styles/fix-tap.style.html">
+<dom-module id="app-button">
+      <template>
+      <style include="fix-tap-style">
+      :host {
+            display: flex;
+            align-items: center;
+            outline: none;
+            contain: paint;
+            color: var(--app-primary-color);
+            border-radius: 3px;
+      }
+
+      :host([raised]) {
+            box-shadow: var(--app-shadow);
+      }
+
+      :host(:focus) > #button {
+            font-weight: 600;
+      }
+
+      :host([center]) > #button {
+            text-align: center;
+      }
+
+      :host(.disabled) {
+            pointer-events: none !important;
+            background-color: transparent !important;
+            box-shadow: none !important;
+      }
+
+      :host(.disabled) > #button, :host(.disabled) > #icon {
+            color: var(--app-disable-color) !important;
+      }
+
+      :host(.disabled) > #button {
+            background-color: var(--app-disabled-bg) !important;
+      }
+
+      :host(.stickLeft) > #button {
+            margin-left: 0 !important;
+            padding-left: 0 !important;
+      }
+
+      :host(.stickRight) > #button {
+            margin-right: 0 !important;
+            padding-right: 0 !important;
+      }
+
+      #button {
+            background-color: transparent;
+            width: 100%;
+            margin: 0;
+      }
+
+      #icon {
+            margin-right: 15px;
+      }
+
+      </style>
+      <iron-a11y-keys target="[[target]]" keys="enter"
+      on-keys-pressed="_redirectEnter"></iron-a11y-keys>
+      <paper-button on-tap="_redirectTap" disabled$="[[disabled]]" tabindex="-1" id="button">
+            <template is="dom-if" if="[[_displayIcon(icon)]]">
+                  <iron-icon id="icon" icon="[[icon]]">
+                  </template>
+                  <content></content>
+            </paper-button>
+      </template>
+      <script>
+      'use strict';
+      Polymer({
+            is: 'app-button',
+            properties: {
+                  target: {
+                        type: Object,
+                        value: function() {
+                              return this;
+                        }
+                  },
+                  icon: {
+                        type: String,
+                        value: ''
+                  },
+                  online: {
+                        type: Boolean,
+                        observer: '_onlineChanged'
+                  },
+                  disabled: {
+                        type: Boolean,
+                        value: false,
+                        observer: '_disabledChanged'
+                  }
+            },
+            ready: function() {
+                  this.setAttribute('tabindex', "0");
+            },
+            _redirectEnter: function() {
+                  this.$.button.click();
+            },
+
+            _redirectTap: function(e) {
+                  e.preventDefault;
+                  e.stopPropagation();
+                  this.fire('tap');
+            },
+
+            _displayIcon: function(icon) {
+                  return icon && icon !== '';
+            },
+
+            _onlineChanged: function(newVal) {
+                  if(newVal) {
+                        if(this.previousIcon) this.icon = this.previousIcon;
+                  } else {
+                        this.previousIcon = this.icon;
+                        this.icon = 'cloud-off';
+                  }
+            },
+
+            _disabledChanged: function(newVal) {
+                  var tabindex;
+                  if(newVal) {
+                        this.classList.add('disabled');
+                        tabindex = '-1';
+                  }
+                  else {
+                        this.classList.remove('disabled');
+                        tabindex = '0';
+                  }
+                  this.setAttribute('tabindex', tabindex);
+            }
+      });
+      </script>
+</dom-module>

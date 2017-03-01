@@ -1,0 +1,379 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-form/iron-form.html">
+<link rel="import" href="../../bower_components/app-route/app-location.html">
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../bower_components/iron-icons/editor-icons.html">
+<link rel="import" href="../../bower_components/iron-icons/image-icons.html">
+<link rel="import" href="../../bower_components/iron-icons/social-icons.html">
+<link rel="import" href="../../bower_components/paper-input/paper-textarea.html">
+<link rel="import" href="../../bower_components/paper-toggle-button/paper-toggle-button.html">
+
+<link rel="import" href="../behaviors/data-pipe.behavior.html">
+<link rel="import" href="../behaviors/form.behavior.html">
+<link rel="import" href="../behaviors/navigation.behavior.html">
+<link rel="import" href="../behaviors/toaster-control.behavior.html">
+
+<link rel="import" href="button.component.html">
+<link rel="import" href="standards-group.component.html">
+<link rel="import" href="loading-layer.component.html">
+<link rel="import" href="file-uploader.component.html">
+<link rel="import" href="capsule-input.component.html">
+<link rel="import" href="dashed-title.component.html">
+<link rel="import" href="thumbnail.component.html">
+<link rel="import" href="data-source.component.html">
+
+<link rel="import" href="../styles/tile.style.html">
+<link rel="import" href="../styles/form.style.html">
+<link rel="import" href="../styles/shop-input.style.html">
+
+<dom-module id="product-form">
+      <template>
+      <style include="form-style shop-input tile-style">
+      :host {
+            display: block;
+            position: relative;
+      }
+
+      #form {
+            width: 100%;
+      }
+
+      app-button {
+            color: var(--app-white);
+      }
+
+      #submit {
+            background-color: var(--app-validation-color);
+      }
+
+      #buttons {
+            margin-top: 15px;
+      }
+
+      #displayPics {
+            display: flex;
+            flex-wrap: wrap;
+            margin-top: var(--app-space);
+      }
+
+      #displayPics > upload-thumbnail {
+            margin-right: 8px;
+            margin-bottom: var(--app-space);
+      }
+
+      </style>
+
+      <app-location route="{{route}}"></app-location>
+
+      <div class="tile keepMinimalSpace">
+            <loading-layer show="[[loading]]"></loading-layer>
+            <form id="form" is="iron-form">
+
+                  <!-- DESCRIPTION -->
+                  <section>
+                        <div class="row">
+                              <dashed-title icon="editor:format-quote">Infos produit</dashed-title>
+                        </div>
+                        <div class="row input-row">
+                              <shop-input>
+                                    <input type="text" id="name" name="name" pattern=".{4,}" required="" placeholder="Nom" on-value-change="_updateHeading" autocomplete="off" value="{{product.name::input}}">
+                                    <shop-md-decorator error-message="Champs requis" aria-hidden="true">
+                                          <label>Nom</label>
+                                          <shop-underline></shop-underline>
+                                    </shop-md-decorator>
+                              </shop-input>
+                        </div>
+
+                        <div class="row input-row">
+                              <paper-textarea error-message="Champs requis" auto-validate name="description" label="Description" required="" value="[[product.description]]"></paper-textarea>
+                        </div>
+
+                        <div class="row input-row">
+                              <capsule-input name="ingredients" label="Ingrédients" data-object="[[product.ingredients]]"></capsule-input>
+                        </div>
+                  </section>
+
+                  <!-- BANNER -->
+                  <section id="banner">
+                        <data-source path="/all_products/[[idProduct]]/banner/pictures" output="{{picsBanner}}"></data-source>
+                        <div class="row">
+                              <dashed-title icon="image:landscape">Bannière</dashed-title>
+                        </div>
+
+                        <paper-toggle-button name="bannerActive" checked="[[product.banner.active]]">
+                              Faire apparaitre ce produit dans le kiosque dynamique
+                        </paper-toggle-button>
+
+                        <div id="displayPics">
+                              <template is="dom-repeat" items="[[toArray(picsBanner, 'key')]]" as="oneBan">
+                                    <upload-thumbnail on-remove-file="_removeBanner" index="[[index]]" data-key="[[oneBan.key]]" src="[[oneBan.url]]" name="Chargement"></upload-thumbnail>
+                              </template>
+                        </div>
+
+                        <template is="dom-if" if="[[hasId]]">
+                              <file-uploader
+                              backend="[[appData.backend]]"
+                              user="[[user]]"
+                              context="[[idProduct]]"
+                              property="banner"
+                              paths="[[bannerPaths]]"></file-uploader>
+                        </template>
+
+                  </section>
+
+                  <!-- PHOTOS -->
+                  <section id="pictures">
+
+                        <data-source path="/all_products/[[idProduct]]/pictures" output="{{picsProduct}}"></data-source>
+
+                        <div class="row">
+                              <dashed-title icon="image:photo-library">Photos</dashed-title>
+                        </div>
+
+                        <div id="displayPics">
+                              <template is="dom-repeat" items="[[toArray(picsProduct, 'key')]]" as="onePic">
+                                    <upload-thumbnail on-remove-file="_removePhoto" index="[[index]]" data-key="[[onePic.key]]" src="[[onePic.url]]" name="Chargement"></upload-thumbnail>
+                              </template>
+                        </div>
+
+                        <template is="dom-if" if="[[hasId]]">
+                              <file-uploader
+                              backend="[[appData.backend]]"
+                              user="[[user]]"
+                              property="pictures"
+                              paths="[[picturePaths]]"
+                              context="[[idProduct]]"></file-uploader>
+                        </template>
+                  </section>
+
+                  <!-- VENTE -->
+                  <section id="sell">
+
+                        <div class="row">
+                              <dashed-title icon="editor:attach-money">Vente</dashed-title>
+                        </div>
+
+                        <div class="row input-row">
+                              <paper-toggle-button name="active" checked="[[product.active]]">Activer le produit</paper-toggle-button>
+                        </div>
+
+                        <div class="separator"></div>
+                        <standards-group id="standards" selectors="[[toArrayFromKey(product.standards, 'std')]]" name="standards"></standards-group>
+                  </section>
+
+                  <!-- ACTIONS -->
+                  <section id="buttons">
+                        <app-button id="submit" icon="[[buttonIcon]]" raised on-tap="_submit">[[buttonText]]</app-button>
+                  </section>
+            </form>
+      </div>
+
+</template>
+<script>
+Polymer({
+      is: 'product-form',
+
+      properties: {
+            user: {
+                  type: Object,
+            },
+
+            route: {
+                  type: Object,
+                  observer: '_getFormAction'
+            },
+
+            appData: {
+                  type: Object,
+            },
+
+            idProduct: {
+                  type: String,
+                  observer: "_onIdChanges",
+            },
+
+            productPath: String,
+
+            loading: {
+                  type: Boolean,
+                  value: false,
+            },
+
+            hasId: {
+                  type: Boolean,
+                  value: false,
+            },
+
+            product: {
+                  type: Object,
+                  value: null
+            },
+      },
+
+      behaviors: [window.DataPipeBehavior, window.NavigationBehavior, window.ToasterControlBehavior, window.FormBehavior],
+
+      observers: [
+            '_updateHeading(product.name)'
+      ],
+
+      _updateHeading: function(name) {
+            this.fire('update-heading', {heading: name});
+      },
+
+      _getFormAction: function(newVal) {
+            if ("create" == newVal.__queryParams.action) {
+                  this.isNew = true;
+            } else if ("edit" == newVal.__queryParams.action) {
+                  this.isNew = false;
+            }
+      },
+
+      _onIdChanges: function(newId, oldId) {
+            if(!newId) return;
+            var _this = this;
+
+            this.hasId = !(null == newId);
+            this.allPath = '/all_products/'+newId;
+            this.activePath = '/active_products/'+newId;
+
+            if(this.isNew) {
+                  this.resetForm();
+                  this.product = {name: ''};
+                  this.$.standards.reset();
+                  this._computeUploadPaths(false);
+                  this.buttonText = 'Créer le produit';
+                  this.buttonIcon = 'add';
+            } else {
+                  this.loading = true;
+                  var ref = firebase.database().ref(this.allPath);
+                  ref.once('value')
+                  .then(function(snapshot) {
+                        _this.product = snapshot.val();
+                        _this.buttonText = 'Mettre à jour';
+                        _this.buttonIcon = 'create';
+                        _this._computeUploadPaths((_this.product && _this.product.active));
+                        _this.loading = false;
+                        _this.$.name.focus();
+                  });
+            }
+
+      },
+
+      resetForm: function() {
+            this.$.form.reset();
+      },
+
+      _syncPictures: function(updates) {
+            updates[this.activePath+'/banner/pictures'] = this.picsBanner;
+            updates[this.activePath+'/pictures'] = this.picsProduct;
+      },
+
+      _syncStock: function(updates) {
+            if(this.product && this.product.stock) {
+                  for(var standard in this.product.stock) {
+                        updates[this.activePath+'/stock/'+standard] = this.product.stock[standard];
+                  }
+            }
+      },
+
+      _computeUploadPaths: function(active) {
+            if(active) {
+                  this.picturePaths = [this.allPath+'/pictures', this.activePath+'/pictures'];
+                  this.bannerPaths = [this.allPath+'/banner/pictures', this.activePath+'/banner/pictures'];
+            } else {
+                  this.picturePaths = [this.allPath+'/pictures'];
+                  this.bannerPaths = [this.allPath+'/banner/pictures'];
+            }
+      },
+
+      _submit: function () {
+            var ok = this.validateForm();
+            if(ok) {
+                  var _this = this;
+                  this.loading = true;
+                  var data = this.$.form.serialize();
+                  var updates = {};
+                  this._computeUpdates(this.allPath, updates, data, this.isNew);
+                  if(typeof data.active !== 'undefined') {
+                        this._computeUploadPaths(true);
+                        this._computeUpdates(this.activePath, updates, data, this.isNew);
+                        this._syncPictures(updates);
+                        this._syncStock(updates);
+                  }
+                  else  {
+                        this._computeUploadPaths(false);
+                        updates[this.activePath] = null;
+                  }
+                  firebase.database().ref().update(updates)
+                  .then(function() {
+                        var message = (_this.isNew) ? "Produit créé" : "Produit mis à jour";
+                        _this.loading = false;
+                        _this.showToaster({
+                              text: message,
+                              state: true,
+                              actions: []
+                        })
+                        _this.goTo('/admin/product-list');
+                  }, function(err) {
+                        _this.loading = false;
+                        _this.showToaster({
+                              text: err,
+                              state: false,
+                              actions: []
+                        })
+                  })
+            }
+      },
+
+      _computeUpdates: function(path, updates, data, isNew) {
+            updates[path+'/description'] = data.description;
+            updates[path+'/ingredients'] = data.ingredients;
+            updates[path+'/name'] = data.name;
+            updates[path+'/active'] = typeof data.active !== 'undefined';
+            updates[path+'/banner/active'] = typeof data.bannerActive !== 'undefined';
+            updates[path+'/standards'] = data.standards;
+            if(isNew) updates[path+'/time/create'] = firebase.database.ServerValue.TIMESTAMP;
+            else updates[path+'/time/update'] = firebase.database.ServerValue.TIMESTAMP;
+            if(this.product && this.product.stock) {
+                  for(var standard in data.standards) {
+                        if(typeof this.product.stock[standard] === 'undefined') {
+                              updates[path+'/stock/'+standard] = {quantity: 0};
+                              updates['/stocks/'+this.idProduct+'/'+standard] = {quantity: 0};
+                        }
+                  }
+            } else {
+                  for(var standard in data.standards) {
+                        updates[path+'/stock/'+standard] = {quantity: 0};
+                        updates['/stocks/'+this.idProduct+'/'+standard] = {quantity: 0};
+                  }
+            }
+            return updates;
+
+      },
+
+      _removePhoto: function (e) {
+            var refStorage = this.picsProduct[e.target.dataKey].refStorage;
+            this._removeOnePic(e.target.dataKey, 'pictures', refStorage);
+      },
+
+      _removeBanner: function (e) {
+            var refStorage = this.picsBanner[e.target.dataKey].refStorage;
+            this._removeOnePic(e.target.dataKey, 'banner/pictures', refStorage);
+      },
+
+      _removeOnePic: function (key, type, refStorage) {
+            // Firebase killing
+            var updates = {};
+            updates['/images/'+ key] = null;
+            updates['/all_products/'+ this.idProduct +'/'+ type +'/'+ key] = null;
+            if(this.product && this.product.active) updates['/active_products/'+ this.idProduct +'/'+ type +'/'+ key] = null;
+            firebase.database().ref().update(updates)
+            .then(function() {
+                  // File storage purging
+                  firebase.storage().ref().child(refStorage).delete();
+            });
+      },
+
+});
+</script>
+</dom-module>

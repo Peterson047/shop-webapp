@@ -1,0 +1,61 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+
+<link rel="import" href="../behaviors/data-pipe.behavior.html">
+<link rel="import" href="../styles/font.style.html">
+
+<dom-module id="cart-recap">
+	<template>
+	<style include="font-style iron-flex iron-flex-alignment">
+	:host {
+		display: block;
+		width: 100%;
+	}
+
+	.item {
+		font-size: var(--recap-font-size);
+	}
+
+	.border {
+		margin-top: 10px;
+		padding-top: 10px;
+		border-top: 1px solid var(--app-light-grey);
+	}
+	</style>
+
+	<template is="dom-repeat" items="[[toArray(cart.items)]]" as="item">
+		<div class="item layout horizontal justified center">
+			<div><span class="font-bold">[[item.name]]</span> - [[item.standardName]] ([[item.quantity]])</div>
+			<div>[[mult(item.quantity, item.price)]]€</div>
+		</div>
+	</template>
+	<div class="item layout horizontal justified center">
+		<div>Frais de livraison</div>
+		<div>[[cart.fees]]€</div>
+	</div>
+	<div class="item border layout horizontal justified center">
+		<div>Total</div>
+		<div>[[toFixed(cart.sum)]]€</div>
+	</div>
+	<div class="item border layout horizontal justified center">
+		<div>Poids</div>
+		<div>[[cart.weight]] grammes</div>
+	</div>
+
+</template>
+<script>
+'use strict';
+Polymer({
+	is: 'cart-recap',
+	properties: {
+		cart: Object
+	},
+	
+	behaviors: [window.DataPipeBehavior],
+
+	mult: function(qty, price) {
+		return this.toFixed(parseInt(qty) * parseFloat(price));
+	}
+});
+</script>
+</dom-module>

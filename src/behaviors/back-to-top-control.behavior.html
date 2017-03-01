@@ -1,0 +1,21 @@
+<script>
+
+'use strict';
+
+window.BackToTopControlBehavior = {
+
+	properties: {
+		btt: {
+			type: Object,
+			value: function() {
+				return Polymer.dom(document.querySelector('my-app').root).querySelector('app-footer').$.btt;
+			}
+		}
+	},
+
+	backToTop: function() {
+		this.btt.tapHandler();
+	}
+
+};
+</script>

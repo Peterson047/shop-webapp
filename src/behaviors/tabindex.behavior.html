@@ -1,0 +1,21 @@
+<script>
+
+'use strict';
+
+window.TabindexBehavior = {
+	recomputeTabindexes: function(bool, target) {
+		var _this = this;
+		var tabindex = bool ? "0" : "-1";
+		var target = (typeof target !== 'undefined') ? target : this;
+		var containers = Array.from(Polymer.dom(target.root).querySelectorAll('[tabable-container]'));
+		var tabables = Array.from(Polymer.dom(target.root).querySelectorAll('[tabable]'));
+		tabables.forEach(function(el) {
+			el.setAttribute("tabindex", tabindex);
+		})
+		containers.forEach(function(el) {
+			_this.recomputeTabindexes.apply(el, [bool]);
+		})
+	}
+}
+
+</script>

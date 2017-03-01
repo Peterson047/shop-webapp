@@ -1,0 +1,124 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+
+<dom-module id="upload-thumbnail">
+	<template>
+	<style>
+	:host {
+		display: block;
+		position: relative;
+		width: 200px;
+		height: 100px;
+		box-shadow: 0px 2px 5px 0px rgba(0,0,0,0.16),0px 2px 5px 0px rgba(0,0,0,0.23);
+		border-radius: 3px;
+	}
+
+	.full {
+		width: 100%;
+		height: 100%;
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		border-radius: 3px;
+	}
+
+	#textual {
+		text-overflow: ellipsis;
+		text-align: center;
+		background-color: var(--app-secondary-color);
+		color: var(--app-white);
+		white-space: nowrap;
+		overflow: hidden;
+		line-height: 100px;
+		padding: 5px;
+		box-sizing: border-box;
+	}
+
+	.error {
+		background-color: var(--app-error-color) !important;
+	}
+
+	#visual {
+		will-change: opacity;
+		opacity: 0;
+		transition: opacity  .2s ease-in .2s;
+		background-size: cover;
+	}
+
+	iron-icon {
+		position: absolute;
+		top: 5px;
+		right: 5px;
+		fill: var(--app-black);
+		background-color: var(--app-white);
+		box-shadow: 0px 2px 5px 0px rgba(0,0,0,0.16),0px 2px 5px 0px rgba(0,0,0,0.23);
+		border-radius: 50%;
+		cursor: pointer;
+	}
+
+	</style>
+
+	<div class="full" id="textual">[[name]]</div>
+	<div class="full" id="visual"></div>
+	<iron-icon on-tap="_remove" icon="close"></iron-icon>
+
+</template>
+<script>
+Polymer({
+	is: 'upload-thumbnail',
+
+	properties: {
+		name: String,
+		base64: {
+			type: String,
+			observer: '_base64Changed'
+		},
+
+		src: {
+			type: String,
+			observer: '_srcChanged',
+		},
+
+		index: {
+			type: Number,
+			value: null
+		}
+	},
+
+	_base64Changed: function(newVal, oldVal) {
+		if(!newVal) return;
+		var el = this.$.visual;
+		el.style.backgroundImage = 'url('+this.base64+')';
+		requestAnimationFrame(function() {
+			el.style.opacity = 1;
+		})
+	},
+
+	_srcChanged: function (newVal) {
+		if(!newVal) return;
+
+		var visual = this.$.visual;
+		var textual = this.$.textual;
+
+		var img = new Image();
+		img.src = this.src;
+		img.onload = function() {
+			visual.style.backgroundImage = 'url('+ newVal+')';
+			visual.style.opacity = 1;
+		};
+
+		img.onerror = function() {
+			textual.classList.add('error');
+			textual.innerHTML = 'Echec';
+		};
+	},
+
+	_remove: function() {
+		this.fire('remove-file', {index: this.index});
+	}
+
+});
+</script>
+</dom-module>

@@ -1,0 +1,69 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="months-data">
+  <template>
+
+  </template>
+  <script>
+  Polymer({
+    is: 'months-data',
+
+    properties: {
+      months: {
+        type: Array,
+        notify: true,
+        value: [
+          {
+            name: 'Jan',
+            value: "01"
+          },
+          {
+            name: 'Fév',
+            value: "02"
+          },
+          {
+            name: 'Mars',
+            value: "03"
+          },
+          {
+            name: 'Avr',
+            value: "04"
+          },
+          {
+            name: 'Mai',
+            value: "05"
+          },
+          {
+            name: 'Juin',
+            value: "06"
+          },
+          {
+            name: 'Juil',
+            value: "07"
+          },
+          {
+            name: 'Août',
+            value: "08"
+          },
+          {
+            name: 'Sept',
+            value: "09"
+          },
+          {
+            name: 'Oct',
+            value: "10"
+          },
+          {
+            name: 'Nov',
+            value: "11"
+          },
+          {
+            name: 'Déc',
+            value: "12"
+          },
+        ]
+      }
+    }
+  });
+  </script>
+</dom-module>

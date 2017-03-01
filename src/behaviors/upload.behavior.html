@@ -1,0 +1,216 @@
+<link rel="import" href="./data-pipe.behavior.html">
+
+<script>
+
+'use strict';
+
+/*
+Problematic : Since we are using a single page application, uploads are problematic.
+Imagine a form (who coresponds to a view and a url ) who can upload images to a server for a product (lets say the product id is in the url).
+You go to your form, fill it and send it. The process is not instantaneous (uploads have to complete). Imagine now
+that while uploading, your user decides to go again to the same form but with another product id.
+What you should be displaying to your user is a form without any uploads running.
+Yet, the user will see the uploads of the precedent product he modified.
+This behavior (coupled with the file-upload component) is designed to attend this problem by providing contexts.
+You can even track an upload (and alter it, like pause and play) in a totally different page if you have its context.
+Context are themselves divided in properties. An example would be upload with context = product id and upload
+banners or pictures. Those would be the properties.
+
+Uploads are stored globally, and each components pulls what it needs and store the data locally
+
+*/
+
+// We set the globalUploads object outside the behavior, it is a singleton
+var globalUploads = {};
+// Same goes for the subs
+var subscribers = {};
+
+
+// Notify every subs of for a context and a property
+function notifySubscribers(context, property, eventName, eventDetail) {
+	if(typeof subscribers[context][property] !== 'undefined') {
+		subscribers[context][property].forEach(function(sub) {
+			sub.fire(eventName, eventDetail);
+		})
+	}
+}
+
+window.UploadBehaviorImpl = {
+
+	properties: {
+		context: {
+			type: String,
+			observer: '_contextChange'
+		},
+		property: String
+	},
+	listeners: {
+		'control_upload': '_controlTaskState',
+		'cancel_upload': '_cancelTask',
+		'force_refresh': '_refreshUploads'
+	},
+
+	observers: [
+		'_storePaths(context, paths)'
+	],
+
+	ready: function(){
+		// If no context provided, we create one
+		if(typeof this.context === 'undefined') this.context = Date.now();
+		// add the context in the global uploads and subscribers, so another component can plug to the same context to share upload state
+		this._addNewContext(this.context);
+		this._forceRefresh();
+	},
+
+	_storePaths: function(context, paths) {
+		globalUploads[context][this.property].paths = paths;
+	},
+
+	_contextChange: function(newVal) {
+		if(!newVal) return;
+		this._addNewContext(newVal);
+		this._forceRefresh();
+	},
+
+	_addNewContext: function (newContext) {
+		// Creating the context object if needed;
+		subscribers[newContext] = subscribers[newContext] || {};
+		// Creating the property array if needed;
+		subscribers[newContext][this.property] = subscribers[newContext][this.property] || [];
+		// adding the component using the behavior to the subs
+		subscribers[newContext][this.property].push(this);
+
+		// Creating the context object if needed;
+		globalUploads[newContext] = globalUploads[newContext] || {};
+		// Creating the property array if needed;
+		globalUploads[newContext][this.property] = globalUploads[newContext][this.property] || {tasks: [], paths: []};
+	},
+
+	_getTaskIndex: function(uid) {
+		// Get a task (upload) index locally
+		for(var i = 0; i < this.uploads.length; i++){
+			if(this.uploads[i].uid == uid) {
+				return i;
+			}
+		}
+	},
+
+	_getGlobalTaskIndex: function (context, property, uid) {
+		// Get a task (upload) index globally
+		for(var i = 0; i < globalUploads[context][property].tasks.length; i++){
+			if(globalUploads[context][property].tasks[i].uid == uid) {
+				return i;
+			}
+		}
+	},
+
+	_getSubscriberIndex: function(context, property) {
+		for(var i = 0; i < subscribers[context][property].length; i++){
+			if(subscribers[context][property][i] === this) {
+				return i;
+			}
+		}
+	},
+
+	setTask: function(uid, task, filename, thumbnail, refStorage, onFinish) {
+		var _this = this;
+
+		// Creating an upload
+
+		task.filename = filename;
+		task.thumbnail = thumbnail;
+		task.refStorage = refStorage;
+		task.progress = 0;
+		task.icon = 'av:pause';
+		task.uid = uid;
+
+		// We will pass this metadata in the onFinish callback
+		var metadata = {
+			uid: uid,
+			context: _this.context,
+			property: _this.property,
+		};
+
+
+		// Push the upload
+		globalUploads[this.context][this.property].tasks.push(task);
+		// Notify subs (upload added);
+		this._forceRefresh();
+
+		// Upload progress
+		task.on('state_changed', function(snapshot) {
+			task.progress = Math.round( (snapshot.bytesTransferred / snapshot.totalBytes) * 100 );
+			// Notify subs (upload changed);
+			_this._forceRefresh();
+		}, function(err) {
+			console.log(err);
+		}, onFinish.bind(_this, task, metadata))
+
+	},
+
+	_controlTaskState: function(e) {
+		var _this = this;
+		var uid = e.detail.uid;
+		var task = globalUploads[this.context][this.property].tasks[this._getTaskIndex(uid)];
+		// Pausing or resuming an upload
+		switch(task.snapshot.state) {
+			case firebase.storage.TaskState.PAUSED:
+			task.resume();
+			task.icon = 'av:pause';
+			break;
+			case firebase.storage.TaskState.RUNNING:
+			task.pause();
+			task.icon = 'av:play-arrow';
+			break;
+		}
+
+		// Notify subs (upload changed);
+		this._forceRefresh();
+
+	},
+
+	_cancelTask: function(e) {
+		var uid = e.detail.uid;
+		var taskIndex = this._getTaskIndex(uid);
+		globalUploads[this.context][this.property].tasks[taskIndex].cancel();
+		this._unqueueTask(this.context, this.property, uid);
+		if(this.uploads.length === 0) {
+			notifySubscribers(this.context, this.property, 'uploads_finished', {});
+		}
+	},
+
+	_getTask: function (uid) {
+		// Get task locally
+		return globalUploads[this.context][this.property].tasks[this._getTaskIndex(uid)];
+	},
+
+	_getGlobalTask: function (context, property, uid) {
+		// Get task globally
+		return globalUploads[context][property].tasks[this._getGlobalTaskIndex(context, property, uid)];
+	},
+
+	_unqueueTask: function(context, property, uid) {
+		var taskIndex = this._getGlobalTaskIndex(context, property, uid);
+		globalUploads[context][property].tasks.splice(taskIndex, 1);
+		this._forceRefresh();
+	},
+
+	_forceRefresh: function () {
+		notifySubscribers(this.context, this.property, 'force_refresh', {});
+	},
+
+	_refreshUploads: function(e) {
+		// A component sharing the same context and property told us to update
+		if(typeof globalUploads[this.context][this.property] !== 'undefined') {
+			var temp = this.deepCopy(globalUploads[this.context][this.property].tasks);
+			this.uploads = [];
+			// Local copy
+			this.uploads = temp;
+		}
+	}
+
+};
+
+window.UploadBehavior = [window.UploadBehaviorImpl, window.DataPipeBehavior];
+
+</script>

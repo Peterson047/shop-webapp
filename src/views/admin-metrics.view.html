@@ -1,0 +1,41 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../components/sales-metrics.component.html">
+
+<link rel="import" href="../behaviors/page.behavior.html">
+
+<dom-module id="admin-metrics-view">
+  <template>
+  <style>
+  :host {
+    display: block;
+  }
+  </style>
+
+  <sales-metrics id="salesMetrics"></sales-metrics>
+
+  </template>
+  <script>
+  'use strict';
+  Polymer({
+    is: 'admin-metrics-view',
+
+    properties: {
+      pageData: {
+        type: Object,
+        value: {
+          category: "Statistiques",
+          topic: null
+        }
+      }
+    },
+
+    behaviors: [window.PageBehavior],
+
+    _onSelected: function() {
+      this.fire('hide-button');
+      this.$.salesMetrics.redrawPie();
+    },
+  });
+  </script>
+</dom-module>

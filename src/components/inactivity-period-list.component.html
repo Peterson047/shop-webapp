@@ -1,0 +1,79 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+
+<link rel="import" href="date.component.html">
+<link rel="import" href="loading-layer.component.html">
+<link rel="import" href="data-source.component.html">
+
+<link rel="import" href="../styles/list.style.html">
+<link rel="import" href="../styles/list-animation.style.html">
+<link rel="import" href="../styles/tile.style.html">
+<link rel="import" href="../styles/text-list.style.html">
+
+<link rel="import" href="../behaviors/modal-control.behavior.html">
+<link rel="import" href="../behaviors/list-animation.behavior.html">
+
+
+<dom-module id="inactivity-period-list">
+      <template>
+      <style include="list-style text-list list-animation tile-style">
+      :host {
+            display: flex;
+            justify-content: center;
+            height: 100%;
+            width: 100%;
+            position: relative;
+      }
+
+      paper-icon-button {
+            color: var(--app-action-color);
+      }
+      </style>
+
+      <data-source path="/inactivity_periods" cache-key="inactivity-periods" array="$key" fetching="{{loading}}" empty="{{empty}}" output="{{ips}}"></data-source>
+
+      <div class="tile keepMinimalSpace">
+
+            <loading-layer show="[[loading]]"></loading-layer>
+
+            <div id="list" hidden$="[[empty]]">
+                  <template is="dom-repeat" items="[[ips]]">
+                        <div class="item">
+                              Du <app-date timestamp="[[item.start]]"></app-date> au <app-date timestamp="[[item.end]]"></app-date>
+                              <paper-icon-button disabled$="[[!online]]" data-key="[[item.$key]]" on-tap="_confirm" icon="close"></paper-icon-button>
+                        </div>
+                  </template>
+            </div>
+
+            <div id="noEntry" hidden$="[[!empty]]">Pas de périodes d'inactivité</div>
+      </div>
+</template>
+<script>
+'use strict';
+Polymer({
+      is: 'inactivity-period-list',
+      behaviors: [window.ModalControlBehavior, window.ListAnimationBehavior],
+
+      listeners: {
+            'section-button': '_add'
+      },
+      _add: function(e) {
+            e.stopPropagation();
+            this.showModal('inactivity-period-modal', {focusBack: Polymer.dom(e).rootTarget});
+      },
+      _confirm: function(e) {
+            var key = e.currentTarget.dataKey;
+            var params = {
+                  title: "Supprimer cette période ?",
+                  confirm: this._remove.bind(this, key)
+            };
+            this.showModal('confirm-modal', params);
+      },
+      _remove: function(key) {
+            var updates = {};
+            updates['/inactivity_periods/' + key] = null;
+            return firebase.database().ref().update(updates)
+      }
+});
+</script>
+</dom-module>

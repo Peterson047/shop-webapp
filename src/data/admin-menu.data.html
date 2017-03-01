@@ -1,0 +1,52 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="admin-menu-data">
+	<template>
+
+	</template>
+	<script>
+	'use strict';
+	Polymer({
+		is: 'admin-menu-data',
+
+		properties: {
+			pages: {
+				type: Array,
+				notify: true,
+				value: [
+					{
+						name: 'order-list',
+						href: '/admin/order-list',
+						display: 'Commandes'
+					},
+					{
+						name: 'product-list',
+						href: '/admin/product-list',
+						display: 'Produits'
+					},
+					{
+						name: 'inactivity-period',
+						href: '/admin/inactivity-period',
+						display: "Périodes d'inactivité"
+					},
+					{
+						name: 'shipping-grid',
+						href: '/admin/shipping-grid',
+						display: "Grille d'envoi"
+					},
+					{
+						name: 'metrics',
+						href: '/admin/metrics',
+						display: "Statistiques"
+					},
+					{
+						name: 'schedules',
+						href: '/admin/schedules',
+						display: "Horaires"
+					}
+				]
+			}
+		}
+	});
+	</script>
+</dom-module>

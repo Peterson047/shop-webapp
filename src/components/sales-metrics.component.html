@@ -1,0 +1,106 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/google-chart/google-chart.html">
+
+<link rel="import" href="loading-layer.component.html">
+<link rel="import" href="data-source.component.html">
+
+<link rel="import" href="../styles/tile.style.html">
+<link rel="import" href="../styles/font.style.html">
+<link rel="import" href="../styles/colors.style.html">
+
+<dom-module id="sales-metrics">
+	<template>
+
+	<style include="tile-style font-style colors-style">
+
+	:host {
+
+	}
+
+	#chartContainer {
+		margin-top: var(--app-space);
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+	}
+
+	#pie {
+		width: 100%;
+	}
+
+	[hidden] {
+		display: none !important;
+	}
+
+	</style>
+
+	<data-source path="/standards" cache-key="standards" fetching="{{loading}}" output="{{standards}}"></data-source>
+	<data-source path="/all_products" cache-key="all_products" fetching="{{loading}}" output="{{products}}"></data-source>
+	<data-source path="/metrics/sales" cache-key="metrics-sales" fetching="{{loading}}" empty="{{empty}}" output="{{metrics}}"></data-source>
+
+	<div class="tile keepMinimalSpace">
+		<loading-layer show="[[loading]]"></loading-layer>
+		<div id="chartContainer" hidden$="[[empty]]">
+			<div class="font-bold font-big"><span class="color-primary">[[metrics.all]]</span> savons vendus</div>
+			<google-chart
+			id="pie"
+			type='pie'
+			options='{"title": "Répartition des ventes"}'
+			cols='[{"label":"Produit", "type":"string"}, {"label":"Quantité", "type":"number"}]'
+		      rows="[[chartData]]"
+			></google-chart>
+		</div>
+
+		<div id="noEntry" hidden$="[[!empty]]">Pas de produit vendu</div>
+	</div>
+
+
+</template>
+<script>
+'use strict';
+
+Polymer({
+	is: 'sales-metrics',
+	properties: {
+		chartData: {
+			type: Array
+		}
+	},
+	observers: [
+		'_computeMetrics(standards, products, metrics)'
+	],
+
+	attached: function() {
+		window.addEventListener('resize', function() {
+			if(this.offsetParent) {
+				this.redrawPie();
+			}
+		}.bind(this));
+	},
+
+	_computeMetrics: function(standards, products, metrics) {
+
+		if(!standards || !products || !metrics) return this.chartData = [];
+
+		var all = metrics.all;
+		var buffer = [];
+
+		for(var productUid in metrics.items) {
+			for(var standardUid in metrics.items[productUid]) {
+				var slice = [];
+				slice.push(products[productUid].name+' - '+standards[standardUid].name);
+				slice.push(metrics.items[productUid][standardUid]);
+				buffer.push(slice);
+			}
+		}
+
+		this.chartData = buffer;
+	},
+
+	redrawPie: function() {
+		this.$.pie.redraw();
+	}
+});
+</script>
+</dom-module>

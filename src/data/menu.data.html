@@ -1,0 +1,39 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="menu-data">
+  <template>
+
+  </template>
+  <script>
+  Polymer({
+    is: 'menu-data',
+
+    properties: {
+      pages: {
+        type: Array,
+        notify: true,
+        value: [
+          {
+            name: 'home',
+            href: '/',
+            display: 'Accueil',
+            icon: "home"
+          },
+          {
+            name: 'customer-product-list',
+            href: '/customer-product-list',
+            display: 'Nos savons',
+            icon: "social:whatshot"
+          },
+          {
+            name: 'contact',
+            href: '/contact',
+            display: 'Contact',
+            icon: "maps:place"
+          },
+        ]
+      }
+    }
+  });
+  </script>
+</dom-module>

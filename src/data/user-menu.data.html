@@ -1,0 +1,47 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="user-menu-data">
+	<template>
+
+	</template>
+	<script>
+	'use strict';
+	Polymer({
+		is: 'user-menu-data',
+
+		properties: {
+			provider: {
+				type: String,
+				observer: '_providerChange'
+			},
+
+			pages: {
+				type: Array,
+				notify: true,
+				value: []
+			}
+		},
+
+		_providerChange: function(provider) {
+			var buf = [];
+
+			buf.push({
+				name: 'orders',
+				href: '/user/orders',
+				display: 'Vos commandes'
+			});
+
+			if(provider === 'password') {
+				buf.push({
+					name: 'infos',
+					href: '/user/infos',
+					display: 'Vos informations',
+					onlineOnly: true
+				});
+			}
+
+			this.pages = buf;
+		}
+	});
+	</script>
+</dom-module>

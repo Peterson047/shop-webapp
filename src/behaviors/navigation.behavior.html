@@ -1,0 +1,20 @@
+<script>
+
+'use strict';
+
+window.NavigationBehavior = {
+	goTo: function(page) {
+		history.pushState({}, '', page);
+		window.dispatchEvent(new PopStateEvent('popstate', {
+			bubbles: false,
+			cancelable: false,
+			state: {message:'New State!'}
+		}));
+	},
+
+	goBack: function() {
+		history.back();
+	}
+}
+
+</script>

@@ -1,0 +1,123 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../bower_components/paper-tooltip/paper-tooltip.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+
+<link rel="import" href="loading-layer.component.html">
+<link rel="import" href="data-source.component.html">
+
+<link rel="import" href="../styles/tile.style.html">
+<link rel="import" href="../styles/list.style.html">
+<link rel="import" href="../styles/text-list.style.html">
+<link rel="import" href="../styles/list-animation.style.html">
+<link rel="import" href="../styles/colors.style.html">
+
+<link rel="import" href="../behaviors/list-animation.behavior.html">
+<link rel="import" href="../behaviors/navigation.behavior.html">
+<link rel="import" href="../behaviors/modal-control.behavior.html">
+
+
+<dom-module id="admin-product-list">
+      <template>
+      <style include="tile-style list-animation list-style text-list iron-flex iron-flex-alignment colors-style">
+      :host {
+            display: flex;
+            justify-content: center;
+            height: 100%;
+            width: 100%;
+            position: relative;
+      }
+
+      a {
+            text-decoration: none;
+      }
+
+      .actionsButtons {
+            min-width: 84px;
+      }
+
+      </style>
+
+      <data-source path="/all_products" cache-key="all_products" array="$key" fetching="{{loading}}" empty="{{empty}}" output="{{data}}"></data-source>
+
+      <div class="tile keepMinimalSpace">
+            <div id="list" hidden$="[[empty]]">
+                  <template is="dom-repeat" items="[[data]]">
+                        <div class="item">
+                              <div class="layout-horizontal grow">
+                                    <iron-icon class="label" active$="[[item.active]]" icon="label"></iron-icon> [[item.name]]
+                              </div>
+                              <div class="actionsButtons layout-horizontal end-justified color-action">
+                                    <paper-icon-button id="see[[index]]" disabled$="[[!item.active]]" product-id="[[item.$key]]" on-tap="_seeProduct" icon="visibility"></paper-icon-button>
+                                    <paper-tooltip for="see[[index]]" position="left">Voir le produit</paper-tooltip>
+
+                                    <paper-icon-button disabled$="[[_canUpdateStock(item.stock, online)]]" id="stock[[index]]" data-index="[[index]]" on-tap="_stock" icon="store"></paper-icon-button>
+                                    <paper-tooltip for="stock[[index]]" position="left">Gérer le stock</paper-tooltip>
+
+                                    <paper-icon-button product-id="[[item.$key]]" on-tap="_editProduct" disabled$="[[!online]]" id="edit[[index]]" icon="create"></paper-icon-button>
+                                    <paper-tooltip for="edit[[index]]" offset="0" position="left">Gérer le produit</paper-tooltip>
+                              </div>
+                        </div>
+                  </template>
+            </div>
+
+            <div id="noEntry" hidden$="[[!empty]]">Pas de produits</div>
+            <loading-layer show="[[loading]]"></loading-layer>
+      </div>
+
+</template>
+<script>
+'use strict';
+Polymer({
+      is: 'admin-product-list',
+      listeners: {
+            'section-button': '_add'
+      },
+      properties: {
+            lastIndex: {
+                  type: Number,
+                  value: null
+            },
+            data: {
+                  type: Array,
+                  observer: '_notifyStockModal'
+            }
+      },
+
+      behaviors: [window.ListAnimationBehavior, window.NavigationBehavior, window.ModalControlBehavior],
+
+      _seeProduct: function(e) {
+            e.stopPropagation();
+            var id = Polymer.dom(e).rootTarget.productId;
+            this.goTo('/product-detail/'+id);
+      },
+
+      _editProduct: function(e) {
+            e.stopPropagation();
+            var id = Polymer.dom(e).rootTarget.productId;
+            this.goTo('/product-form/'+id+'?action=edit');
+      },
+
+      _add: function(e) {
+            e.stopPropagation();
+            var newProductKey = firebase.database().ref().child('all_products').push().key;
+            this.goTo("/product-form/"+newProductKey+"?action=create");
+      },
+
+      _canUpdateStock: function(stock, online) {
+            return !stock || !online;
+      },
+
+      _notifyStockModal: function(newData) {
+            if(this.lastIndex === null || typeof this.lastIndex === 'undefined') return;
+            this.notifyModal('stock-modal', {stock: newData[this.lastIndex].stock});
+      },
+
+      _stock: function(e) {
+            this.lastIndex = e.currentTarget.dataIndex;
+            this.showModal('stock-modal', {name: this.data[e.currentTarget.dataIndex].name, stock: this.data[e.currentTarget.dataIndex].stock, id: this.data[e.currentTarget.dataIndex].$key})
+      }
+});
+</script>
+</dom-module>

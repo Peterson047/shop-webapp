@@ -1,0 +1,189 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../styles/shop-select.style.html">
+<link rel="import" href="../styles/colors.style.html">
+
+<link rel="import" href="../behaviors/data-pipe.behavior.html">
+<link rel="import" href="../behaviors/toaster-control.behavior.html">
+
+<dom-module id="product-quantity">
+	<template>
+	<style include="shop-select colors-style">
+	:host {
+		display: block;
+	}
+
+	:host(.full) > shop-select {
+		width: 100%;
+	}
+
+	shop-select {
+		padding-left: var(--select-padding-left, 0px);
+	}
+	</style>
+	<template is="dom-if" if="[[!outOfStock]]">
+		<shop-select>
+			<label prefix>[[label]]</label>
+			<select id="quantity" required="" on-change="_computeRange" value="{{strQty::change}}">
+				<template id="quantityRangeTemplate" is="dom-repeat" items="[[quantityRange]]" as="quantity">
+					<option value="[[quantity]]">[[quantity]]</option>
+				</template>
+			</select>
+			<shop-md-decorator aria-hidden="true">
+				<shop-underline></shop-underline>
+			</shop-md-decorator>
+		</shop-select>
+	</template>
+	<template is="dom-if" if="[[outOfStock]]">
+		<div class="color-error">Rupture de stock</div>
+	</template>
+
+</template>
+<script>
+'use strict';
+
+Polymer({
+
+	is: 'product-quantity',
+
+	behaviors: [window.DataPipeBehavior, window.ToasterControlBehavior],
+
+	properties: {
+		limit: {
+			type: Number,
+			value: 5
+		},
+
+		productStock: {
+			type: Object,
+			observer: '_computeFromStocks',
+		},
+
+		productStandard: {
+			type: String,
+			observer: '_computeFromStandard',
+		},
+
+		quantityRange: {
+			type: Array,
+			value: []
+		},
+
+		quantity: {
+			type: Number,
+			observer: '_qtyChange',
+			notify: true,
+		},
+
+		strQty: {
+			type: String,
+			observer: '_strQtyChange'
+		},
+
+		outOfStock: {
+			type: Boolean,
+			value: false,
+			notify: true
+		},
+	},
+
+	_qtyChange: function(newVal) {
+		if(newVal) this.strQty = this.quantity.toString();
+	},
+
+	_strQtyChange: function() {
+		this.quantity = parseInt(this.strQty);
+	},
+
+	_computeFromStocks: function (stocksUpdated, oldStock) {
+		if (!this._shouldComputeRange()) return;
+
+		this._reflectQuantity('stock', oldStock);
+		// If stock was under the limit and some was added, we notify the user
+		// If no stock, this will not trigger (since stock quantity = 0)
+
+		if((this.productStandard === this.previousStandard || !this.previousStandard) && oldStock
+		&& oldStock.quantity < this.limit && this.productStock.quantity > oldStock.quantity) {
+			this.showToaster({
+				text: 'Stock mis à jour, '+this.productStock.quantity+' disponible(s)',
+				state: true,
+				actions: []
+			})
+		}
+	},
+
+	_computeFromStandard: function (standardSelected, oldStandard) {
+		this.previousStandard = oldStandard;
+		if (this._shouldComputeRange()) this._reflectQuantity('standard', null);
+	},
+
+	_shouldComputeRange: function () {
+		// If there is no stocks available or no standard selected, range is empty anyway
+		if(!this.productStock || !this.productStandard) return false;
+		// First check if we have some stocks or not
+		if (!this._checkStock()) return false;
+		// Update range of the beautiful select
+		this._computeRange();
+
+		return true;
+	},
+
+	_computeRange: function () {
+		var stock = this._grabStock();
+		// If there is some stocks available, compute range
+		var buf = [];
+		var limiteScaled = (isNaN(this.quantity) || null == this.quantity) ? parseInt(this.limit) : parseInt(this.limit) + parseInt(this.quantity);
+		var limit = (limiteScaled > stock) ? stock : limiteScaled;
+
+		for(var i = 1; i <= limit; i++) {
+			buf.push(i);
+		}
+		this.quantityRange = buf;
+	},
+
+	_reflectQuantity: function (origin, oldStock) {
+		// If selected quantity is no longer available, set the quantity to the closest qty available
+		if('stock' == origin && this.productStock.quantity < this.quantity) {
+			this.quantity = this.quantityRange[this.quantityRange.length-1];
+		}
+		// If we were out of stock but some was added or if quantity is not set yet or if we switch standard, we automatically set qty to 1
+		else if('standard' == origin || !this.quantity || ('stock' == origin && oldStock && oldStock.quantity == 0) ) {
+			this.quantity = this.quantityRange[0];
+		}
+
+		this._updateSelect();
+	},
+
+	_updateSelect: function () {
+		var _this = this;
+
+		this.async(function () {
+			_this.$$('#quantityRangeTemplate').addEventListener("dom-change", function(event){
+				event.stopPropagation();
+				_this.$$('#quantity').value = _this.quantity;
+			});
+		});
+	},
+
+	_checkStock: function () {
+		// Grab stock available for the current standard
+		var stock = this._grabStock();
+		// If no quantity is available for this standard in the stocks
+		if(stock < 1) {
+			this.outOfStock = true;
+			this.quantity = null;
+			return false;
+		}
+		else {
+			this.outOfStock = false;
+			return stock;
+		}
+	},
+
+	_grabStock: function () {
+		// Grab stock quantity
+		return this.productStock.quantity;
+	},
+});
+</script>
+</dom-module>

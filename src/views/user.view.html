@@ -1,0 +1,111 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/app-route/app-route.html">
+<link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
+
+<link rel="import" href="../behaviors/page-transition.behavior.html">
+<link rel="import" href="../behaviors/navigation.behavior.html">
+<link rel="import" href="../behaviors/page.behavior.html">
+
+<link rel="import" href="../components/loader.component.html">
+<link rel="import" href="../components/section.component.html">
+
+<link rel="import" href="../styles/transition-block.style.html">
+<link rel="import" href="../styles/page.style.html">
+
+<link rel="import" href="../data/user-menu.data.html">
+
+<dom-module id="user-view">
+	<template>
+	<style include="page-style transition-block-style">
+	:host {
+		display: block;
+	}
+
+	#loadingBackground {
+		background-color: var(--app-white);
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 40px;
+		border-bottom-left-radius: 3px;
+		border-bottom-right-radius: 3px;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+
+	#transitionBlock {
+		box-shadow: var(--app-shadow);
+	}
+
+	#loader {
+		--app-loader-color: var(--app-primary-color);
+	}
+
+	</style>
+
+	<app-route
+	route="[[route]]"
+	pattern="/:page"
+	data="{{routeData}}"></app-route>
+
+	<user-menu-data provider="[[_getProvider(user)]]" pages="{{pages}}"></user-menu-data>
+
+	<app-section online="[[online]]" heading="[[user.displayName]]" menu="[[pages]]" selected="[[page]]" main-background="--app-section-header-background-color" fill-background="--app-section-fill-color">
+		<div id="loadingBackground" tabindex="-1">
+			<app-loader id="loader"></app-loader>
+		</div>
+
+		<section id="transitionBlock">
+			<iron-pages selected="[[page]]" attr-for-selected="name">
+				<user-infos-view provider="[[_getProvider(user)]]" app-data="[[appData]]" user="[[user]]" name="infos"></user-infos-view>
+				<user-orders-view user="[[user]]" name="orders"></user-orders-view>
+			</iron-pages>
+		</section>
+	</app-section>
+
+	</template>
+	<script>
+	'use strict';
+	Polymer({
+		is: 'user-view',
+
+		properties: {
+			defaultPage: {
+				type: String,
+				value: 'orders'
+			},
+
+			viewsPath: {
+				type: String,
+				value: './user-'
+			},
+
+			pageData: {
+				type: Object,
+				value: {
+					category: "Utilisateur",
+					topic: null,
+					path: "user",
+				}
+			},
+
+			user: Object,
+			appData: Object,
+		},
+
+		behaviors: [window.PageBehavior, window.PageTransitionBehavior, window.NavigationBehavior],
+
+		_onSelected: function(){
+			if(!this.user) this.goTo('/');
+		},
+
+		_getProvider: function(user) {
+			if(user) return user.providerData[0].providerId;
+			else return null;
+		},
+
+	});
+	</script>
+</dom-module>

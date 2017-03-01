@@ -1,0 +1,82 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-progress/paper-progress.html">
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../bower_components/iron-icons/av-icons.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+
+<link rel="import" href="thumbnail.component.html">
+
+<dom-module id="upload-progress">
+	<template>
+	<style>
+	:host {
+		display: block;
+		position: relative;
+		width: 200px;
+		height: 100px;
+	}
+
+	#progress {
+		position: absolute;
+		bottom: 0;
+	}
+
+	#numericProgress {
+		color: var(--app-white);
+		font-size: 30px;
+    width: 100%;
+    text-align: center;
+    height: 60px;
+    position: absolute;
+    left: 0;
+    top: 50%;
+    margin-top: -30px;
+    line-height: 60px;
+		text-shadow: 1px 1px 4px rgba(0, 0, 0, 1);
+
+	}
+
+	iron-icon {
+		bottom: 9px;
+		left: 5px;
+		position: absolute;
+		fill: var(--app-black);
+		background-color: var(--app-white);
+		box-shadow: 0px 2px 5px 0px rgba(0,0,0,0.16),0px 2px 5px 0px rgba(0,0,0,0.23);
+		border-radius: 50%;
+		cursor: pointer;
+	}
+
+	</style>
+
+	<upload-thumbnail on-remove-file="_fireCancel" name="[[data.filename]]" base64="[[data.thumbnail]]"></upload-thumbnail>
+	<iron-icon icon="[[data.icon]]" id="control"></iron-icon>
+	<div id="numericProgress">[[data.progress]]%</div>
+	<paper-progress id="progress" value="[[data.progress]]" min="0" max="100"></paper-progress>
+
+</template>
+<script>
+'use strict';
+Polymer({
+	is: 'upload-progress',
+
+	properties: {
+		data: {
+			type: Object
+		}
+	},
+
+	listeners: {
+		'control.tap': '_fireControl',
+	},
+
+	_fireControl: function(e) {
+		this.fire('control_upload', { uid: this.data.uid });
+	},
+	
+	_fireCancel: function(e) {
+		this.fire('cancel_upload', { uid: this.data.uid });
+	}
+});
+</script>
+</dom-module>

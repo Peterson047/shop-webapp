@@ -1,0 +1,102 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../bower_components/paper-material/paper-material.html">
+
+<link rel="import" href="./loading-layer.component.html">
+<link rel="import" href="./sign-in-credentials.component.html">
+<link rel="import" href="./sign-in-provider.component.html">
+
+<link rel="import" href="../behaviors/modal-control.behavior.html">
+<link rel="import" href="../behaviors/modal.behavior.html">
+<link rel="import" href="../behaviors/auth-control.behavior.html">
+<link rel="import" href="../behaviors/toaster-control.behavior.html">
+
+<link rel="import" href="../styles/modal.style.html">
+
+
+<dom-module id="sign-in-modal">
+      <template>
+      <style include="modal-style">
+      :host {
+            display: block;
+      }
+
+      sign-in-credentials {
+            width: 100%;
+      }
+
+      sign-in-provider {
+            margin-bottom: var(--app-space);
+      }
+
+      sign-in-provider, sign-in-credentials {
+                  margin-top: auto;
+      }
+
+      </style>
+
+      <paper-material id="container" tabable-container>
+            <div id="content">
+                  <paper-icon-button  tabable id="close" on-tap="hide" icon="close"></paper-icon-button>
+                  <sign-in-credentials tabable-container id="credentials"></sign-in-credentials>
+                  <sign-in-provider tabable-container></sign-in-provider>
+            </div>
+            <loading-layer show="[[loading]]"></loading-layer>
+      </paper-material>
+
+</template>
+<script>
+Polymer({
+      is: 'sign-in-modal',
+      listeners: {
+            'no-account': '_swap'
+      },
+      behaviors: [window.AuthControlBehavior, window.ModalBehavior, window.ModalControlBehavior, window.ToasterControlBehavior],
+
+      focus: function() {
+            this.$.credentials.focus();
+      },
+
+      _swap: function(e){
+            e.stopPropagation();
+            this.swapModals('sign-in-modal', 'sign-up-modal');
+      },
+
+      _signInSucceed: function() {
+            this.hide(true);
+            this.$.credentials.reset();
+            this.showToaster({
+                  text: 'Authentification réussie',
+                  state: true,
+                  actions: []
+            })
+      },
+
+      _signInFailed: function(err) {
+            this.showToaster({
+                  text: err,
+                  state: false,
+                  actions: []
+            })
+      },
+
+      _mailSent: function() {
+            this.hide(true);
+            this.showToaster({
+                  text: 'Email envoyé',
+                  state: true,
+                  actions: []
+            })
+      },
+
+      _mailError: function(err) {
+            this.showToaster({
+                  text: 'Aucun utilisateur lié à cet email.',
+                  state: false,
+                  actions: []
+            })
+      }
+
+});
+</script>
+</dom-module>

@@ -1,0 +1,334 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../bower_components/paper-tooltip/paper-tooltip.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../bower_components/iron-icons/maps-icons.html">
+<link rel="import" href="../../bower_components/iron-icons/editor-icons.html">
+<link rel="import" href="../../bower_components/app-route/app-location.html">
+
+<link rel="import" href="button.component.html">
+<link rel="import" href="date.component.html">
+<link rel="import" href="loading-layer.component.html">
+<link rel="import" href="cart-recap.component.html">
+<link rel="import" href="dashed-title.component.html">
+<link rel="import" href="address.component.html">
+<link rel="import" href="data-source.component.html">
+<link rel="import" href="api-call.component.html">
+
+<link rel="import" href="dashed-title.component.html">
+
+<link rel="import" href="../behaviors/clipboard.behavior.html">
+<link rel="import" href="../behaviors/modal-control.behavior.html">
+<link rel="import" href="../behaviors/toaster-control.behavior.html">
+<link rel="import" href="../behaviors/cart.behavior.html">
+
+<link rel="import" href="../styles/tile.style.html">
+<link rel="import" href="../styles/colors.style.html">
+<link rel="import" href="../styles/font.style.html">
+<link rel="import" href="../styles/fix-tap.style.html">
+
+
+<dom-module id="app-order">
+	<template>
+	<style include="tile-style iron-flex iron-flex-alignment colors-style font-style fix-tap-style">
+
+	:host {
+		display: block;
+	}
+
+	#adminActions {
+		text-align: right;
+	}
+
+	cart-recap {
+		margin-top: 1em;
+		margin-bottom: 1em;
+	}
+
+	.shippingAddr {
+		padding: 15px 30px 15px 30px;
+	}
+
+	app-address {
+		margin-top: 5px;
+	}
+
+	.noMarginBot {
+		margin-bottom: 0;
+	}
+
+	[hidden] {
+		display: none !important;
+	}
+
+	</style>
+
+	<data-source path="[[_computeOrderPath(orderId, route)]]" cache-key="[[_getCacheKey(route)]]" cache-prop="[[orderId]]" output="{{data}}" fetching="{{loading}}"></data-source>
+
+	<app-location route="{{route}}"></app-location>
+
+	<api-call id="refundCall" uri="[[appData.backend]]/order/refund" method="PUT" on-response="_onRefund"></api-call>
+
+	<div class="tile keepMinimalSpace">
+
+		<template is="dom-if" if="[[isAdmin]]">
+			<div id="adminActions">
+				<paper-icon-button class="color-action" disabled$="[[_cannotSend(data, online)]]" on-tap="_send" id="send" icon="send"></paper-icon-button>
+				<paper-tooltip for="send" position="left">Envoyer</paper-tooltip>
+				<paper-icon-button class="color-action" disabled$="[[_cannotRefund(data, online)]]" on-tap="_confirm" id="refund" icon="editor:attach-money"></paper-icon-button>
+				<paper-tooltip for="refund" position="left">Rembourser</paper-tooltip>
+			</div>
+		</template>
+
+		<div class="horizontal justified layout center">
+			<div hidden$="[[loading]]">Commande passée le <app-date timestamp="[[data.time.create]]"></app-date>.</div>
+
+			<template is="dom-if" if="[[data.delivery.tracklink]]">
+				<a class="no-decoration" href="[[data.delivery.tracklink]]" target="_blank">
+					<app-button class="color-white bg-action" center raised>Suivre le colis</app-button>
+				</a>
+			</template>
+		</div>
+
+		<div class="horizontal layout center" hidden$="[[loading]]">
+			<div><span class="font-bold">Numéro de commande :</span> <span class="color-accent" id="orderId">[[orderId]]</span></div>
+			<paper-icon-button class="color-action" disabled$="[[!canCopy]]" on-tap="_copyId" icon="content-copy"></paper-icon-button>
+		</div>
+		<template is="dom-if" if="[[isAdmin]]">
+			<div class$="[[stateColor]]">[[_getOrderState(data.status)]]</div>
+		</template>
+
+		<dashed-title icon="payment">Paiement</dashed-title>
+
+		<div class$="[[paymentColor]]"><p><b>[[_getPaymentState(data.status)]]</b></p></div>
+
+		<dashed-title icon="maps:local-shipping">Livraison</dashed-title>
+
+		<p class="noMarginBot">
+			<template is="dom-if" if="[[_getDelivery(data, 'planned')]]">
+				Livraison prévue pour le <app-date string="[[data.delivery.date]]"></app-date>.
+			</template>
+
+			<template is="dom-if" if="[[_getDelivery(data, 'estimated')]]">
+				Livraison estimée pour le <app-date string="[[data.cart.estimateDelivery]]"></app-date>.
+			</template>
+
+			<template is="dom-if" if="[[_getDelivery(data, 'refunded')]]">
+				Livraison <span class="color-error">annulée</span>.
+			</template>
+		</p>
+
+		<div class="layout horizontal wrap">
+			<div class="shippingAddr"><b>Adresse de livraison :</b> <app-address is-fancy="true" data="[[data.address.shipping]]"></app-address></div>
+			<template is="dom-if" if="[[data.address.billing]]" restamp="true">
+				<div class="shippingAddr"><b>Adresse de facturation :</b> <app-address is-fancy="true" data="[[data.address.shipping]]"></app-address></div>
+			</template>
+		</div>
+
+		<dashed-title icon="shopping-basket">Récapitulatif</dashed-title>
+		<cart-recap cart="[[data.cart]]"></cart-recap>
+
+		<dashed-title icon="mail">Contact</dashed-title>
+		<template is="dom-if" if="[[!isAdmin]]">
+			<p>Pour toute réclamation, contactez <a href="mailto:support@[[appData.domain]]" class="color-link">support@[[appData.domain]]</a> en fournissant votre numéro de commande.</p>
+		</template>
+		<template is="dom-if" if="[[isAdmin]]">
+			<p>
+				Adresse de l'utilisateur : <a href="mailto:[[data.user.email]]" class="color-primary">[[data.user.email]]</a>
+			</p>
+		</template>
+	</template>
+
+	<loading-layer show="[[loading]]"></loading-layer>
+
+</div>
+
+
+</template>
+<script>
+'use strict';
+Polymer({
+	is: 'app-order',
+
+	properties: {
+		orderId: {
+			type: String
+		},
+		appData: Object,
+		user : {
+			type: Object,
+			observer: '_onUserChanges',
+		},
+		isAdmin: {
+			type: Boolean,
+			value: false,
+		},
+		paymentColor: String,
+		stateColor: String
+	},
+
+	behaviors: [window.CartBehavior, window.ModalControlBehavior, window.ToasterControlBehavior, window.ClipboardBehavior],
+
+	observers: ['_checkRouteAction(route)'],
+
+	_computeOrderPath: function(orderId, route) {
+		if(!orderId) return null;
+		var path;
+		if(route.__queryParams.archived) path = '/archives/orders/'+orderId;
+		else path = '/orders/'+orderId;
+		return path;
+	},
+
+	_getCacheKey: function(route) {
+		if(route.__queryParams.cachekey) return route.__queryParams.cachekey;
+	},
+
+	_onUserChanges: function (incomingUser) {
+		if (!incomingUser || !incomingUser.role) return;
+		this.isAdmin = incomingUser.role === 'admin';
+	},
+
+	_getPaymentState: function(status) {
+		if(!status) return;
+		var str = '';
+
+		switch(status.payment) {
+
+			case 'waiting':
+			str = 'Paiement en attente.';
+			this.paymentColor = 'color-primary';
+			break;
+
+			case 'paid':
+			str = 'Paiement accepté.';
+			this.paymentColor = 'color-validation';
+			break;
+
+			case 'refunded':
+			str = 'Paiement remboursé.';
+			this.paymentColor = 'color-secondary';
+			break;
+
+			case 'none':
+			str = 'Paiement jamais effectué.';
+			this.paymentColor = 'color-error';
+			break;
+
+			case 'cancelled':
+			str = 'Paiement annulé.';
+			this.paymentColor = 'color-error';
+			break;
+
+			default:
+			break;
+		}
+
+		return str;
+	},
+
+	_getOrderState: function(status) {
+		if(!status) return;
+		var str = '';
+
+		switch(status.state) {
+			case 'processing':
+			str += 'Commande en traitement.';
+			this.stateColor = 'color-error';
+			break;
+
+			case 'cancelled':
+			str = 'Commande annulée.';
+			this.stateColor = 'color-error';
+			break;
+
+			case 'placed':
+			str = 'Commande validée ';
+			str += status.shipping === 'to_ship' ? '& à envoyer.' : '& envoyée.'
+			this.stateColor = 'color-validation';
+			break;
+			default:
+			break;
+		}
+
+		return str;
+	},
+
+	_getDelivery: function(order, delivery) {
+
+		if(!order) return;
+
+		var deliveryDate = order.delivery && order.delivery.date;
+		var status = order.status;
+		var payment = (order.status) ? status.payment: null;
+
+		switch(delivery) {
+			case 'planned':
+			return deliveryDate && payment !== 'refunded';
+			break;
+			case 'estimated':
+			return !deliveryDate && payment !== 'refunded';
+			break;
+			case 'refunded':
+			return payment === 'refunded';
+			break;
+		}
+	},
+
+	_send: function() {
+		this.showModal('send-order-modal', {orderId: this.orderId});
+	},
+
+	_confirm: function() {
+		var params = {
+			title: "Rembourser cette commande ? Réfléchis bien.",
+			confirm: this._refund.bind(this)
+		};
+		this.showModal('confirm-modal', params);
+	},
+
+	_refund: function() {
+		var data = {orderId: this.orderId};
+		this.$.refundCall.request(data);
+	},
+
+	_onRefund: function(response) {
+		var res = response.detail;
+		if(res.success) {
+			this.showToaster({
+				text: 'Commande remboursée',
+				state: true,
+				actions: []
+			})
+		} else {
+			this.showToaster({
+				text: res.error,
+				state: false,
+				actions: []
+			})
+		}
+	},
+
+	_copyId: function() {
+		this.clipboardCopy(this.$.orderId);
+	},
+
+	_checkRouteAction: function (route) {
+		if ("clear-cart" == route.__queryParams.action) {
+			this.clearCart();
+		}
+	},
+
+	_cannotSend: function (data, online) {
+		if (!data.status) return false;
+		else if(!online) return true;
+		return data.status.payment !== 'paid' || data.status.shipping !== 'to_ship';
+	},
+
+	_cannotRefund: function (data, online) {
+		if (!data.status) return false;
+		else if(!online) return true;
+		return data.status.payment !== 'paid';
+	}
+});
+</script>
+</dom-module>

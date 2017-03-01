@@ -1,0 +1,42 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../components/admin-product-list.component.html">
+
+<link rel="import" href="../behaviors/page.behavior.html">
+
+<dom-module id="admin-product-list-view">
+  <template>
+  <style>
+  :host {
+    display: block;
+  }
+
+  </style>
+
+  <admin-product-list id="target" online="[[online]]"></admin-product-list>
+
+  </template>
+  <script>
+  'use strict';
+  Polymer({
+    is: 'admin-product-list-view',
+
+    properties: {
+      pageData: {
+        type: Object,
+        value: {
+          category: "Produits",
+          topic: null,
+          path: "products"
+        }
+      }
+    },
+
+    behaviors: [window.PageBehavior],
+
+    _onSelected: function() {
+      this.fire('update-button', {icon: 'add'});
+    },
+  });
+  </script>
+</dom-module>

@@ -1,0 +1,79 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html"/>
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../bower_components/paper-tooltip/paper-tooltip.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/iron-icons/hardware-icons.html">
+
+<link rel="import" href="../styles/colors.style.html">
+
+<dom-module id="back-to-top">
+      <template>
+      <style include="colors-style">
+      :host{
+            display: inline-block;
+            cursor:pointer;
+      }
+
+      paper-icon-button {
+            --paper-icon-button-ink-color: var(--back-to-top-ink-color, var(--app-primary-color));
+      }
+
+      </style>
+
+      <paper-icon-button class="color-white" id="backToTop" icon="hardware:keyboard-arrow-up"></paper-icon-button>
+      <paper-tooltip for="backToTop" position="left">Retour en haut de page</paper-tooltip>
+</template>
+
+<script>
+Polymer({
+      is: 'back-to-top',
+
+      properties: {
+            animating : {
+                  type: Boolean,
+                  value : false
+            },
+      },
+
+      listeners: {
+            'tap': 'tapHandler'
+      },
+
+      tapHandler: function () {
+
+            if (this.animating) return false;
+
+            this.animating = true;
+            var that = this;
+
+            var startTime = -1;
+            var animationLength = 400; // Animation length in milliseconds
+            var scrollTop = document.body.scrollTop || document.documentElement.scrollTop;
+
+            function backToTop(timestamp) {
+
+                  // Calculate animation progress
+                  var progress = 0;
+
+                  if (startTime < 0) {
+                        startTime = timestamp;
+                  } else {
+                        progress = Math.min(100.0, (timestamp - startTime)*100/animationLength);
+                  }
+
+                  // Do animation ...
+                  if (progress < 100.0) {
+                        window.scroll(0,scrollTop - (scrollTop*progress/100));
+                        requestAnimationFrame(backToTop);
+                  }else{
+                        window.scroll(0,0);
+                        that.animating = false;
+                  }
+            }
+
+            requestAnimationFrame(backToTop);
+      },
+
+});
+</script>
+</dom-module>

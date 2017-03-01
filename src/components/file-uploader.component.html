@@ -1,0 +1,295 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-tooltip/paper-tooltip.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/iron-icons/image-icons.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="./api-call.component.html">
+<link rel="import" href="./upload-progress.component.html">
+<link rel="import" href="../behaviors/upload.behavior.html">
+<link rel="import" href="./thumbnail.component.html">
+<link rel="import" href="../styles/fix-tap.style.html">
+<link rel="import" href="../styles/colors.style.html">
+
+<dom-module id="file-uploader">
+	<template>
+	<style include="fix-tap-style colors-style">
+
+	:host {
+		display: block;
+	}
+
+	:host(.drag) {
+		border: 3px red solid;
+	}
+
+	#files {
+		display: none;
+	}
+
+	.button {
+		color: var(--app-white);
+		margin: 0;
+	}
+
+	.thumbnailsContainer {
+		display: flex;
+		flex-wrap: wrap;
+		margin-top: var(--app-space);
+	}
+
+	.thumbnailsContainer > *:not(:first-child) {
+		margin-left: 8px;
+	}
+
+	[hidden] {
+		display: none !important;
+	}
+
+	</style>
+
+	<api-call id="encodeCall" uri="[[backend]]/images/encode" method="GET" on-response="_handleResponse"></api-call>
+
+	<input type="file" id="files" on-change="_fileChange">
+	<label for="files">
+		<paper-icon-button id="chose" class="color-action" icon="image:add-a-photo"></paper-icon-button>
+		<paper-tooltip for="chose" position="bottom">Choisir des photos</paper-tooltip>
+	</label>
+
+	<paper-icon-button disabled="[[!canUpload]]" icon="cloud-upload" class="color-action" on-tap="_upload" id="upload"></paper-icon-button>
+	<paper-tooltip for="upload" position="bottom">Upload</paper-tooltip>
+	<div class="thumbnailsContainer" hidden$="[[uploading]]">
+		<template id="thumbnails" is="dom-repeat" items="[[files]]" as="file">
+			<upload-thumbnail on-remove-file="_removeFile" index="[[index]]" name="[[file.name]]"></upload-thumbnail>
+		</template>
+	</div>
+
+	<div class="thumbnailsContainer" hidden$="[[!uploading]]">
+		<template is="dom-repeat" items="[[uploads]]" as="upload">
+			<upload-progress data="[[upload]]"></upload-progress>
+		</template>
+	</div>
+	<template is="dom-if" if="[[error]]">
+		<div id="error">[[error]]</div>
+	</template>
+
+</template>
+<script>
+Polymer({
+	is: 'file-uploader',
+	listeners: {
+		'uploads_finished': '_resetState'
+	},
+	properties: {
+		user: {
+			type: Object,
+			value: null,
+			observer: '_validate',
+		},
+		rootPath: {
+			type: String,
+			value: 'images'
+		},
+		allowedFormats: {
+			type: Array,
+			value: ['image/jpeg', 'image/png']
+		},
+		maxSize: {
+			type: Number,
+			value: 1000000
+		},
+		files: {
+			type: Object,
+			value: null
+		},
+		error: {
+			type: String,
+			value: null
+		},
+		canUpload: {
+			type: Boolean,
+			value: false,
+			computed: '_canUpload(error, files, uploads)'
+		},
+		uploads: {
+			type: Array,
+			value: [],
+			observer: '_onUploadsChange'
+		},
+		uploading: {
+			type: Boolean,
+			value: false
+		}
+	},
+	behaviors: [window.UploadBehavior],
+	ready: function() {
+		this.addEventListener("dragenter", this._dragEnter, false);
+		this.addEventListener("dragleave", this._dragLeave, false);
+		this.addEventListener("dragover", this._dragOver, false);
+		this.addEventListener("drop", this._drop, false);
+	},
+	_preprocessFiles: function(files) {
+		files.forEach(function(file) {
+			var uid = Math.round(Math.random() * 1000);
+			file.uid = uid;
+			file.base64 = null;
+		})
+		return files;
+	},
+	_dragEnter: function(e) {
+		e.stopPropagation();
+		e.preventDefault();
+		this.classList.add('drag');
+	},
+	_dragLeave: function(e) {
+		e.stopPropagation();
+		e.preventDefault();
+		this.classList.remove('drag');
+	},
+	_dragOver: function(e) {
+		e.stopPropagation();
+		e.preventDefault();
+	},
+	_drop: function(e) {
+		e.stopPropagation();
+		e.preventDefault();
+		this.classList.remove('drag');
+		var dt = e.dataTransfer;
+		this._fileChange(null, dt.files)
+	},
+
+	_onUploadsChange: function(newVal) {
+		this.uploading = newVal.length > 0;
+	},
+
+	_fileChange: function(e, droppedFiles) {
+		var _this = this;
+		this.files = (typeof droppedFiles !== 'undefined') ? this._preprocessFiles(Array.from(droppedFiles)) : this._preprocessFiles(Array.from(this.$.files.files));
+		this.$.files.value = '';
+		this._validate();
+		var domChanged = function(){
+			var thumbnails = Polymer.dom(_this.root).querySelectorAll('upload-thumbnail');
+			_this.files.forEach(function(file, index) {
+				var reader = new FileReader();
+				var cb = function () {
+					thumbnails[index].base64 = reader.result;
+					_this.files[index].base64 = reader.result;
+					reader.removeEventListener("load", cb);
+				};
+				reader.addEventListener("load", cb , false);
+				reader.readAsDataURL(_this.files[index]);
+			})
+			_this.$.thumbnails.removeEventListener("dom-change", domChanged);
+		};
+		this.$.thumbnails.addEventListener("dom-change", domChanged);
+
+		if(this.error) return;
+
+	},
+	_removeFile: function(e) {
+		this.splice('files', e.detail.index, 1);
+		if(!this.files.length) this._resetState();
+	},
+	_bytesToKb: function(bytes) {
+		return Math.round(bytes / 1024);
+	},
+	_canUpload: function(error, files, uploads) {
+		return files && files.length > 0 && !error && !uploads.length;
+	},
+	_validate: function() {
+		var _this = this;
+		if(!this.files || this.files.length < 1) return;
+		if(!this.user || !this.user.uid) {
+			return this.error = 'Vous devez être authentifié pour pouvoir upload des fichiers';
+		}
+
+		this.files.forEach(function(file) {
+			if(file.size > this.maxSize) {
+				return this.error = 'Le fichier '+file.name+' ne peut pas peser plus de '+( _this._bytesToKb(_this.maxSize) )+'ko (actuellement '+( _this._bytesToKb(file.size) )+'ko).';
+			}
+			if(!~_this.allowedFormats.indexOf(file.type)) {
+				return this.error = "Le format "+file.type+" n'est pas supporté";
+			}
+			_this.error = null;
+		})
+	},
+
+	_upload: function() {
+		if(!this.canUpload) return;
+		var _this = this;
+		var storageRef = firebase.storage().ref();
+
+		var metadata = {
+			cacheControl: 'public,max-age=86400'
+		};
+
+		this.files.forEach(function(file) {
+			var uid = file.uid;
+			var refStorage = _this._computeFilePath(file.name);
+			var imageRef = storageRef.child(refStorage);
+			var onFinish = function(task, metadata) {
+				_this.$.encodeCall.request({"img_path": task.snapshot.downloadURL, "metadata": JSON.stringify(metadata)});
+			};
+			_this.setTask(uid, imageRef.put(file, metadata), file.name, file.base64, refStorage, onFinish);
+		})
+
+		this.files = null;
+
+	},
+
+	_getFileIndex: function(uid) {
+		for(var i = 0; i < this.files.length; i++){
+			if(this.files[i].uid == uid) {
+				return i;
+			}
+		}
+	},
+	_resetState: function() {
+		this.$.files.value = '';
+		this.files = null;
+		this.error = null;
+	},
+
+	_computeFilePath: function(filename) {
+		return this.rootPath+'/'+this.user.uid+'-'+ Date.now() +'-'+ filename;
+	},
+
+	_handleResponse: function(response) {
+
+		var data = response.detail.data;
+		var encoded = 'data:'+data.type+';base64,'+data.buffer;
+		var metadata = JSON.parse(data.metadata);
+
+		// If no uploads, just break
+		if(0 === globalUploads[metadata.context][metadata.property].tasks.length || !globalUploads[metadata.context][metadata.property].tasks) return;
+		// Get back the associated task and its data
+		var task = this._getGlobalTask(metadata.context, metadata.property, metadata.uid);
+		var imageData = {refStorage: task.refStorage, url: data.url, base64: encoded};
+
+		// Unqueue task and reflect to firebase
+		this._unqueueTask(metadata.context, metadata.property, metadata.uid);
+		this._reflectToDatabase(metadata, imageData);
+
+		// If no more uploads reset the state
+		if(0 === this.uploads.length) this._resetState();
+	},
+
+	_reflectToDatabase: function(metadata, imageData) {
+		// Get a key for a new Image
+		var newImgKey = firebase.database().ref().child('images').push().key;
+		var paths = globalUploads[metadata.context][metadata.property].paths;
+
+		// Write the new image's data simultaneously in the images list and the product's image list.
+		var updates = {};
+		updates['/images/' + newImgKey] = imageData;
+		paths.forEach(function(path) {
+			updates[path + '/' + newImgKey] = imageData;
+		}.bind(this))
+
+		return firebase.database().ref().update(updates);
+	},
+
+
+});
+</script>
+</dom-module>

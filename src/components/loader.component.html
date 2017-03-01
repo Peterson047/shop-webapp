@@ -1,0 +1,38 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-spinner/paper-spinner-lite.html">
+
+<dom-module id="app-loader">
+      <template>
+
+      <style>
+
+      :host {
+            display: block;
+            position: relative;
+            height: 70px;
+            width: 70px;
+      }
+
+      paper-spinner-lite {
+            width: 100%;
+            height: 100%;
+            --paper-spinner-color: var(--app-loader-color, --app-white);
+      }
+      </style>
+      <paper-spinner-lite active$="[[active]]"></paper-spinner-lite>
+</template>
+<script>
+'use strict';
+
+Polymer({
+      is: 'app-loader',
+      properties: {
+            active: {
+                  type: Boolean,
+                  value: false
+            }
+      },
+
+});
+</script>
+</dom-module>

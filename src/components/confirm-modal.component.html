@@ -1,0 +1,69 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../behaviors/modal.behavior.html">
+<link rel="import" href="button.component.html">
+<link rel="import" href="../styles/modal.style.html">
+<link rel="import" href="../styles/form.style.html">
+
+<dom-module id="confirm-modal">
+	<template>
+	<style include="modal-style form-style">
+	:host {
+		display: block;
+	}
+
+	app-button {
+		color: var(--app-white);
+	}
+
+	#buttons {
+		margin-top: auto;
+	}
+
+	#confirm {
+		background-color: var(--app-validation-color);
+	}
+
+	#cancel {
+		background-color: var(--app-error-color);
+	}
+	</style>
+
+	<paper-material id="container" tabable-container>
+		<div id="content">
+			<paper-icon-button tabable id="close" on-tap="hide" icon="close"></paper-icon-button>
+			<div id="title">[[title]]</div>
+			<div id="buttons">
+				<app-button raised id="cancel" tabable color="--app-error-color" on-tap="_cancel">Annuler</app-button>
+				<app-button raised id="confirm" tabable color="--app-validation-color" on-tap="_confirm">Continuer</app-button>
+			</div>
+			<div class="filler"></div>
+		</div>
+	</paper-material>
+
+</template>
+<script>
+'use strict';
+Polymer({
+	is: 'confirm-modal',
+	behaviors: [window.ModalBehavior],
+
+	focus: function() {
+		this.$.cancel.focus();
+	},
+
+	_onShow: function() {
+		var _this = this;
+		if(typeof this.params.title !== 'undefined') this.title = this.params.title;
+		this._confirm =  function(){
+			if(typeof _this.params.confirm === 'function') _this.params.confirm();
+			_this.hide(true);
+		};
+		this._cancel = function(){
+			if(typeof _this.params.cancel === 'function') _this.params.cancel();
+			_this.hide(true);
+		};
+	}
+
+});
+</script>
+</dom-module>

@@ -1,0 +1,32 @@
+<script>
+
+'use strict';
+
+var overlay_subscriptions = [];
+
+window.OverlayControlBehavior = {
+
+      attached: function() {
+            overlay_subscriptions.push(this);
+      },
+
+      showOverlay: function(cb) {
+            document.querySelector('my-app').$$('app-overlay').show(cb);
+      },
+
+      hideOverlay: function() {
+            document.querySelector('my-app').$$('app-overlay').hide();
+      },
+
+      setOverlayLoading: function(bool) {
+            document.querySelector('my-app').$$('app-overlay').loading = bool;
+      },
+
+      _notifySubs: function() {
+            overlay_subscriptions.forEach(function(sub) {
+                  if(typeof sub.hide === 'function' && sub.visible === true) sub.hide();
+            })
+      }
+
+};
+</script>

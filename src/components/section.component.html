@@ -1,0 +1,264 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../../bower_components/paper-tabs/paper-tab.html">
+<link rel="import" href="../../bower_components/paper-fab/paper-fab.html">
+<link rel="import" href="../styles/transition-block.style.html">
+<link rel="import" href="../styles/fix-tap.style.html">
+<link rel="import" href="../behaviors/navigation.behavior.html">
+
+<dom-module id="app-section">
+	<template>
+	<style include="tabs-style iron-flex iron-flex-alignment fix-tap-style">
+
+	:host {
+		display: block;
+		position: relative;
+		width: 100%;
+
+		margin-bottom: var(--app-double-space);
+	}
+
+	:host(.simpleSpace) {
+		margin-bottom: var(--app-space) !important;
+	}
+
+	:host(.simpleSpace) #background {
+		bottom: -var(--app-space) !important;
+	}
+
+	:host > section {
+		width: 100%;
+	}
+
+	:host > section > #content > ::content {
+		@apply(--section-content);
+		background-color: transparent;
+	}
+
+	#button {
+		position: absolute;
+		right: calc(5% - 18px);
+		z-index: 11;
+		margin-top: -96px;
+		--paper-fab-background: var(--app-action-color);
+		--paper-fab-keyboard-focus-background: var(--app-action-color);
+		will-change: transform;
+		transition: transform 300ms ease;
+		pointer-events: none;
+		transform: scale(0);
+	}
+
+	#button.show {
+		transform: scale(1);
+		pointer-events: auto !important;
+	}
+
+
+	#container {
+		position: relative;
+		display: flex;
+		justify-content: center;
+	}
+
+	h2 {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		padding-top: var(--app-space);
+		padding-bottom: var(--app-space);
+		font-weight: 300;
+		font-size: 1.8em;
+		line-height: 1em;
+		letter-spacing: -0.04em;
+		min-height: 94px;
+		z-index: 1;
+		margin-left: 16px;
+
+	}
+
+	.max-width {
+		max-width: var(--app-max-width);
+		position: relative;
+		width: 90%;
+	}
+
+	.center {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+
+	#background {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: -40px;
+	}
+
+	#content {
+		z-index: 1;
+		position: relative;
+	}
+
+	#top {
+		position: relative;
+	}
+
+	#back {
+		--paper-icon-button-ink-color: var(--app-white);
+	}
+
+	.nav {
+		display: flex;
+		align-items: center;
+	}
+
+	@media (min-width: 750px) {
+		h2 {
+			font-size: 2.4em;
+		}
+	}
+
+	@media (min-width: 1555px) {
+		#button {
+			right: calc((100% - var(--app-max-width) - 56px) / 2)
+		}
+	}
+	</style>
+
+	<section>
+		<div class="center" id="heading">
+			<div class="max-width nav">
+				<template is="dom-if" if="[[back]]">
+					<paper-icon-button on-tap="goBack" id="back" icon="arrow-back"></paper-icon-button>
+				</template>
+				<h2>[[heading]]</h2>
+			</div>
+		</div>
+		<div class="center" id="tabs">
+			<div class="max-width">
+				<template is="dom-if" if="[[menu]]">
+					<paper-tabs scrollable class="sub" selected="[[selected]]" attr-for-selected="name">
+						<template is="dom-repeat" items="[[menu]]" as="page">
+							<paper-tab disabled$="[[disableTabs]]" class="sub" link name="[[page.name]]">
+								<a href="[[page.href]]">[[page.display]]</a>
+							</paper-tab>
+						</template>
+					</paper-tabs>
+				</template>
+			</div>
+		</div>
+		<div id="container">
+			<div id="background">
+				<div id="top">
+					<paper-fab disabled$="[[_disableFab(online)]]" on-tap="_redirectEvent" icon="[[buttonIcon]]" id="button"></paper-fab>
+				</div>
+				<div id="splitted"></div>
+			</div>
+			<div id="content" class="max-width">
+				<content id="sr"></content>
+			</div>
+		</div>
+	</section>
+
+</template>
+<script>
+'use strict';
+Polymer({
+	is: 'app-section',
+	properties: {
+		heading: {
+			type: String,
+			value: '_'
+		},
+		buttonIcon: {
+			type: String,
+			value: ''
+		},
+		mainBackground: String,
+		fillBackground: String,
+		splittedColor: String,
+		titleColor: {
+			type: String,
+			value: '--app-secondary-color',
+		},
+		menu: {
+			type: Array,
+			value: null
+		},
+		disableTabs: {
+			type: Boolean,
+			value: false
+		},
+		selected: String
+	},
+
+	listeners: {
+		'update-heading': '_updateHeading',
+		'update-button': '_updateButton',
+		'hide-button': '_hideButton'
+
+	},
+
+	behaviors: [window.NavigationBehavior],
+
+	attached: function() {
+		var mainBackground = this.getComputedStyleValue(this.mainBackground);
+		this.$.heading.style.backgroundColor = mainBackground;
+		this.$.heading.style.color = this.getComputedStyleValue(this.titleColor);
+		this.$.top.style.backgroundColor = mainBackground;
+		this.$.tabs.style.backgroundColor = mainBackground;
+		if(typeof this.splittedColor === 'undefined') {
+			this.$.top.style.height = '140px';
+			if(this.fillBackground) {
+				var fillBackground = this.getComputedStyleValue(this.fillBackground);
+				this.$.splitted.style.height = 'calc(100% - 140px)';
+				this.$.splitted.style.backgroundColor = fillBackground;
+			}
+		}
+		else {
+			var splittedColor = this.getComputedStyleValue(this.splittedColor);
+			this.$.top.style.height = '50%';
+			this.$.splitted.style.height = '50%';
+			this.$.splitted.style.backgroundColor = splittedColor;
+		}
+	},
+
+	_disableFab: function(online) {
+		return online === false;
+	},
+
+	_redirectEvent: function(e) {
+		var firstChild = Array.from(Polymer.dom(this.$.sr).getDistributedNodes()).filter(function(item){
+			return typeof item.tagName !== 'undefined';
+		})[0];
+
+		var event = new CustomEvent("section-button", {
+			bubbles: true,
+			cancelable: false
+		})
+		firstChild.dispatchEvent(event);
+	},
+
+	_updateHeading: function(e) {
+		e.stopPropagation();
+		this.heading = e.detail.heading;
+	},
+
+	_updateButton: function(e) {
+		e.stopPropagation();
+		this.buttonIcon = e.detail.icon;
+		this.$.button.classList.add('show');
+	},
+
+	_hideButton: function(e) {
+		e.stopPropagation();
+		this.$.button.classList.remove('show');
+	}
+
+});
+</script>
+</dom-module>

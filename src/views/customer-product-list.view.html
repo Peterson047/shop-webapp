@@ -1,0 +1,43 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../components/section.component.html">
+<link rel="import" href="../components/customer-product-list.component.html">
+
+<link rel="import" href="../behaviors/page.behavior.html">
+
+<link rel="import" href="../styles/page.style.html">
+
+<dom-module id="customer-product-list-view">
+  <template>
+  <style include="page-style">
+  :host {
+    display: block;
+  }
+  </style>
+
+  <app-section back="true" class="simpleSpace" heading="Nos savons" main-background="--app-section-header-background-color" fill-background="--app-section-fill-color">
+    <customer-product-list online="[[online]]"></customer-product-list>
+  </app-section>
+
+  </template>
+  <script>
+  'use strict';
+  Polymer({
+    is: 'customer-product-list-view',
+
+    properties: {
+      pageData: {
+        type: Object,
+        value: {
+          category: "Nos produits",
+          topic: null,
+        }
+      },
+
+      user: Object,
+      appData: Object
+    },
+    behaviors: [window.PageBehavior]
+  });
+  </script>
+</dom-module>

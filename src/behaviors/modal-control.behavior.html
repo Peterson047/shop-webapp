@@ -1,0 +1,34 @@
+<script>
+
+'use strict';
+
+window.ModalControlBehavior = {
+
+      properties: {
+            modals: Array,
+            container: {
+                  type: Object,
+                  value: function() {
+                        return Polymer.dom(document.querySelector('my-app').root).querySelector('modal-container');
+                  }
+            }
+      },
+
+      showModal: function(tag, params) {
+            this.container.showModal(tag, params);
+      },
+
+      hideModal: function(tag) {
+            this.container.hideModal(tag);
+      },
+
+      notifyModal: function(tag, detail) {
+            this.container.notifyModal(tag, detail);
+      },
+
+      swapModals: function(from, to) {
+            this.container.swapModals(from, to);
+      }
+
+};
+</script>

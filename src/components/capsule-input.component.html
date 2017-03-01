@@ -1,0 +1,212 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-a11y-keys/iron-a11y-keys.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../bower_components/iron-validatable-behavior/iron-validatable-behavior.html">
+<link rel="import" href="../../bower_components/iron-form-element-behavior/iron-form-element-behavior.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input-container.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input-error.html">
+<link rel="import" href="../behaviors/data-pipe.behavior.html">
+
+<link rel="import" href="capsule.component.html">
+
+<link rel="import" href="../styles/fix-tap.style.html">
+
+<dom-module id="capsule-input">
+	<template>
+	<style include="fix-tap-style">
+	:host {
+		display: block;
+		font-size: 1em;
+		font-weight: 300;
+	}
+
+	#wrapper {
+		display: flex;
+		flex-wrap: wrap;
+	}
+
+	#wrapper input {
+		min-width: 180px;
+		width: auto;
+		flex-grow: 1;
+	}
+
+	paper-input-container {
+		--paper-input-container-color: var(--app-light-grey);
+		--paper-input-container-focus-color: var(--app-dark-grey);
+		--paper-input-container-input-color: var(--app-input-color);
+		--paper-input-container-label: {
+			font-size: 17px;
+			opacity: 0.5;
+			color: var(--app-label-color);
+		};
+		--paper-input-container-label-floating: {
+			opacity: 1;
+		}
+	}
+
+	.content {
+		padding: 0px 20px 0px 10px;
+		color: var(--app-white);
+	}
+
+	</style>
+
+	<iron-a11y-keys target="[[target]]" keys="enter"
+	on-keys-pressed="_addItem"></iron-a11y-keys>
+	<iron-a11y-keys target="[[target]]" keys="backspace"
+	on-keys-pressed="_removeLastItem"></iron-a11y-keys>
+	<paper-input-container id="paperContainer">
+		<label>[[label]]</label>
+		<div id="wrapper">
+			<template is="dom-repeat" items="[[data]]" as="capsule">
+				<app-capsule on-remove="_removeItemByIndex" removable index="[[index]]">[[capsule]]</app-capsule>
+			</template>
+			<input is="iron-input" tabable id="input" value="{{inputValue::input}}">
+		</div>
+		<paper-input-error>[[error]]</paper-input-error>
+	</paper-input-container>
+
+</template>
+<script>
+'use strict';
+Polymer({
+	is: 'capsule-input',
+
+	behaviors: [Polymer.IronFormElementBehavior, Polymer.IronValidatableBehavior, window.DataPipeBehavior],
+
+	properties: {
+		data: {
+			type: Array,
+			value: [],
+			observer: '_onDataChange'
+		},
+
+		dataObject: {
+			type: Object,
+			observer: '_onDataObjectChange'
+		},
+
+		value: {
+			type: Array,
+			observer: '_resetWatcher',
+			value: null
+		},
+
+		inputValue: {
+			type: String,
+			observer: '_inputValueWatcher'
+		},
+
+		label: {
+			type: String,
+			value: 'label'
+		},
+
+		target: {
+			type: Object,
+			value: function() {
+				return this.$.input;
+			}
+		},
+
+		invalid: {
+			type: Boolean,
+			value: false
+		},
+
+		error: {
+			type: String,
+			value: null
+		},
+
+		limitRule: {
+			type: Number,
+			value: 1
+		},
+	},
+
+	focus: function() {
+		this.$.input.focus();
+	},
+
+	_onDataObjectChange: function(newVal) {
+		this.data =  this.toArrayFromKey(newVal);
+	},
+
+	_onDataChange: function (newVal, oldVal) {
+		if (newVal.length) {
+			this.value = (this.dataObject) ? this.toObjectFromKey(newVal) : newVal;
+			this.$.paperContainer.setAttribute('always-float-label', true);
+			this.validate();
+		}
+		else {
+			this.$.paperContainer.removeAttribute('always-float-label');
+		}
+	},
+
+	_inputValueWatcher: function(newVal) {
+		if(typeof this.data === 'undefined') this.data = [];
+		if(newVal !== '' && !this.data.length) {
+			this.$.paperContainer.setAttribute('always-float-label', true);
+		} else if(newVal === '' && !this.data.length){
+			this.$.paperContainer.setAttribute('always-float-label', false);
+		}
+	},
+
+	_addItem: function(e) {
+		var value = this.inputValue.trim();
+
+		if(value === '' || ~this.data.indexOf(value)) return;
+		this.push('data', value);
+		this.value = (this.dataObject) ? this.toObjectFromKey(this.data) : this.data;
+		this.$.paperContainer.setAttribute('always-float-label', true);
+		this.inputValue = '';
+		this.validate();
+	},
+
+	_removeItemByIndex: function(e) {
+		var index = e.detail.index;
+		this._removeItem(index);
+	},
+
+	_removeLastItem: function() {
+		if(this.data.length && this.inputValue === '') this._removeItem( ( this.data.length - 1 ) );
+	},
+
+	_removeItem: function(index) {
+		this.splice('data', index, 1);
+		this.value = (this.dataObject) ? this.toObjectFromKey(this.data) : this.data;
+		this.$.input.focus();
+		if(!this.data.length) this.$.paperContainer.removeAttribute('always-float-label');
+		this.validate();
+	},
+
+	_resetWatcher: function(newVal, oldVal) {
+		if(newVal === null && typeof oldVal !== 'undefined') this.reset();
+	},
+
+	reset: function() {
+		this.inputValue = '';
+		this.data = [];
+		this.$.paperContainer.removeAttribute('invalid');
+		this.error = null;
+	},
+
+	validate: function() {
+		if(!this.data) this.data = [];
+		var valid = this.data.length >= this.limitRule;
+		if(valid) {
+			this.$.paperContainer.removeAttribute('invalid');
+			this.error = null;
+		} else {
+			this.$.paperContainer.setAttribute('invalid', true);
+			this.error = 'Au moins ' + this.limitRule + ' item(s) requis';
+		}
+		if(this.value === null) this.value = [];
+		return valid;
+	},
+
+});
+</script>
+</dom-module>

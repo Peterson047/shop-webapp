@@ -1,0 +1,84 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="app-style">
+  <template>
+  <style>
+
+  #drawer {
+    --app-drawer-content-container: {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    };
+  }
+
+  #drawerHeader {
+    background-color: var(--app-secondary-color);
+    color: var(--app-white);
+    padding: var(--app-space);
+    height: inherit;
+    flex-grow: 0;
+  }
+
+  #drawerHeader .title {
+    font-size: 0.8em;
+  }
+
+  #drawerMenu {
+    background-color: var(--app-white);
+    flex-grow: 1;
+  }
+
+  #drawerFooter {
+    flex-grow: 0;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    background-color: var(--app-white);
+    padding: var(--app-space);
+  }
+
+  .logo {
+    --logo-savonnerie-dimension: {
+      width: 56px;
+      height: 56px;
+      margin-right: 16px;
+    };
+
+    --logo-savonnerie-fill: var(--app-accent-color);
+  }
+
+  .drawer-list {
+    margin: 0 var(--app-space);
+  }
+
+  .drawer-list a {
+    display: flex;
+    align-items: center;
+
+    padding: 0 16px;
+    color: var(--app-accent-color);
+    outline: none;
+    line-height: 40px;
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  .drawer-list a.iron-selected {
+    color: var(--app-secondary-color);
+  }
+
+  .drawer-list a iron-icon{
+    margin-right: 16px;
+  }
+
+  .mobileMenuLink {
+    text-transform: uppercase;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    line-height: 24px;
+  }
+
+  </style>
+  </template>
+</dom-module>

@@ -1,0 +1,78 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../bower_components/paper-badge/paper-badge.html">
+<link rel="import" href="../styles/fix-tap.style.html">
+
+<dom-module id="highlighted-icon">
+	<template>
+	<style include="fix-tap-style">
+	:host {
+		display: block;
+		position: relative;
+	}
+
+	paper-icon-button {
+		--paper-icon-button-ink-color: var(--app-white);
+		color: inherit;
+		width: 100%;
+		height: 100%;
+	}
+
+	#underline {
+		position: absolute;
+		bottom: 0;
+		left: 0;
+		width: 100%;
+		height: 2px;
+		background-color: var(--app-white);
+		-webkit-transform: scale3d(0, 1, 1);
+		transform: scale3d(0, 1, 1);
+		transition: -webkit-transform 0.2s ease-out;
+		transition: transform 0.2s ease-out;
+	}
+
+	[highlighted] {
+		-webkit-transform: scale3d(1, 1, 1) !important;
+		transform: scale3d(1, 1, 1) !important;
+	}
+
+	paper-badge {
+		--paper-badge-background: var(--app-white);
+		--paper-badge-text-color: var(--app-secondary-color);
+		transform: translate(-10px, 7px);
+	}
+	</style>
+
+	<paper-icon-button id="icon" icon="[[icon]]"></paper-icon-button>
+	<template is="dom-if" if="[[_showBadge(badge)]]">
+		<paper-badge for="icon" label="[[badge]]"></paper-badge>
+	</template>
+	<div highlighted$="[[_isHighlighted(highlightedOn, currentPage)]]" id="underline"></div>
+
+</template>
+<script>
+Polymer({
+	is: 'highlighted-icon',
+	properties: {
+		icon: String,
+
+		currentPage: String,
+
+		highlightedOn: String,
+
+		badge: {
+			type: Boolean,
+			value: false,
+		},
+	},
+
+	_isHighlighted: function (highlightedOn, currentPage) {
+		return highlightedOn == currentPage;
+	},
+
+	_showBadge: function (badge) {
+		return (typeof badge != 'undefined' && badge !== false);
+	},
+});
+</script>
+</dom-module>

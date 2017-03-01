@@ -1,0 +1,156 @@
+<link rel="import" href="tabindex.behavior.html">
+<link rel="import" href="overlay-control.behavior.html">
+
+<script>
+'use strict';
+window.ModalBehaviorImpl = {
+
+      properties: {
+            timing: {
+                  type: Number,
+                  value: 200
+            },
+            scaleFactor: {
+                  type: Number,
+                  value: 0.5
+            },
+            visible: {
+                  type: Boolean,
+                  value: false
+            },
+            loading: {
+                  type: Boolean,
+                  value: false
+            },
+            delayFocus: {
+                  type: Boolean,
+                  value: false
+            },
+            animating: {
+                  type: Boolean,
+                  value: false
+            }
+      },
+
+      attached: function() {
+            this._handleFocus(false);
+            this.addEventListener('blur', function() {
+                  if(this.visible) this.defaultFocus();
+            })
+      },
+
+      _handleFocus: function(show) {
+            if(show) this.defaultFocus();
+            this.recomputeTabindexes(show);
+      },
+
+      show: function(params) {
+            var _this = this;
+
+            this.animating = true;
+            this.visible = true;
+            this.params = params;
+
+            var onFinish = function(e){
+                  e.stopPropagation();
+                  _this.animating = false;
+                  _this.removeEventListener('transitionend', onFinish);
+                  if(typeof _this._onShow === 'function') Polymer.RenderStatus.afterNextRender(_this, _this._onShow);
+                  if(!_this.delayFocus) Polymer.RenderStatus.afterNextRender(_this, _this._handleFocus.bind(_this, true));
+            };
+
+            this.addEventListener('transitionend', onFinish);
+            requestAnimationFrame(function() {
+                  _this._setModalStyles('visible');
+            });
+      },
+      hide: function(closeOverlay) {
+            var _this = this;
+            this.animating = true;
+            this.visible = false;
+            this.loading = false;
+            var onFinish = function(e){
+                  e.stopPropagation();
+                  _this.animating = false;
+                  _this.removeEventListener('transitionend', onFinish);
+                  Polymer.RenderStatus.afterNextRender(_this, function() {
+                        if(_this.params && _this.params.focusBack) _this.params.focusBack.focus();
+                        if(typeof _this._onHide === 'function') _this._onHide();
+                        _this._handleFocus(false);
+                  });
+
+            };
+
+            this.addEventListener('transitionend', onFinish);
+            if(closeOverlay) this.hideOverlay();
+            this.async(this._setModalStyles.bind(this, null));
+      },
+
+      swapOut: function() {
+            var _this = this;
+            this.loading = false;
+            this.visible = false;
+
+            var onFinish = function(e){
+                  e.stopPropagation();
+                  _this.removeEventListener('transitionend', onFinish);
+            };
+            this.addEventListener('transitionend', onFinish);
+            this.async(this._setModalStyles.bind(this, 'swapOut'));
+      },
+
+      swapIn: function(params, previous) {
+            var _this = this;
+            this.params = params;
+            this.visible = true;
+
+            var onFinish = function(e){
+                  e.stopPropagation();
+                  _this.removeEventListener('transitionend', onFinish);
+                  _this.style.transitionDelay = '';
+                  previous._handleFocus(false);
+                  _this._handleFocus(true);
+                  _this.async(this._setModalStyles.bind(previous, null));
+            };
+
+            this.style.transitionDelay = this.timing+'ms';
+            this.addEventListener('transitionend', onFinish);
+            this.async(this._setModalStyles.bind(this, 'swapIn'));
+      },
+
+      defaultFocus: function() {
+            if( typeof this.focus === 'function' ) {
+                  this.focus();
+            }
+      },
+
+      _setModalStyles: function(state) {
+            switch(state) {
+                  case 'visible':
+                  this.style.pointerEvents = 'auto';
+                  this.style.transform = 'scale(1)';
+                  this.style.opacity = 1;
+                  break;
+                  case 'swapOut':
+                  this.style.pointerEvents = 'none';
+                  this.style.transform = 'scale('+this.scaleFactor+')';
+                  this.style.opacity = 0;
+                  break;
+                  case 'swapIn':
+                  this.style.pointerEvents = 'auto';
+                  this.style.transform = 'scale(1)';
+                  this.style.opacity = 1;
+                  break;
+                  default:
+                  this.style.pointerEvents = 'none';
+                  this.style.transform = 'scale('+this.scaleFactor+')';
+                  this.style.opacity = 0;
+                  break;
+            }
+      }
+
+};
+
+window.ModalBehavior = [window.ModalBehaviorImpl, window.TabindexBehavior, window.OverlayControlBehavior];
+
+</script>

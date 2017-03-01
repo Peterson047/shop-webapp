@@ -1,0 +1,21 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="list-animation">
+  <template>
+  <style>
+
+  :host {
+    overflow: hidden;
+  }
+
+  .item:nth-child(odd) {
+    transform: translateX(-50px);
+  }
+
+  .item:nth-child(even) {
+    transform: translateX(50px);
+  }
+
+  </style>
+  </template>
+</dom-module>

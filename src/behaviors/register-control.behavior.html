@@ -1,0 +1,50 @@
+<script>
+
+'use strict';
+
+window.RegisterControlBehavior = {
+
+      listeners: {
+            'register': '_createUser'
+      },
+
+      _createUser: function(e) {
+            e.stopPropagation();
+            if(this.loading) return;
+            var _this = this;
+            var data = e.detail;
+            var mail = data.email;
+            var password = data.password;
+            var name = data.name;
+            var authEl = document.querySelector('my-app').$.auth;
+            if(typeof authEl === 'undefined' || typeof authEl === null) return console.error('Auth el not defined');
+            this.loading = true;
+            return authEl.createUserWithEmailAndPassword(mail, password)
+            .then(function() {
+                  var user = firebase.auth().currentUser;
+                  user.updateProfile({
+                        displayName: name,
+                  }).then(function() {
+                        user.sendEmailVerification().then(function() {
+                              _this.loading = false;
+                              if(typeof _this._userCreated === 'function') _this._userCreated(user, data);
+                        }, function(err) {
+                              _this._onError(err);
+                        });
+
+                  }, function(err) {
+                        _this._onError(err);
+                  });
+
+            }, function(err) {
+                  _this._onError(err);
+            })
+      },
+
+      _onError: function(err) {
+            this.loading = false;
+            if(typeof this._userCreationFailed === 'function') this._userCreationFailed(err);
+      }
+
+};
+</script>

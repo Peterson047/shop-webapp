@@ -1,0 +1,27 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="fix-tap.style.html">
+
+<dom-module id="list-style">
+      <template>
+      <style include="fix-tap-style">
+
+      .item {
+            opacity: 0;
+            will-change: opacity;
+      }
+
+      #noEntry {
+            pointer-events: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-grow: 1;
+      }
+
+      [hidden] {
+		display: none !important;
+	}
+
+      </style>
+</template>
+</dom-module>

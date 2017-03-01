@@ -1,0 +1,53 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../behaviors/page.behavior.html">
+
+<link rel="import" href="../components/data-source.component.html">
+<link rel="import" href="../components/order-list.component.html">
+
+<link rel="import" href="../styles/tile.style.html">
+
+<dom-module id="user-orders-view">
+  <template>
+  <style include="tile-style">
+  :host {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+  }
+
+  order-list {
+    --order-list-height: calc(100vh - 496px) !important;
+  }
+  </style>
+
+  <data-source path="/users/[[user.uid]]/orders" cache-key="user-orders-[[user.uid]]" array="$key" output="{{orders}}" fetching="{{loading}}" empty="{{empty}}"></data-source>
+
+  <div class="tile keepMinimalSpace">
+    <order-list cache-key="user-orders-[[user.uid]]" loading="[[loading]]" orders="[[orders]]" no-entry="[[empty]]"></order-list>
+  </div>
+
+  </template>
+  <script>
+  'use strict';
+  Polymer({
+    is: 'user-orders-view',
+
+    properties: {
+      pageData: {
+        type: Object,
+        value: {
+          category: "Commandes",
+          topic: null
+        }
+      },
+
+      user: Object
+    },
+
+    behaviors: [window.PageBehavior],
+
+  });
+  </script>
+</dom-module>

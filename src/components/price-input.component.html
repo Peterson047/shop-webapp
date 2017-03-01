@@ -1,0 +1,90 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-validatable-behavior/iron-validatable-behavior.html">
+<link rel="import" href="../../bower_components/iron-form-element-behavior/iron-form-element-behavior.html">
+
+<link rel="import" href="../styles/shop-input.style.html">
+
+<dom-module id="price-input">
+	<template>
+
+	<style include="shop-input">
+
+	:host {
+		display: flex;
+	}
+
+	shop-input {
+		width: 100%;
+	}
+
+	</style>
+
+	<shop-input>
+		<input type="text" id="price" required="" placeholder="[[label]]" value="{{data::input}}">
+		<shop-md-decorator error-message$="[[error]]" aria-hidden="true">
+			<label>[[label]]</label>
+			<shop-underline></shop-underline>
+		</shop-md-decorator>
+	</shop-input>
+
+</template>
+<script>
+'use strict';
+
+Polymer({
+	is: 'price-input',
+	properties: {
+		label: String,
+		error: {
+			type: String,
+			value: 'Le prix doit être un chiffre positif'
+		},
+		value: {
+			type: Number,
+			notify: true,
+			observer: '_resetWatcher',
+			value: null
+		},
+		data: {
+			type: String,
+			observer: '_parse'
+		}
+	},
+
+	behaviors: [Polymer.IronFormElementBehavior, Polymer.IronValidatableBehavior],
+
+	_resetWatcher: function(newVal, oldVal) {
+		if(newVal === null && typeof oldVal !== 'undefined') this.reset();
+	},
+
+	_parse: function() {
+		if(this.data) {
+			if(typeof this.data === 'string') this.value = parseFloat( this.data.replace(',', '.') );
+			else if(typeof this.data === 'number') this.value = this.data;
+			this.validate();
+		}
+	},
+
+	_setInputState: function(bool) {
+		if(bool) {
+			this.$.price.setCustomValidity('');
+			this.$.price.removeAttribute('aria-invalid');
+		} else {
+			this.$.price.setCustomValidity('Invalid field');
+			this.$.price.setAttribute('aria-invalid', true);
+		}
+	},
+
+	reset: function() {
+		this.data = '';
+		this._setInputState(true);
+	},
+
+	validate: function() {
+		var ok = !isNaN(this.value) && this.value > 0;
+		this._setInputState(ok);
+		return ok;
+	}
+});
+</script>
+</dom-module>

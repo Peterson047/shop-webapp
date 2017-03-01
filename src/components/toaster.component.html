@@ -1,0 +1,151 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+
+<link rel="import" href="button.component.html">
+
+<link rel="import" href="../styles/fix-tap.style.html">
+<link rel="import" href="../styles/font.style.html">
+<link rel="import" href="../styles/colors.style.html">
+
+<dom-module id="app-toaster">
+	<template>
+	<style include="fix-tap-style iron-flex iron-flex-alignment font-style colors-style">
+	:host {
+		display: flex;
+		flex-direction: column;
+		pointer-events: auto;
+		position: relative;
+		min-height: 50px;
+		max-width: 450px;
+		border-radius: 3px;
+		box-shadow: var(--app-shadow);
+		box-sizing: border-box;
+		padding: 10px;
+		background-color: var(--app-validation-color);
+		color: var(--app-white);
+		transform: translateY(calc(100% + var(--app-space)));
+		will-change: transform;
+	}
+
+	:host(.transition) {
+		transition: transform 400ms ease !important;
+	}
+
+	:host(.remove) {
+		opacity: 0;
+		transform: translateX(calc(-100% - var(--app-space))) !important;
+		transition: transform 400ms ease, opacity 400ms ease !important;
+	}
+
+	:host(.error) {
+		background-color: var(--app-error-color);
+	}
+
+	#icon {
+		margin-right: 10px;
+	}
+
+	#close {
+		transform: translate(8px, -7px);
+	}
+
+	</style>
+
+	<div class="layout horizontal justified center">
+		<div class="layout horizontal center">
+			<template is="dom-if" if="[[data.icon]]">
+				<iron-icon id="icon" icon="[[data.icon]]">
+			</template>
+			<div class="font-regular">[[data.text]]</div>
+		</div>
+		<paper-icon-button id="close" on-tap="remove" icon="close"></paper-icon-button>
+	</div>
+
+	<div id="buttons" class="layout horizontal end-justified">
+		<template is="dom-repeat" items="[[data.actions]]" as="action">
+			<app-button icon="[[action.icon]]" class="color-white" index="[[index]]" on-tap="_triggerAction">[[action.text]]</app-button>
+		</template>
+	</div>
+
+	</template>
+	<script>
+	'use strict';
+	Polymer({
+		is: 'app-toaster',
+
+		properties: {
+			data: Object,
+
+			lifespan: {
+				type: Number,
+				value: 5000
+			},
+
+			removed: {
+				type: Boolean,
+				value: false
+			}
+		},
+
+		attached: function() {
+			this._defaultIcon();
+			this._entrance();
+			this._autoClose();
+		},
+
+		_defaultIcon: function() {
+			if(!this.data.state) {
+				this.classList.add('error');
+				if(!this.data.icon) this.set('data.icon', 'error');
+			} else if(!this.data.icon) {
+				this.set('data.icon', 'check');
+			}
+		},
+
+		_entrance: function() {
+			this.addEventListener('transitionend', this._onEntranceFinish);
+			this.classList.add('transition');
+
+			// This is ugly but in a world where every browser handles micro tasks however they want, I have no choice.
+
+			// Thus on we went as far as to the light,
+			// talking of things whereof is silence here
+			// becoming, even as speech was, where we spoke.
+
+			// Force chrome / safari to acknowledge the transition;
+			getComputedStyle(this).transition;
+			// Force FF to acknowledge the transition;
+			Polymer.RenderStatus.afterNextRender(this, function() {
+				this.style.transform = 'none';
+			})
+		},
+
+		_onEntranceFinish: function(e) {
+			e.stopPropagation();
+			this.classList.remove('transition');
+			this.removeEventListener('transitionend', this._onEntranceFinish);
+		},
+
+		_autoClose: function() {
+			if(typeof this.data.autoClose === 'undefined' || this.data.autoClose) {
+				this.timeout = setTimeout(this.remove.bind(this), this.lifespan);
+			}
+		},
+
+		remove: function() {
+			if(this.removed) return;
+			this.removed = true;
+			if(this.timeout) clearTimeout(this.timeout);
+			this.fire('remove');
+		},
+
+		_triggerAction: function(e) {
+			this.data.actions[Polymer.dom(e).rootTarget.index].fn();
+			this.remove();
+		},
+
+	});
+	</script>
+</dom-module>

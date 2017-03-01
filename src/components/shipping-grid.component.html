@@ -1,0 +1,81 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+
+<link rel="import" href="../styles/list.style.html">
+<link rel="import" href="../styles/text-list.style.html">
+<link rel="import" href="../styles/tile.style.html">
+<link rel="import" href="../styles/colors.style.html">
+<link rel="import" href="../styles/list-animation.style.html">
+
+<link rel="import" href="../behaviors/modal-control.behavior.html">
+<link rel="import" href="../behaviors/list-animation.behavior.html">
+<link rel="import" href="../behaviors/data-pipe.behavior.html">
+
+<link rel="import" href="loading-layer.component.html">
+<link rel="import" href="data-source.component.html">
+
+<dom-module id="shipping-grid">
+      <template>
+      <style include="colors-style text-list list-style list-animation tile-style">
+      :host {
+            display: flex;
+            justify-content: center;
+            height: 100%;
+            width: 100%;
+            position: relative;
+      }
+
+      [hidden] {
+            display: none !important;
+      }
+      </style>
+
+      <data-source path="/shipping_grid" cache-key="shipping_grid" array="$key" fetching="{{loading}}" empty="{{empty}}" output="{{grid}}"></data-source>
+
+      <div class="tile keepMinimalSpace">
+
+            <loading-layer show="[[loading]]"></loading-layer>
+
+            <div id="list" hidden$="[[empty]]">
+                  <template is="dom-repeat" items="[[sort(grid, 'weight')]]">
+                        <div class="item">
+                              Poids : <span class="color-accent">[[item.weight]] grammes</span> Prix : <span class="color-accent">[[item.price]] €</span>
+                              <paper-icon-button class="color-action" disabled$="[[!online]]" data-key="[[item.$key]]" on-tap="_confirm" icon="close"></paper-icon-button>
+                        </div>
+                  </template>
+            </div>
+
+            <div id="noEntry" hidden$="[[!empty]]">Pas de tarifs</div>
+
+      </div>
+
+</template>
+<script>
+'use strict';
+Polymer({
+      is: 'shipping-grid',
+      behaviors: [window.ModalControlBehavior, window.ListAnimationBehavior, window.DataPipeBehavior],
+
+      listeners: {
+            'section-button': '_add'
+      },
+      _add: function(e) {
+            e.stopPropagation();
+            this.showModal('shipping-grid-modal');
+      },
+      _confirm: function(e) {
+            var key = e.currentTarget.dataKey;
+            var params = {
+                  title: "Supprimer ce tarif ?",
+                  confirm: this._remove.bind(this, key)
+            };
+            this.showModal('confirm-modal', params);
+      },
+      _remove: function(key) {
+            var updates = {};
+            updates['/shipping_grid/' + key] = null;
+            return firebase.database().ref().update(updates)
+      }
+});
+</script>
+</dom-module>

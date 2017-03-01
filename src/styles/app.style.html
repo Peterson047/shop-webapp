@@ -1,0 +1,88 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="drawer-style">
+  <template>
+  <style>
+
+  :host {
+    display: block;
+  }
+
+  #transitionBlock {
+    background-color: var(--app-background-color);
+  }
+
+  #loadingBackground {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background-color: var(--app-primary-color);
+  }
+
+  app-loader {
+    position: fixed;
+    top: 50vh;
+    left: 50%;
+    margin-top: -35px;
+    margin-left: -35px;
+  }
+
+  app-header {
+    @apply(--layout-fixed-top);
+    color: var(--app-white);
+    display: flex;
+    justify-content: center;
+    --app-header-background-rear-layer: {
+      background-color: var(--app-primary-color);
+    };
+  }
+
+  app-toolbar {
+    height: 85px;
+  }
+
+  app-header paper-icon-button {
+    --paper-icon-button-ink-color: var(--app-white);
+  }
+
+  .center {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+
+  #topToolbar {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    max-width: var(--app-max-width);
+  }
+
+  #burger {
+    color: var(--app-white);
+    --paper-icon-button-ink-color: var(--app-primary-color);
+  }
+
+  .right-bar-item {
+    position: relative;
+    margin-left: auto;
+    display: flex;
+  }
+
+  #pages {
+    min-height: calc(100vh - 85px - 165px);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .icon {
+    width: 48px;
+    height: 48px;
+    color: var(--app-menu-icon-color);
+  }
+
+  </style>
+  </template>
+</dom-module>

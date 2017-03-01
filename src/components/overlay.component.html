@@ -1,0 +1,81 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-progress/paper-progress.html">
+
+<link rel="import" href="../behaviors/overlay-control.behavior.html">
+
+<dom-module id="app-overlay">
+      <template>
+      <style>
+      :host {
+            display: block;
+            width: 100vw;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 10;
+            transform: translate3d(0, 0, 0);
+            transition: opacity 300ms ease-in;
+            background-color: black;
+            opacity: 0;
+            pointer-events: none;
+            contain: strict;
+      }
+
+      paper-progress {
+            position: fixed;
+            top: 0;
+            width: 100%;
+      }
+      </style>
+      
+      <template is="dom-if" if="[[loading]]">
+            <paper-progress indeterminate></paper-progress>
+      </template>
+
+</template>
+<script>
+'use strict';
+Polymer({
+      is: 'app-overlay',
+      listeners: {
+            'tap': 'hide'
+      },
+
+      properties: {
+            loading: {
+                  type: Boolean,
+                  value: false
+            }
+      },
+
+      behaviors: [window.OverlayControlBehavior],
+
+      show: function(cb) {
+            var _this = this;
+            document.body.style.overflow = 'hidden';
+            if(cb && typeof cb === 'function') {
+                  var onFinish = function() {
+                        _this.removeEventListener('transitionend', onFinish);
+                        cb();
+                  }
+                  this.addEventListener('transitionend', onFinish);
+            }
+            requestAnimationFrame(function(){
+                  _this.style.opacity = 0.5;
+                  _this.style.pointerEvents = 'auto';
+            });
+      },
+      hide: function(e) {
+            var fromTap = e instanceof Event;
+            var _this = this;
+            if(fromTap) this._notifySubs();
+            document.body.style.overflow = 'auto';
+            requestAnimationFrame(function(){
+                  _this.style.opacity = 0;
+                  _this.style.pointerEvents = 'none';
+            });
+      }
+});
+</script>
+</dom-module>

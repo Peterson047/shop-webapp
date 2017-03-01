@@ -1,0 +1,100 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../behaviors/overlay-control.behavior.html">
+
+<dom-module id="modal-container">
+	<template>
+	<style>
+	:host {
+		display: block;
+		height: 100vh;
+		width: 100vw;
+		position: fixed;
+		top: 0;
+		left: 0;
+		pointer-events: none;
+		z-index: 12;
+		contain: strict;
+	}
+	</style>
+
+	<create-standard-modal></create-standard-modal>
+	<confirm-modal></confirm-modal>
+	<inactivity-period-modal></inactivity-period-modal>
+	<send-order-modal app-data="[[appData]]" user="[[user]]"></send-order-modal>
+	<shipping-grid-modal></shipping-grid-modal>
+	<stock-modal app-data="[[appData]]" user="[[user]]"></stock-modal>
+	<sign-in-modal></sign-in-modal>
+	<reauth-modal></reauth-modal>
+	<sign-up-modal></sign-up-modal>
+	<disclaimer-modal></disclaimer-modal>
+
+</template>
+<script>
+'use strict';
+Polymer({
+	is: 'modal-container',
+	properties: {
+		loadedModals: {
+			type: Array,
+			value: []
+		},
+
+		user: Object,
+		appData: Object
+	},
+
+	behaviors: [window.OverlayControlBehavior],
+
+	loadModal: function(modalTag, cb) {
+		var _this = this;
+		if(~this.loadedModals.indexOf(modalTag)) {
+			cb();
+		} else {
+			this.setOverlayLoading(true);
+			var onLoad = function() {
+				_this.loadedModals.push(modalTag);
+				_this.setOverlayLoading(false);
+				_this.$$(modalTag).style.transition = 'opacity 200ms ease-in 0s, transform 200ms ease-in 0s';
+				_this.async(cb, 100);
+			}
+			var resolvedModalUrl = this.resolveUrl('./' + modalTag + '.component.html');
+			this.importHref(resolvedModalUrl, onLoad, null, true);
+		}
+	},
+
+	showModal: function(modalTag, params) {
+		var _this = this;
+		var cb = function() {
+			var modal = _this.$$(modalTag);
+			modal.show(params);
+		};
+		if(this.$$(modalTag).animating) return;
+		this.showOverlay();
+		this.loadModal(modalTag, cb);
+	},
+
+	hideModal: function(modalTag) {
+		var modal = this.$$(modalTag);
+		if(modal.animating) return;
+		modal.hide(true);
+	},
+
+	notifyModal: function(modalTag, detail) {
+		this.$$(modalTag).fire('notif', detail);
+	},
+
+	swapModals: function(from, to) {
+		var _this = this;
+		var cb = function() {
+			var a = _this.$$(from);
+			var b = _this.$$(to);
+			a.swapOut();
+			b.swapIn(a.params, a);
+		}
+		this.loadModal(to, cb);
+	}
+
+});
+</script>
+</dom-module>

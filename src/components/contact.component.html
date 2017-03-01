@@ -1,0 +1,188 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/google-map/google-map.html">
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../bower_components/iron-icons/maps-icons.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../bower_components/paper-tooltip/paper-tooltip.html">
+
+<link rel="import" href="date.component.html">
+<link rel="import" href="dashed-title.component.html">
+<link rel="import" href="loading-layer.component.html">
+<link rel="import" href="data-source.component.html">
+
+<link rel="import" href="../data/days.data.html">
+
+<link rel="import" href="../behaviors/data-pipe.behavior.html">
+<link rel="import" href="../behaviors/clipboard.behavior.html">
+
+<link rel="import" href="../styles/tile.style.html">
+<link rel="import" href="../styles/colors.style.html">
+<link rel="import" href="../styles/font.style.html">
+
+<dom-module id="app-contact">
+	<template>
+	<style include="tile-style iron-flex iron-flex-alignment colors-style font-style">
+	:host {
+		min-height: var(--app-section-min-height);
+		@apply(--layout-vertical);
+	}
+
+	#mapContainer {
+		height: 400px;
+		width: calc(100% + (var(--app-space) * 2));
+		margin-top: -var(--app-space);
+		margin-left: -var(--app-space);
+		position: relative;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+
+	google-map {
+		width: 100%;
+	}
+
+	iron-icon {
+		color: white;
+		height: 100px;
+		width: 100px;
+	}
+
+	.wrapper {
+		margin-top: var(--app-space);
+	}
+
+	.redAlert {
+		--dashed-title-background-color: var(--app-error-color);
+	}
+
+	ul {
+		padding-left: 20px;
+	}
+
+	.weekContainer {
+		margin-top: 1em;
+	}
+
+	.dayContainer {
+		padding-left: 15px;
+		padding-right: 15px;
+	}
+	</style>
+
+	<data-source path="/inactivity_periods" cache-key="inactivity-periods" output="{{ips}}"></data-source>
+	<data-source path="/schedules" cache-key="schedules" output="{{schedules}}"></data-source>
+
+	<days-data id="days" json="[[schedules]]" array="{{openDays}}"></days-data>
+
+	<div class="tile">
+
+		<div class="layout vertical bg-light-grey" id="mapContainer">
+			<template is="dom-if" if="[[online]]">
+				<loading-layer transparent show="[[mapLoading]]"></loading-layer>
+				<google-map api-key="AIzaSyA8644jA0nIptc9fvg-n-TVqM0DAuvLXM4" latitude="48.788697" longitude="2.497371" fit-to-markers disable-zoom>
+					<google-map-marker title="ATELIER / MAGASIN" latitude="48.788697" longitude="2.497371"></google-map-marker>
+				</google-map>
+			</template>
+			<template is="dom-if" if="[[!online]]">
+				<iron-icon icon="cloud-off"></iron-icon>
+			</template>
+		</div>
+
+		<div class="wrapper">
+			<template is="dom-if" if="[[_showWarning(ips)]]">
+				<dashed-title class="redAlert" icon="warning">Fermeture exceptionnelle</dashed-title>
+				<div>
+					<p>
+						<span>Du</span>
+						<app-date timestamp="[[displayedIp.start]]"></app-date>
+						<span>au</span>
+						<app-date timestamp="[[displayedIp.end]]"></app-date>.
+					</p>
+				</div>
+			</template>
+			<dashed-title icon="maps:place">L'atelier</dashed-title>
+
+			<div class="horizontal layout center">
+				<p>L'atelier se trouve au <span id="address">4 bis avenue des Sorbiers, 94210 La Varenne Saint-Hilaire, FRANCE</span>.</p>
+				<paper-icon-button class="color-action" id="copy" disabled$="[[!canCopy]]" on-tap="_copyAddress" icon="content-copy"></paper-icon-button>
+			</div>
+			<paper-tooltip for="copy" position="bottom">Copier l'addresse</paper-tooltip>
+
+			L'atelier est ouvert le :
+			<div class="weekContainer layout horizontal wrap">
+				<template is="dom-repeat" items="[[openDays]]" as="schedule">
+					<div class="dayContainer">
+						<div class="font-bold color-accent">[[schedule.day]]</div>
+						<ul>
+							<template is="dom-repeat" items="[[schedule.slices]]" as="slice">
+								<li>de [[slice.start]] à [[slice.end]]</li>
+							</template>
+						</ul>
+					</div>
+				</template>
+			</div>
+
+			<dashed-title icon="mail">Contact</dashed-title>
+			<p>Si vous avez des questions à propos de la boutique, du site, de nos méthodes de production, ou encore des remarques, n'hésitez pas à nous écrire à
+				<a class="color-link" href="mailto:contact@[[appData.domain]]">contact@[[appData.domain]]</a> !</p>
+			</div>
+		</div>
+
+	</template>
+	<script>
+	'use strict';
+	Polymer({
+		is: 'app-contact',
+		behaviors: [window.ClipboardBehavior, window.DataPipeBehavior],
+		properties: {
+			mapLoading: {
+				type: Boolean,
+				value: true
+			},
+			appData: Object,
+			online: Boolean
+		},
+
+		ready: function() {
+			var map = this.$.mapContainer;
+			var _this = this;
+			map.addEventListener('google-map-ready', function(e) {
+				_this.mapLoading = false;
+			});
+		},
+		_copyAddress: function() {
+			this.clipboardCopy(this.$.address);
+		},
+
+		_showWarning: function(ips) {
+
+			var now = Date.now();
+
+			this.displayedIp = false;
+			var closestStart;
+			var closestEnd;
+
+			for(var key in ips) {
+				var startIp = ips[key].start;
+
+				var endIp = ips[key].end;
+
+				if(!this.displayedIp && ( startIp > now || endIp > now ) ) {
+					this.displayedIp = ips[key];
+					closestStart = startIp;
+					closestEnd = endIp;
+				}
+				else if( ( startIp > now || endIp > now ) && ( startIp < closestStart || endIp < closestEnd ) ) {
+					this.displayedIp = ips[key];
+					closest = startIp;
+				}
+			}
+
+			return this.displayedIp = ips[key];
+		},
+
+	});
+	</script>
+</dom-module>

@@ -1,0 +1,103 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../bower_components/paper-tooltip/paper-tooltip.html">
+
+<link rel="import" href="button.component.html">
+
+<link rel="import" href="../behaviors/auth-control.behavior.html">
+<link rel="import" href="../behaviors/modal-control.behavior.html">
+<link rel="import" href="../behaviors/toaster-control.behavior.html">
+
+<dom-module id="user-menu-button">
+      <template>
+      <style>
+      :host {
+            display: block;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+      }
+
+      .icon {
+            width: 48px;
+            height: 48px;
+            color: var(--app-menu-icon-color);
+            --paper-icon-button-ink-color: var(--app-white);
+      }
+
+      .container {
+            display: flex;
+            font-size: 14px;
+            font-weight: 400;
+      }
+
+      a {
+            text-decoration: none;
+      }
+
+      app-button {
+            background-color: var(--app-white);
+            color: var(--app-secondary-color);
+            margin-left: 10px;
+            width: 117px;
+      }
+      </style>
+
+      <template is="dom-if" if="[[user]]">
+            <div class="container">
+                  <template is="dom-if" if="[[_checkRole(user, 'admin')]]">
+                        <a id="seeAdmin" href="/admin" tabindex="-1">
+                              <highlighted-icon class="icon" highlighted-on="admin" current-page="[[page]]" icon="settings"></highlighted-icon>
+                        </a>
+                        <paper-tooltip for="seeAdmin" position="bottom">Espace administrateur</paper-tooltip>
+                  </template>
+                  <template is="dom-if" if="[[_checkRole(user, 'customer')]]">
+                        <a id="seeUser" href="/user" tabindex="-1">
+                              <highlighted-icon class="icon" highlighted-on="user" current-page="[[page]]" icon="account-circle"></highlighted-icon>
+                        </a>
+                        <paper-tooltip for="seeUser" position="bottom">Espace personnel</paper-tooltip>
+                  </template>
+                  <paper-icon-button id="signout" class="icon" on-tap="_signOut" icon="exit-to-app"></paper-icon-button>
+                  <paper-tooltip for="signout" position="bottom">Déconnexion</paper-tooltip>
+            </div>
+      </template>
+
+      <template is="dom-if" if="[[!user]]">
+            <div class="container">
+                  <app-button id="login" on-tap="_openModal">Se connecter</app-button>
+            </div>
+      </template>
+
+</template>
+<script>
+'use strict';
+Polymer({
+      is: 'user-menu-button',
+
+      properties: {
+            user: Object,
+            page: String
+      },
+
+      behaviors: [window.AuthControlBehavior, window.ModalControlBehavior, window.ToasterControlBehavior],
+
+      _openModal: function(){
+            this.showModal('sign-in-modal', {focusBack: this.$$('#login')});
+      },
+
+      _checkRole: function(user, role) {
+            if(!user) return false;
+            return user.role === role;
+      },
+
+      _signOutSucceed: function() {
+            this.showToaster({
+                  text: 'Déconnexion réussie',
+                  state: true,
+                  actions: []
+            })
+      }
+});
+</script>
+</dom-module>

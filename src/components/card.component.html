@@ -1,0 +1,90 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../bower_components/iron-image/iron-image.html">
+
+<dom-module id="app-card">
+      <template>
+
+      <style>
+      :host {
+            display: flex;
+            flex-direction: column;
+            box-shadow: var(--app-shadow);
+            border-radius: 3px;
+            flex-grow: 1;
+      }
+
+      h2 {
+            margin: 10px 0;
+      }
+
+      #header {
+            height: var(--app-card-header-height, 160px);
+            width: 100%;
+            background-color: var(--app-card-heading-background-color, white);
+            color: var(--app-card-heading-color, black);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+      }
+
+      #header.padding-top {
+            padding-top: var(--app-space);
+      }
+
+      iron-icon {
+            height: calc(100% - 46px);
+            width: 100%;
+      }
+
+      iron-image {
+            height: 100%;
+            width: 100%;
+      }
+
+      #text {
+            border-top: 1px solid var(--app-light-grey);
+            padding: var(--app-space);
+            background-color: var(--app-card-text-background-color, white);
+            color: var(--app-card-text-color, black);
+            flex-grow: 1;
+            box-sizing: border-box;
+      }
+      </style>
+
+      <div id="header" class$="[[_needPadding(icon)]]">
+            <template is="dom-if" if="[[icon]]">
+                  <iron-icon icon="[[icon]]"></iron-icon>
+                  <h2>[[heading]]</h2>
+            </template>
+            <template is="dom-if" if="[[image]]">
+                  <iron-image
+                  placeholder="[[placeholder]]"
+                  sizing="cover"
+                  preload src="[[image]]"
+                  fade></iron-image>
+            </template>
+      </div>
+      <div id="text">
+            <content></content>
+      </div>
+
+</template>
+<script>
+'use strict';
+
+Polymer({
+      is: 'app-card',
+      properties: {
+            icon: String,
+            image: String,
+            placeholder: String,
+            heading: String
+      },
+
+      _needPadding: function(icon) {
+            return 'padding-top';
+      }
+});
+</script>
+</dom-module>

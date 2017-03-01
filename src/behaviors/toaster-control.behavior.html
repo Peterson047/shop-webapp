@@ -1,0 +1,13 @@
+<script>
+
+'use strict';
+
+window.ToasterControlBehavior = {
+
+   showToaster: function(toaster) {
+	   var toasterContainer = Polymer.dom(document.querySelector('my-app').root).querySelector('toaster-container');
+	   toasterContainer.add(toaster);
+   }
+
+};
+</script>

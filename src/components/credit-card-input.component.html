@@ -1,0 +1,130 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../behaviors/complex-input.behavior.html">
+<link rel="import" href="../data/months.data.html">
+<link rel="import" href="../data/years.data.html">
+<link rel="import" href="../styles/shop-input.style.html">
+<link rel="import" href="../styles/shop-select.style.html">
+<link rel="import" href="../styles/form.style.html">
+
+<dom-module id="credit-card-input">
+	<template>
+	<style include="shop-input shop-select form-style">
+	:host {
+		display: block;
+	}
+	</style>
+
+
+	<months-data months="{{months}}"></months-data>
+	<years-data from="now" plus="10" years="{{years}}"></years-data>
+
+
+	<form class="no-padding">
+		<div class="row input-row">
+			<shop-input>
+				<input tabable type="text" id="cardHolder" name="ccName" pattern=".{3,}" placeholder="Titulaire de la carte" required="" autocomplete="cc-name" value="{{data.cardHolder::input}}">
+				<shop-md-decorator error-message="Champs requis" aria-hidden="true">
+					<label for="ccName">Titulaire de la carte</label>
+					<shop-underline></shop-underline>
+				</shop-md-decorator>
+			</shop-input>
+		</div>
+
+		<div class="row input-row">
+			<shop-input>
+				<input tabable type="tel" id="cardNumber" name="ccNumber" pattern="[\d\s]{15,}" placeholder=">Numéro de la carte" required="" autocomplete="cc-number" value="{{data.cardNumber::input}}">
+				<shop-md-decorator error-message="Numéro de carte invalide" aria-hidden="true">
+					<label for="ccNumber">Numéro de la carte</label>
+					<shop-underline></shop-underline>
+				</shop-md-decorator>
+			</shop-input>
+		</div>
+		<div class="row input-row">
+			<div class="column">
+				<label class="outsideLabel" for="ccExpMonth">Date d'expiration</label>
+				<shop-select>
+					<select tabable id="expMonth" name="ccExpMonth" required="" autocomplete="cc-exp-month" aria-label="Expiry month" value="{{data.expMonth::change}}">
+						<template is="dom-repeat" id="monthsTemplate" items="[[months]]" as="month">
+							<option selected$="[[!index]]" value="[[month.value]]">[[month.name]]</option>
+						</template>
+					</select>
+					<shop-md-decorator aria-hidden="true">
+						<shop-underline></shop-underline>
+					</shop-md-decorator>
+				</shop-select>
+			</div>
+			<shop-select>
+				<select tabable id="expYear" name="ccExpYear" required="" autocomplete="cc-exp-year" aria-label="Expiry year" value="{{data.expYear::change}}">
+					<template is="dom-repeat" id="yearsTemplate" items="[[years]]" as="year">
+						<option selected$="[[!index]]" value="[[year]]">[[year]]</option>
+					</template>
+				</select>
+				<shop-md-decorator aria-hidden="true">
+					<shop-underline></shop-underline>
+				</shop-md-decorator>
+			</shop-select>
+			<shop-input>
+				<input type="tel" tabable id="cvv" name="ccCVV" pattern="\d{3,4}" placeholder="Cryptogramme" required="" autocomplete="cc-csc" value="{{data.cvv::input}}">
+				<shop-md-decorator error-message="Cryptogramme invalide" aria-hidden="true">
+					<label for="ccCVV">Cryptogramme</label>
+					<shop-underline></shop-underline>
+				</shop-md-decorator>
+			</shop-input>
+		</div>
+	</form>
+</template>
+<script>
+Polymer({
+	is: 'credit-card-input',
+	behaviors: [window.ComplexInputBehavior],
+	attached: function() {
+
+		this._setDefaultMonth();
+		this._setDefaultYear();
+
+		this.$.monthsTemplate.addEventListener("dom-change", this._setDefaultMonth.bind(this));
+		this.$.yearsTemplate.addEventListener("dom-change", this._setDefaultYear.bind(this));
+	},
+
+	_setDefaultMonth: function() {
+		this.preventValidation = true;
+		this.$.expMonth.value = this.data.expMonth || this.months[0].value;
+		this.set('data.expMonth', this.data.expMonth || this.months[0].value);
+	},
+
+	_setDefaultYear: function() {
+		this.preventValidation = true;
+		this.$.expYear.value = this.data.expYear || this.years[0];
+		this.set('data.expYear', this.data.expYear || this.years[0]);
+	},
+
+	_setAriaInvalid: function(cardHolder, cardNumber, cvv) {
+		this.$.cardHolder.setAttribute('aria-invalid', cardHolder);
+		this.$.cardNumber.setAttribute('aria-invalid', cardNumber);
+		this.$.cvv.setAttribute('aria-invalid', cvv);
+	},
+
+	focus: function() {
+		this.$.ccName.focus();
+	},
+	reset: function() {
+		this.$.cardHolder.value = "";
+		this.$.cardNumber.value = "";
+		this.$.cvv.value = "";
+		this.$.expMonth.value = this.months[0].value;
+		this.$.expYear.value = this.years[0];
+		this._setAriaInvalid(false, false, false);
+	},
+	validate: function() {
+
+		var cardHolderValid = this.$.cardHolder.checkValidity();
+		var cardNumberValid = this.$.cardNumber.checkValidity();
+		var cvvValid = this.$.cvv.checkValidity();
+		this._setAriaInvalid(!cardHolderValid, !cardNumberValid, !cvvValid);
+		// reset hack
+		if(this.value === null) this.value = {};
+		return cardHolderValid && cardNumberValid && cvvValid;
+	}
+});
+</script>
+</dom-module>

@@ -1,0 +1,44 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="app-address">
+      <template>
+      <style>
+      :host {
+            display: block;
+            color: var(--app-accent-color);
+      }
+      </style>
+
+      <template is="dom-if" if="[[!isFancy]]">
+            <div>[[data.streetAddress]], [[data.zip]] [[data.city]] [[data.country]]</div>
+      </template>
+
+      <template is="dom-if" if="[[isFancy]]">
+            <div>
+                  <div class="icon"></div>
+                  <div class="address">
+                        <div class="street">[[data.streetAddress]]</div>
+                        <div class="zip">[[data.zip]] [[data.city]]</div>
+                        <div class="country">[[data.country]]</div>
+                  </div>
+            </div>
+      </template>
+
+</template>
+<script>
+'use strict';
+Polymer({
+      is: 'app-address',
+      properties: {
+            data: {
+                  type: Object
+            },
+            isFancy: {
+                  type: Boolean,
+                  value: false,
+            }
+      },
+
+});
+</script>
+</dom-module>

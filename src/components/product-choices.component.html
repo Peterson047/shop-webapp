@@ -1,0 +1,131 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="data-source.component.html">
+
+<link rel="import" href="../styles/shop-select.style.html">
+
+<link rel="import" href="../behaviors/data-pipe.behavior.html">
+
+<dom-module id="product-choices">
+	<template>
+	<style include="shop-select">
+	:host {
+		display: block;
+	}
+
+	shop-select {
+		width: 100%;
+	}
+
+	</style>
+
+	<data-source path="/standards" cache-key="standards" output="{{standards}}" empty="{{emptyStandards}}"></data-source>
+
+	<shop-select>
+		<select required="" id="standardsSelect" value="{{standard::change}}">
+			<template is="dom-repeat" id="standardsTemplate" items="[[productStandardsArray]]" as="productStandard">
+				<option value="[[productStandard.$key]]">[[_getStandardName(standards, productStandard.$key)]]</option>
+			</template>
+		</select>
+		<shop-md-decorator aria-hidden="true">
+			<shop-underline></shop-underline>
+		</shop-md-decorator>
+	</shop-select>
+
+</template>
+<script>
+'use strict';
+Polymer({
+	is: 'product-choices',
+	behaviors: [window.DataPipeBehavior],
+	properties: {
+		productStandards: Object,
+		productStandardsArray: Array,
+		productStock: Object,
+		price: {
+			type: Number,
+			notify: true
+		},
+		grammage: {
+			type: Number,
+			notify: true
+		},
+		standard: {
+			type: String,
+			notify: true,
+			observer: '_update'
+		},
+
+		standardName: {
+			type: String,
+			notify: true,
+		},
+		description: {
+			type: String,
+			notify: true,
+		},
+		unit: {
+			type: String,
+			notify: true,
+		},
+		standards: Object,
+		everythingOk: {
+			type: Boolean,
+			value: false
+		}
+	},
+
+	observers: [
+			'_init(standards, productStandards)'
+	],
+
+	_init: function(standards, productStandards) {
+		if(this.emptyStandards) return this.everythingOk = false;
+		else if(!productStandards) return this.reset();
+		else {
+			this.everythingOk = true;
+			this.productStandardsArray = this.toArray(productStandards);
+			this._update(this._findFirstStandardToDisplay());
+		}
+	},
+
+	_findFirstStandardToDisplay: function() {
+		for(var i = 0; i < this.productStandardsArray.length; i++) {
+			var standard = this.productStandardsArray[i].$key;
+			if(this.productStock[standard].quantity > 0) return standard;
+		}
+
+		return this.productStandardsArray[0].$key;
+	},
+
+	_getStandardName: function(stds, key) {
+		if(this.everythingOk) {
+			return stds[key].name;
+		}
+	},
+
+	reset: function() {
+		this.everythingOk = false;
+		this.productStandardsArray = [];
+		this.grammage = null;
+		this.unit = null;
+		this.price = null;
+		this.description = null;
+	},
+
+	_update: function(newVal) {
+		if(!newVal) return;
+		this.set('standard', newVal);
+		this.async(function() {
+			this.$.standardsSelect.value = newVal;
+		}.bind(this))
+		this.grammage = this.standards[newVal].value;
+		this.unit = this.standards[newVal].unit;
+		this.standardName = this.standards[newVal].name;
+		this.description = this.standards[newVal].description;
+		this.price = this.productStandards[newVal].price;
+	}
+
+});
+</script>
+</dom-module>

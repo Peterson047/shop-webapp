@@ -1,0 +1,169 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-validatable-behavior/iron-validatable-behavior.html">
+<link rel="import" href="../../bower_components/iron-form-element-behavior/iron-form-element-behavior.html">
+
+<link rel="import" href="../behaviors/data-pipe.behavior.html">
+<link rel="import" href="../behaviors/modal-control.behavior.html">
+
+<link rel="import" href="../styles/colors.style.html">
+
+<link rel="import" href="data-source.component.html">
+<link rel="import" href="button.component.html">
+<link rel="import" href="standard-selector.component.html">
+
+<dom-module id="standards-group">
+      <template>
+      <style include="colors-style">
+      :host {
+            display: block;
+      }
+
+      #buttons {
+            display: flex;
+            flex-direction: column-reverse;
+            align-items: center;
+      }
+
+      @media (min-width: 640px) {
+            #buttons {
+                  flex-direction: row;
+            }
+      }
+
+      </style>
+
+      <data-source path="/standards" output="{{standards}}"></data-source>
+
+      <div id="buttons">
+            <app-button class="color-action" id="addStd" disabled="[[blockAdd]]" on-tap="_addSelector" class="stickLeft" icon="add">Ajouter un standard au produit</app-button>
+            <app-button class="color-action" id="createStd" icon="create" on-tap="_createNewStd">Créer un standard</app-button>
+
+      </div>
+
+      <template is="dom-repeat" items="[[selectors]]" as="selector">
+            <standard-selector standards="[[standards]]" index="[[index]]" value={{selector}}></standard-selector>
+      </template>
+
+</template>
+<script>
+Polymer({
+      is: 'standards-group',
+
+      properties : {
+            value: {
+                  type: Object,
+                  value: null,
+                  observer: '_resetWatcher'
+            },
+            standards: {
+                  type: Object,
+                  observer: '_tooMuchSelectors'
+            },
+
+            selectors: {
+                  type: Array,
+                  value: function() {
+                        return [this._newSelector()]
+                  },
+                  observer: '_selectorsWatcher'
+            },
+
+            blockAdd: Boolean,
+
+      },
+
+      behaviors: [window.ModalControlBehavior, window.DataPipeBehavior, Polymer.IronFormElementBehavior, Polymer.IronValidatableBehavior],
+
+      listeners: {
+            'update-standard-selector': '_updateSelectors',
+            'remove-selector': '_removeSelector',
+      },
+
+      _resetWatcher: function(newVal, oldVal) {
+            if(newVal === null && typeof oldVal !== 'undefined') this.reset();
+      },
+
+      _newSelector: function() {
+            return {
+                  std: null,
+                  price: null,
+            };
+      },
+
+      _selectorsWatcher: function(newVal) {
+            if(!(newVal instanceof Array)) this.selectors = [this._newSelector()];
+            else this._updateSelectors();
+      },
+
+      _updateSelectors: function (e) {
+            if(e) e.stopPropagation();
+            this._ensureSingleton();
+            this._tooMuchSelectors();
+            this.value = this.toObjectFromKey(this.selectors, 'std');
+      },
+
+      _ensureSingleton: function() {
+            var _this = this;
+            var buf = {};
+            this.selectors.forEach(function(selector, index) {
+                  if(buf.hasOwnProperty(selector.std) && selector.price !== null) {
+                        _this.fire('remove-selector', buf[selector.std]);
+                  }
+                  buf[selector.std] = index;
+            })
+      },
+
+      _isSelected: function (std, selectors) {
+            for (var i = 0; i < selectors.length; i++) {
+                  if (std.name == selectors[i].std) return true;
+            }
+            return false;
+      },
+
+      _createNewStd: function () {
+            this.showModal('create-standard-modal', {focusBack: this.$.createStd});
+      },
+
+      _addSelector: function () {
+            var _this = this;
+            this.push('selectors', this._newSelector());
+            this.async(function() {
+                  if(_this.selectors.length) _this._getStandardEl(_this.selectors.length - 1).$$('#price').focus();
+            })
+      },
+
+      _removeSelector: function (e) {
+            e.stopPropagation();
+            this.splice('selectors', e.detail, 1);
+            this._updateSelectors();
+            this._tooMuchSelectors();
+            if(this.selectors.length) this._getStandardEl(this.selectors.length - 1).$$('#price').focus();
+            else this.$.addStd.focus();
+      },
+
+      _getStandardEl: function(index) {
+            return Polymer.dom(this.root).querySelectorAll('standard-selector')[index];
+      },
+
+      _tooMuchSelectors: function () {
+            if(this.selectors && this.standards) this.set('blockAdd', (this.selectors.length >= Object.keys(this.standards).length));
+      },
+
+      reset: function () {
+            this.selectors = [this._newSelector()];
+            this._tooMuchSelectors();
+      },
+
+      validate: function () {
+            var mySelectors = Array.from(Polymer.dom(this.root).querySelectorAll('standard-selector'));
+            if(!mySelectors.length) return false;
+            var isEverythingValid = true;
+            mySelectors.forEach(function(item) {
+                  var test = item.validate();
+                  if (! test) isEverythingValid = false;
+            })
+            return isEverythingValid;
+      },
+});
+</script>
+</dom-module>

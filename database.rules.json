@@ -1,0 +1,125 @@
+{
+	"rules": {
+		"stocks": {
+			".read": "true",
+			".write": "root.child('users/'+auth.uid+'/role').val() === 'admin'",
+			"$pid": {
+				"$sid": {
+					"quantity": {
+						".validate": "newData.val() > -1"
+					}
+				}
+			}
+		},
+		"groups": {
+			".read": "root.child('users/'+auth.uid+'/role').val() === 'admin'",
+			".write": "root.child('users/'+auth.uid+'/role').val() === 'admin'"
+		},
+		"schedules": {
+			".read": "true",
+			".write": "root.child('users/'+auth.uid+'/role').val() === 'admin'"
+		},
+		"inactivity_periods": {
+			".read": "true",
+			".write": "root.child('users/'+auth.uid+'/role').val() === 'admin'"
+		},
+		"shipping_grid": {
+			".read": "root.child('users/'+auth.uid+'/role').val() === 'admin'",
+			".write": "root.child('users/'+auth.uid+'/role').val() === 'admin'"
+		},
+		"all_products": {
+			".read": "root.child('users/'+auth.uid+'/role').val() === 'admin'",
+			".write": "root.child('users/'+auth.uid+'/role').val() === 'admin'",
+			"$pid": {
+				"stock": {
+					"$sid": {
+						"quantity": {
+							".validate": "newData.val() > -1"
+						}
+
+					}
+				},
+				"standards": {
+					"$sid": {
+						"price": {
+							".validate": "newData.val() > 0"
+						}
+					}
+				}
+			}
+		},
+		"active_products": {
+			".read": "true",
+			".write": "root.child('users/'+auth.uid+'/role').val() === 'admin'",
+			".indexOn": ["banner/active"],
+			"$pid": {
+				"stock": {
+					"$sid": {
+						"quantity": {
+							".validate": "newData.val() > -1"
+						}
+
+					}
+				},
+				"standards": {
+					"$sid": {
+						"price": {
+							".validate": "newData.val() > 0"
+						}
+					}
+				}
+			}
+		},
+		"images": {
+			".read": "true",
+			".write": "root.child('users/'+auth.uid+'/role').val() === 'admin'"
+		},
+		"users": {
+			"$uid": {
+				".read": "auth != null && ( auth.uid === $uid || root.child('users/'+auth.uid+'/role').val() === 'admin' )",
+				".write": "auth != null && ( auth.uid === $uid || root.child('users/'+auth.uid+'/role').val() === 'admin' )",
+				"groups": {
+					".validate": "root.child('users/'+auth.uid+'/role').val() === 'admin'"
+				},
+				"role": {
+					".validate": "root.child('users/'+auth.uid+'/role').val() === 'admin'"
+				}
+			}
+		},
+		"standards": {
+			".read": "true",
+			".write": "root.child('users/'+auth.uid+'/role').val() === 'admin'"
+		},
+		"orders": {
+			".write": "root.child('users/'+auth.uid+'/role').val() === 'admin'",
+			".read": "auth != null && root.child('users/'+auth.uid+'/role').val() === 'admin'",
+			".indexOn": ["status/shipping", "status/payment"],
+			"$orderId": {
+				".read": "auth != null && auth.uid === data.child('/user/uid').val()"
+			}
+		},
+		"payments": {
+			".read": "root.child('users/'+auth.uid+'/role').val() === 'admin'",
+			".write": "root.child('users/'+auth.uid+'/role').val() === 'admin'"
+		},
+		"errors": {
+			".read": "root.child('users/'+auth.uid+'/role').val() === 'admin'",
+			".write": "root.child('users/'+auth.uid+'/role').val() === 'admin'"
+		},
+		"archives": {
+			".write": "root.child('users/'+auth.uid+'/role').val() === 'admin'",
+			"orders": {
+				".write": "root.child('users/'+auth.uid+'/role').val() === 'admin'",
+				".read": "auth != null && root.child('users/'+auth.uid+'/role').val() === 'admin'",
+				".indexOn": ["status/shipping", "status/payment"],
+				"$orderId": {
+					".read": "auth != null && auth.uid === data.child('/user/uid').val()"
+				}
+			}
+		},
+		"metrics": {
+			".write": "root.child('users/'+auth.uid+'/role').val() === 'admin'",
+			".read": "root.child('users/'+auth.uid+'/role').val() === 'admin'"
+		}
+	}
+}

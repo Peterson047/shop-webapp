@@ -1,0 +1,35 @@
+{
+      "database": {
+            "rules": "database.rules.json"
+      },
+      "hosting": {
+            "public": "build/unbundled",
+            "headers": [
+                  {
+                        "source": "/",
+                        "headers": [
+                              {"key": "Link", "value": "</src/my-app.html>;rel=import;as=document"},
+                              {"key": "Link", "value": "</src/views/home.view.html>;rel=import;as=document"}
+                        ]
+                  },
+                  {
+                        "source": "/customer-product-list",
+                        "headers": [
+                              {"key": "Link", "value": "</src/view/product-detail.view.html>;rel=preload;as=document"}
+                        ]
+                  },
+                  {
+                        "source": "/cart",
+                        "headers": [
+                              {"key": "Link", "value": "</src/view/checkout.view.html>;rel=preload;as=document"}
+                        ]
+                  }
+            ],
+            "rewrites": [
+                  {
+                        "source": "**!(/bower_components/**|/images/**)",
+                        "destination": "/index.html"
+                  }
+            ]
+      }
+}

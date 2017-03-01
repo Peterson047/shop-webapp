@@ -1,0 +1,167 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-toggle-button/paper-toggle-button.html">
+<link rel="import" href="../../bower_components/iron-icons/hardware-icons.html">
+
+<link rel="import" href="../behaviors/toaster-control.behavior.html">
+<link rel="import" href="../behaviors/modal-control.behavior.html">
+
+<link rel="import" href="double-check-input.component.html">
+<link rel="import" href="button.component.html">
+<link rel="import" href="dashed-title.component.html">
+<link rel="import" href="loading-layer.component.html">
+
+<link rel="import" href="../styles/colors.style.html">
+<link rel="import" href="../styles/shop-input.style.html">
+
+<dom-module id="user-infos">
+	<template>
+	<style include="shop-input colors-style">
+	:host {
+		display: block;
+	}
+
+	shop-input, double-check-input {
+		width: 100%;
+		margin-top: var(--app-space);
+	}
+
+	</style>
+
+	<loading-layer show="[[loading]]"></loading-layer>
+
+	<dashed-title icon="mail">Email</dashed-title>
+	<shop-input>
+		<input tabable id="mail" type="email" name="email" required="" placeholder="Email" value="[[user.email]]" autocomplete="email">
+		<shop-md-decorator error-message="Champs requis" aria-hidden="true">
+			<label>Email</label>
+			<shop-underline></shop-underline>
+		</shop-md-decorator>
+	</shop-input>
+
+	<app-button icon="check" raised on-tap="_updateMail" class="color-white bg-validation">Mettre à jour</app-button>
+
+	<dashed-title icon="perm-identity">Nom & prénom</dashed-title>
+	<shop-input>
+		<input id="name" type="text" name="name" required="" placeholder="Nom complet" value="[[user.displayName]]" autocomplete="name">
+		<shop-md-decorator error-message="Champs requis" aria-hidden="true">
+			<label>Nom & prénom</label>
+			<shop-underline></shop-underline>
+		</shop-md-decorator>
+	</shop-input>
+
+	<app-button icon="check" raised on-tap="_updateName" class="color-white bg-validation">Mettre à jour</app-button>
+
+	<dashed-title icon="hardware:security">Mot de passe</dashed-title>
+	<double-check-input id="newPassword" type="password" label="Nouveau mot de passe" name="password" error-message="6 caractères minimum" pattern=".{6,}"></double-check-input>
+	<app-button icon="check" raised on-tap="_updatePassword" class="color-white bg-validation">Mettre à jour</app-button>
+
+</template>
+<script>
+'use strict';
+Polymer({
+	is: 'user-infos',
+	properties: {
+		user: Object,
+		backend: String,
+
+		loading: {
+			type: Boolean,
+			value: false
+		}
+	},
+
+	behaviors: [window.ModalControlBehavior, window.ToasterControlBehavior],
+
+	_needReauth: function(err) {
+		return err.code = 'auth/requires-recent-login';
+	},
+
+	_updateEmail: function() {
+		var mailInput = this.$.mail;
+
+		if(mailInput.checkValidity()) {
+			var _this = this;
+			var user = firebase.auth().currentUser;
+			this.loading = true;
+			user.updateEmail(mailInput.value).then(function() {
+				_this.loading = false;
+				_this.showToaster({
+					text: 'Email de confirmation envoyé à votre nouvelle adresse',
+					state: true,
+					actions: []
+				})
+			}, function(err) {
+				_this.loading = false;
+				if(_this._needReauth(err)) _this.showModal('reauth-modal', {onReauth: _this._updateEmail.bind(_this)});
+				else {
+					_this.showToaster({
+						text: err,
+						state: false,
+						actions: []
+					})
+				}
+			});
+		}
+	},
+
+	_updateName: function() {
+		var nameInput = this.$.name;
+		if(nameInput.checkValidity()) {
+			var _this = this;
+			var user = firebase.auth().currentUser;
+			this.loading = true;
+			user.updateProfile({
+				displayName: nameInput.value,
+			}).then(function() {
+				_this.loading = false;
+				_this.showToaster({
+					text: 'Nom modifié',
+					state: true,
+					actions: []
+				})
+			}, function(err) {
+				_this.loading = false;
+				_this.showToaster({
+					text: err,
+					state: false,
+					actions: []
+				})
+			});
+		} else {
+			nameInput.setAttribute('aria-invalid', true);
+			nameInput.focus();
+		}
+	},
+
+	_updatePassword: function() {
+		var newPassInput = this.$.newPassword;
+
+		if(newPassInput.validate()) {
+			var _this = this;
+			var user = firebase.auth().currentUser;
+			this.loading = true;
+
+			user.updatePassword(newPassInput.value).then(function() {
+				_this.loading = false;
+				newPassInput.reset();
+				_this.showToaster({
+					text: 'Mot de passe modifié',
+					state: true,
+					actions: []
+				})
+			}, function(err) {
+				_this.loading = false;
+				if(_this._needReauth(err)) _this.showModal('reauth-modal', {onReauth: _this._updatePassword.bind(_this)});
+				else {
+					_this.showToaster({
+						text: err,
+						state: false,
+						actions: []
+					})
+				}
+			});
+		}
+	}
+});
+</script>
+</dom-module>

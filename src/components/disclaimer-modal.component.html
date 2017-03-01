@@ -1,0 +1,105 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-material/paper-material.html">
+
+<link rel="import" href="button.component.html">
+<link rel="import" href="separator.component.html">
+
+<link rel="import" href="../behaviors/modal.behavior.html">
+
+<link rel="import" href="../styles/modal.style.html">
+<link rel="import" href="../styles/form.style.html">
+<link rel="import" href="../styles/font.style.html">
+
+<dom-module id="disclaimer-modal">
+      <template>
+      <style include="modal-style font-style">
+      :host {
+            display: block;
+            position: relative;
+      }
+
+      app-button {
+            margin-top: var(--app-space);
+            margin-bottom: var(--app-space);
+            color: var(--app-white);
+            background-color: var(--app-validation-color);
+      }
+
+      p {
+            margin-top: 0;
+            margin-bottom: 0;
+      }
+
+      #warning {
+            position: absolute;
+            pointer-events: none;
+            top: -45%;
+            left: -42%;
+
+            height: 170%;
+            width: 170%;
+
+            color: var(--app-light-grey);
+            opacity: 0.2;
+
+            transform: rotate(-20deg);
+      }
+
+      #title, #disclaim {
+            margin-top: auto;
+      }
+
+      @media (min-width: 640px) {
+            #content {
+                  padding-left: 7%;
+                  padding-right: 7%;
+            }
+      }
+
+      @media (min-width: 940px) {
+            #content {
+                  padding-left: 12%;
+                  padding-right: 12%;
+            }
+      }
+      </style>
+
+      <paper-material id="container" tabable-container>
+            <div id="content" class="large">
+                  <paper-icon-button tabable id="close" on-tap="hide" icon="close"></paper-icon-button>
+                  <!-- <iron-icon id="warning" icon="warning"></iron-icon> -->
+                  <div id="title">ATTENTION !</div>
+                  <div id="disclaim">
+                        <p>
+                              L'application est en <b>phase de test</b>. Toutes les informations (produits, images, tarifs, etc.) sont factices
+                              et n'ont pour but que de montrer le fonctionnement de l'application. Le paiement est en "mode developpement" et n'execute <b>aucune réelle transaction</b>.
+                              <br><br>
+                              <b class="font-upper">Aucune commande ne sera acceptée ou honorée.</b>
+                              <br><br>
+                              Tous les <b>informations</b> (commandes, comptes, etc.) seront <b>effacées</b> au terme de la phase de test. Merci !
+                        </p>
+                        <app-separator></app-separator>
+                        <p>
+                              The application is in <b>testing phase</b>. All the informations (products, pictures, prices, etc.) are fake and are only to show
+                              how the app works. Payment is in "development mode" and <b>don't execute any real transaction</b>.
+                              <br><br>
+                              <b class="font-upper">No order will be accepted or honoured.</b>
+                              <br><br>
+                              All <b>informations</b> (orders, accounts, etc.) will be <b>deleted</b> once the testing phase is over. Thank you !
+                        </p>
+
+                        <app-button raised id="confirm" tabable color="--app-validation-color" on-tap="hide">Ok</app-button>
+                  </div>
+            </div>
+      </paper-material>
+
+</template>
+<script>
+'use strict';
+Polymer({
+      is: 'disclaimer-modal',
+
+      behaviors: [window.ModalBehavior],
+});
+</script>
+</dom-module>

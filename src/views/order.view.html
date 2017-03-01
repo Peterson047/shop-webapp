@@ -1,0 +1,62 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../components/order.component.html">
+<link rel="import" href="../components/section.component.html">
+
+<link rel="import" href="../behaviors/page.behavior.html">
+
+<link rel="import" href="../styles/page.style.html">
+
+<dom-module id="order-view">
+	<template>
+	<style include="page-style">
+	:host {
+		display: block;
+	}
+	</style>
+
+	<app-section back="true" heading="Détail de la commande" main-background="--app-section-header-background-color" fill-background="--app-section-fill-color">
+		<app-order id="order" online="[[online]]" app-data="[[appData]]" user="[[user]]" order-id="[[orderId]]"></app-order>
+	</app-section>
+
+	</template>
+	<script>
+	'use strict';
+	Polymer({
+		is: 'order-view',
+
+		properties: {
+			orderId : {
+				type: String,
+				value: null,
+			},
+
+			pageData: {
+				type: Object,
+				value: {
+					category: "Commande",
+					topic: null,
+				}
+			},
+
+			appData: Object,
+			user: Object
+		},
+
+		behaviors: [window.PageBehavior],
+
+		_onSelected: function () {
+			// clear all listeners on previous item
+			if (null != this.orderId) {
+				firebase.database().ref('/orders/'+ this.orderId).off();
+			}
+
+			// change item
+			if(this.orderId !== this.route.path.slice(1)) {
+				this.orderId = this.route.path.slice(1);
+			}
+		},
+
+	});
+	</script>
+</dom-module>

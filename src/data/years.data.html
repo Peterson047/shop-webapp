@@ -1,0 +1,33 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="years-data">
+  <template>
+
+  </template>
+  <script>
+  'use strict';
+  Polymer({
+    is: 'years-data',
+
+    properties: {
+      from: String,
+      plus: Number,
+
+      years: {
+        type: Array,
+        notify: true,
+        value: []
+      }
+    },
+
+    attached: function(){
+      var from = (this.from === 'now') ? new Date().getFullYear() : parseInt(this.from);
+      if(isNaN(from)) return console.error('from is NaN');
+      for(var i = 0; i <= this.plus; i++) {
+        this.push('years', (from + i));
+      }
+    }
+
+  });
+  </script>
+</dom-module>

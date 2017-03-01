@@ -1,0 +1,55 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../components/section.component.html">
+<link rel="import" href="../components/checkout.component.html">
+<link rel="import" href="../components/force-sign-in.component.html">
+
+<link rel="import" href="../behaviors/page.behavior.html">
+<link rel="import" href="../behaviors/navigation.behavior.html">
+
+<link rel="import" href="../styles/page.style.html">
+
+<dom-module id="checkout-view">
+  <template>
+  <style include="page-style">
+  :host {
+    display: block;
+  }
+  </style>
+
+  <app-section back="true" heading="Paiement" main-background="--app-section-header-background-color" fill-background="--app-section-fill-color">
+    <template is="dom-if" if="[[user]]">
+      <app-checkout online="[[online]]" selected="[[!disabled]]" app-data="[[appData]]" user="[[user]]"></app-checkout>
+    </template>
+    <template is="dom-if" if="[[!user]]">
+      <force-sign-in online="[[online]]"></force-sign-in>
+    </template>
+  </app-section>
+
+  </template>
+  <script>
+  Polymer({
+    is: 'checkout-view',
+
+    properties: {
+      pageData: {
+        type: Object,
+        value: {
+          category: "Checkout",
+          topic: null,
+          path: "checkout",
+        }
+      },
+
+      user: Object,
+      appData: Object,
+    },
+
+    behaviors: [window.PageBehavior, window.NavigationBehavior],
+
+    _onSelected: function() {
+      if(this.online === false) this.goBack();
+    },
+  });
+  </script>
+</dom-module>

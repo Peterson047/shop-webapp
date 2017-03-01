@@ -1,0 +1,214 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-radio-group/paper-radio-group.html">
+<link rel="import" href="../../bower_components/paper-radio-button/paper-radio-button.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="./date-input.component.html">
+<link rel="import" href="./button.component.html">
+
+<link rel="import" href="../styles/shop-input.style.html">
+<link rel="import" href="../styles/fix-tap.style.html">
+
+<dom-module id="order-list-filters">
+	<template>
+	<style include="shop-input fix-tap-style">
+	:host {
+		display: block;
+		padding: var(--app-space);
+		box-sizing: border-box;
+		z-index: 1;
+		background-color: var(--filters-background-color);
+		color: var(--filters-color);
+		height: 100%;
+		overflow: auto;
+		--shop-input-underline-color: var(--app-accent-color);
+	}
+
+	paper-icon-button {
+		--paper-icon-button-ink-color: var(--filters-color);
+	}
+
+	paper-radio-button {
+		width: 160px;
+		--paper-radio-button-label-color: var(--filters-color);
+		--paper-radio-button-checked-color: var(--filters-color);
+		--paper-radio-button-unchecked-ink-color: var(--filters-color);
+		--paper-radio-button-checked-ink-color: var(--filters-color);
+	}
+
+	paper-radio-group {
+		width: calc(100% - var(--app-double-space));
+		--paper-radio-group-item-padding: 0px;
+	}
+
+	date-input, shop-input {
+		width: calc(100% - 80px);
+	}
+
+	date-input {
+		--input-background: var(--filters-background-color);
+		--label-color: var(--app-white);
+	}
+
+	input {
+		background-color: var(--filters-background-color) !important;
+		color: var(--filters-color) !important;
+	}
+
+	label {
+		color: var(--app-white) !important;
+	}
+
+	.highlight {
+		color: var(--filters-color);
+	}
+
+	.filter {
+		color: var(--app-white);
+	}
+
+	.reset:not([disabled]) {
+		color: var(--app-error-color);
+	}
+
+	.reset[disabled] {
+		color: var(--app-white);
+		opacity: 0.5;
+	}
+
+	.container {
+		display: flex;
+		align-items: flex-end;
+		flex-wrap: wrap;
+	}
+
+	.container:not(:last-of-type) {
+		margin-bottom: var(--app-space);
+	}
+
+	#close {
+		position: absolute;
+		top: 10px;
+		right: var(--app-space);
+	}
+
+
+	</style>
+
+	<paper-icon-button id="close" on-tap="_close" icon="arrow-upward"></paper-icon-button>
+
+	<div class="container">
+		<paper-radio-group selected="{{stateFilter}}">
+			<template is="dom-repeat" items="[[categories]]">
+				<paper-radio-button name="[[item.category]]">[[item.display]]</paper-radio-button>
+			</template>
+		</paper-radio-group>
+	</div>
+
+	<div class="container">
+		<shop-input>
+			<input type="text" required="" id="searchId" placeholder="Numéro de commande" pattern=".{1,}">
+			<shop-md-decorator error-message="Champs requis" aria-hidden="true">
+				<label>Numéro de commande</label>
+				<shop-underline></shop-underline>
+			</shop-md-decorator>
+		</shop-input>
+		<paper-icon-button disabled$="[[!idFilterResetable]]" on-tap="_resetIdFilter" class="reset" icon="cancel"></paper-icon-button>
+		<paper-icon-button on-tap="_idFilter" icon="check" class="filter"></app-button>
+		</div>
+
+
+
+		<div class="container">
+			<date-input value="{{start}}" lt="[[end]]" label="Entre" id="start"></date-input>
+		</div>
+
+		<div class="container">
+			<date-input value="{{end}}" gt="[[start]]" label="et" id="end"></date-input>
+			<paper-icon-button disabled$="[[!dateFilterResetable]]" on-tap="_resetDateFilter" class="reset" icon="cancel"></paper-icon-button>
+			<paper-icon-button on-tap="_dateFilter" class="filter" icon="date-range"></paper-icon-button>
+		</div>
+	</template>
+	<script>
+	'use strict';
+	Polymer({
+		is: 'order-list-filters',
+		properties: {
+			categories: {
+				type: Array,
+				observer: '_setDefaultFilter'
+			},
+			stateFilter: {
+				type: String,
+				value: '',
+				notify: true
+			},
+
+			idFilter: {
+				type: String,
+				value: '',
+				notify: true
+			},
+
+			dateFilter: {
+				type: Object,
+				value: null,
+				notify: true
+			},
+			idFilterResetable: {
+				type: Boolean,
+				value: false
+			},
+			dateFilterResetable: {
+				type: Boolean,
+				value: false
+			}
+		},
+
+		_idFilter: function() {
+			var ok = this.$.searchId.checkValidity();
+			if(ok) {
+				this.$.searchId.removeAttribute('aria-invalid');
+				this.idFilter = this.$.searchId.value.trim();
+				this.idFilterResetable = true;
+				this._close();
+			}
+			else this.$.searchId.setAttribute('aria-invalid', true);
+		},
+
+		_resetIdFilter: function() {
+			this.idFilter = '';
+			this.$.searchId.value = '';
+			this.idFilterResetable = false;
+		},
+
+		_dateFilter: function() {
+			var ok = this.$.start.validate() && this.$.end.validate();
+			if(ok) {
+				var buffer = {};
+				this.dateFilterResetable = true;
+				buffer.start = this.$.start.value;
+				buffer.end = this.$.end.value;
+				this.dateFilter = buffer;
+
+				this._close();
+			} else this.dateFilter = null;
+		},
+
+		_resetDateFilter: function() {
+			this.dateFilterResetable = false;
+			this.dateFilter = null;
+			this.$.start.reset();
+			this.$.end.reset();
+		},
+
+		_close: function() {
+			this.fire('close-filters');
+		},
+
+		_setDefaultFilter: function() {
+			if(this.stateFilter === '') this.stateFilter = this.categories[0].category;
+		}
+
+	});
+	</script>
+</dom-module>

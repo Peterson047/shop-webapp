@@ -1,0 +1,151 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-icons/social-icons.html">
+<link rel="import" href="../../bower_components/polymerfire/firebase-messaging.html">
+
+<link rel="import" href="./api-call.component.html">
+
+<link rel="import" href="../behaviors/toaster-control.behavior.html">
+
+<dom-module id="notification-registerer">
+	<template>
+
+		<api-call
+		id="endptUpdateCall"
+		uri="[[backend]]/users/notifications/endpoint/update"
+		method="POST"
+		on-response="_endpointUpdateResponse"
+		debounce-duration="300">
+	</api-call>
+
+	<firebase-messaging id="messaging"
+	token="{{token}}"></firebase-messaging>
+
+</template>
+<script>
+Polymer({
+	is: 'notification-registerer',
+
+	properties: {
+		enabled: {
+			type: Boolean,
+			notify: true
+		},
+		user: {
+			type: Object,
+			observer: '_onUserChange',
+		},
+		subscribed: {
+			type: Boolean,
+			notify: true,
+			observer: 'subscribe'
+		},
+		registration_id: {
+			type: String
+		},
+		backend: String,
+		token:{
+			type: String,
+			observer: '_tokenChange'
+		}
+	},
+
+	behaviors: [window.ToasterControlBehavior],
+
+	_notificationAvailable: function () {
+		return (null != this.user && 'serviceWorker' in navigator && Notification.permission !== 'denied')
+	},
+
+	_computeNotificationState: function () {
+		this.enabled = this._notificationAvailable();
+		if(!this.enabled || Notification.permission === 'default') {
+			this.registration_id = null;
+			this.subscribed = false;
+		} else if(Notification.permission === 'granted') {
+			this.subscribed = true;
+		}
+	},
+
+	_tokenChange: function() {
+		if(this.token) {
+			this.registration_id = this.token;
+			if(this.enabled) {
+				// user just granted permission
+				if(!this.subscribed) this._updateEndpoint(true);
+				// user has granted permission, just checking we have the freshest token stored
+				else this._checkRegistrationId();
+			}
+		}
+	},
+
+	subscribe: function(){
+
+		var _this = this;
+
+		if(this.enabled && this.subscribed === false){
+			if(this.registration_id) {
+				this._updateEndpoint(true);
+			} else {
+				this.showToaster({
+					text: 'Veuillez activer les notifications',
+					icon: 'social:notifications',
+					state: true,
+					actions: []
+				});
+				this.$.messaging.requestPermission()
+				.then(function(){
+					_this.showToaster({
+						text: 'Notifications activées',
+						state: true,
+						actions: []
+					});
+				}, function(err) {
+					_this.showToaster({
+						text: err,
+						state: false,
+						actions: []
+					});
+				});
+			}
+		}
+	},
+
+	unsubscribe: function(){
+		if(this.enabled && this.registration_id){
+			this._updateEndpoint(false);
+			this.subscribed = false;
+		}
+	},
+
+	_updateEndpoint: function(subscribe){
+		this.$.endptUpdateCall.request(this._computePayload(this.registration_id, subscribe));
+	},
+
+	_endpointUpdateResponse: function(response){
+		if(response.detail.success) this.subscribed = true;
+	},
+
+	_computePayload: function(registration_id, subscribe){
+		var payload = {
+			registration_id: registration_id,
+			subscribe: subscribe
+		};
+		return payload;
+	},
+
+	_onUserChange: function(newValue, oldValue) {
+		this._computeNotificationState();
+	},
+
+	_checkRegistrationId: function() {
+		if(this.enabled) {
+			var _this = this;
+			var ref = firebase.database().ref('/users/'+this.user.uid+'/device_group/endpoints/'+this.registration_id)
+			ref.once('value', function(snap) {
+				if(snap.val() !== true) _this._updateEndpoint(true);
+			})
+		}
+	},
+
+});
+</script>
+</dom-module>

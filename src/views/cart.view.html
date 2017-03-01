@@ -1,0 +1,44 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../components/section.component.html">
+<link rel="import" href="../components/cart.component.html">
+
+<link rel="import" href="../behaviors/page.behavior.html">
+
+<link rel="import" href="../styles/page.style.html">
+
+<dom-module id="cart-view">
+  <template>
+  <style include="page-style">
+  :host {
+    display: block;
+  }
+  </style>
+
+  <app-section back="true" heading="Panier" main-background="--app-section-header-background-color" fill-background="--app-section-fill-color">
+    <app-cart user="[[user]]" online="[[online]]" app-data="[[appData]]"></app-cart>
+  </app-section>
+
+  </template>
+  <script>
+  Polymer({
+    is: 'cart-view',
+
+    properties: {
+      pageData: {
+        type: Object,
+        value: {
+          category: "Panier",
+          topic: null,
+          path: "cart",
+        }
+      },
+
+      user: Object,
+      appData: Object,
+    },
+
+    behaviors: [window.PageBehavior],
+  });
+  </script>
+</dom-module>

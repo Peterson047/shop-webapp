@@ -1,0 +1,47 @@
+{
+  "entrypoint": "index.html",
+  "shell": "src/my-app.html",
+  "fragments": [
+    "src/views/home.view.html",
+    "src/views/admin-product-list.view.html",
+    "src/views/customer-product-list.view.html",
+    "src/views/product-detail.view.html",
+    "src/views/product-form.view.html",
+    "src/views/user.view.html",
+    "src/views/admin.view.html",
+    "src/views/admin-metrics.view.html",
+    "src/views/admin-inactivity-period.view.html",
+    "src/views/admin-shipping-grid.view.html",
+    "src/views/admin-order-list.view.html",
+    "src/views/admin-schedules.view.html",
+    "src/views/contact.view.html",
+    "src/views/cart.view.html",
+    "src/views/order.view.html",
+    "src/views/checkout.view.html",
+    "src/views/user-infos.view.html",
+    "src/views/user-orders.view.html",
+    "src/components/create-standard-modal.component.html",
+    "src/components/reauth-modal.component.html",
+    "src/components/confirm-modal.component.html",
+    "src/components/send-order-modal.component.html",
+    "src/components/shipping-grid-modal.component.html",
+    "src/components/inactivity-period-modal.component.html",
+    "src/components/stock-modal.component.html",
+    "src/components/sign-in-modal.component.html",
+    "src/components/sign-up-modal.component.html",
+    "src/components/disclaimer-modal.component.html",
+    "src/views/404.view.html"
+  ],
+  "sourceGlobs": [
+   "src/**/*",
+   "images/**/*",
+   "bower.json"
+  ],
+  "includeDependencies": [
+    "manifest.json",
+    "firebase-messaging-sw.js",
+    "bower_components/webcomponentsjs/webcomponents-lite.min.js",
+    "bower_components/app-storage/app-indexeddb-mirror/app-indexeddb-mirror-worker.js",
+    "bower_components/app-storage/app-indexeddb-mirror/common-worker-scope.js"
+  ]
+}

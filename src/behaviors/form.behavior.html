@@ -1,0 +1,37 @@
+<script>
+'use strict';
+
+window.FormBehavior = {
+
+	validateForm: function() {
+
+		var form = this.$.form;
+
+		var valid = form.validate();
+		// monkey patching
+		var firstInvalid = false;
+		for (var el, i = 0; el = form.elements[i], i < form.elements.length; i++) {
+			el.setCustomValidity("");
+			if (el.checkValidity()) {
+				el.removeAttribute('aria-invalid');
+			} else {
+				if (!firstInvalid) {
+					if (el.scrollIntoViewIfNeeded) {
+						// safari, chrome
+						el.scrollIntoViewIfNeeded();
+					} else {
+						// firefox, edge, ie
+						el.scrollIntoView(false);
+					}
+					el.focus();
+					firstInvalid = true;
+				}
+				el.setAttribute('aria-invalid', 'true');
+			}
+		}
+
+		return valid;
+	},
+}
+
+</script>

@@ -1,0 +1,43 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../components/section.component.html">
+<link rel="import" href="../components/contact.component.html">
+
+<link rel="import" href="../behaviors/page.behavior.html">
+
+<link rel="import" href="../styles/page.style.html">
+
+<dom-module id="contact-view">
+	<template>
+	<style include="page-style">
+	:host {
+		display: block;
+	}
+	</style>
+
+	<app-section back="true" heading="Contact" main-background="--app-section-header-background-color" fill-background="--app-section-fill-color">
+		<app-contact app-data="[[appData]]" online="[[online]]"></app-contact>
+	</app-section>
+
+	</template>
+	<script>
+	'use strict';
+	Polymer({
+		is: 'contact-view',
+
+		properties: {
+			pageData: {
+				type: Object,
+				value: {
+					category: "Contact",
+					topic: null
+				}
+			},
+
+			appData: Object
+		},
+
+		behaviors: [window.PageBehavior],
+	});
+	</script>
+</dom-module>

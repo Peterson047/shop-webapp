@@ -1,0 +1,35 @@
+<script>
+'use strict';
+window.ListAnimationBehavior = {
+
+	ready: function() {
+
+		var _this = this;
+		this.$.list.addEventListener('dom-change', function(e) {
+			e.stopPropagation();
+			_this.async(function() {
+				var items = Array.from(Polymer.dom(_this.root).querySelectorAll('.item'));
+				items.forEach(function(item, index) {
+					item.style.transition = 'opacity 300ms ease '+(100*index)+'ms, transform 300ms ease '+(100*index)+'ms';
+					if(index === items.length - 1) {
+						var onFinish = function(e) {
+							e.stopPropagation();
+							item.removeEventListener('transitionend', onFinish);
+							_this.fire('animation-done');
+						};
+						item.addEventListener('transitionend', onFinish);
+					}
+				})
+
+				_this.async(function() {
+					items.forEach(function(item) {
+						item.style.opacity = 1;
+						item.style.transform = 'none';
+					})
+				}, 100)
+			})
+		})
+	},
+}
+
+</script>

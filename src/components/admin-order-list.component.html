@@ -1,0 +1,311 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="order-list.component.html">
+<link rel="import" href="order-list-filters.component.html">
+<link rel="import" href="button.component.html">
+<link rel="import" href="data-source.component.html">
+
+<link rel="import" href="../behaviors/data-pipe.behavior.html">
+
+<link rel="import" href="../styles/tile.style.html">
+<link rel="import" href="../styles/colors.style.html">
+<link rel="import" href="../styles/text-list.style.html">
+
+<dom-module id="admin-order-list">
+	<template>
+
+	<style include="tile-style colors-style text-list">
+
+	:host {
+		display: flex;
+		flex-direction: column;
+		overflow: hidden;
+		position: relative;
+	}
+
+	order-list {
+		--order-list-height: calc(100vh - 576px) !important;
+	}
+
+	order-list-filters {
+		position: absolute;
+		transition: transform 400ms ease;
+		width: 100%;
+		margin-left: -var(--app-space);
+		margin-top: -var(--app-space);
+		will-change: transform;
+		--filters-background-color: var(--app-secondary-color);
+		--filters-color: var(--app-white);
+	}
+
+	order-list-filters.hidden {
+		transform: translateY(calc(-100% - 5px));
+	}
+
+	app-button:not(:last-of-type) {
+		margin-right: var(--app-space);
+	}
+
+	#controls {
+		display: flex;
+		justify-content: space-between;
+		margin: var(--app-space) 0 var(--app-space) 0;
+	}
+
+	#actions {
+		display: flex;
+	}
+
+	#number {
+		font-size: 1.9em;
+	}
+
+	</style>
+
+	<data-source
+	id="toShip"
+	auto-fetch="[[autoFetch]]"
+	fetching="{{loading}}"
+	path="/orders"
+	order-by-child="/status/shipping"
+	equal-to="to_ship"
+	cache-key="orders-[[user.uid]]-to-ship"
+	array="$key"
+	></data-source>
+
+	<data-source
+	id="shipped"
+	auto-fetch="[[autoFetch]]"
+	fetching="{{loading}}"
+	path="/orders"
+	order-by-child="/status/shipping"
+	equal-to="shipped"
+	cache-key="orders-[[user.uid]]-shipped"
+	array="$key"
+	></data-source>
+
+	<data-source
+	id="refunded"
+	auto-fetch="[[autoFetch]]"
+	fetching="{{loading}}"
+	path="/orders"
+	order-by-child="/status/payment"
+	equal-to="refunded"
+	cache-key="orders-[[user.uid]]-refunded"
+	array="$key"
+	></data-source>
+
+	<data-source
+	id="approved"
+	auto-fetch="[[autoFetch]]"
+	fetching="{{loading}}"
+	path="/orders"
+	order-by-child="/status/payment"
+	equal-to="paid"
+	cache-key="orders-[[user.uid]]-paid"
+	array="$key"
+	></data-source>
+
+	<data-source
+	id="waiting"
+	auto-fetch="[[autoFetch]]"
+	fetching="{{loading}}"
+	path="/orders"
+	order-by-child="/status/payment"
+	equal-to="waiting"
+	cache-key="orders-[[user.uid]]-waiting"
+	array="$key"
+	></data-source>
+
+	<data-source
+	id="archived"
+	auto-fetch="[[autoFetch]]"
+	fetching="{{loading}}"
+	path="/archives/orders"
+	cache-key="orders-[[user.uid]]-archived"
+	array="$key"
+	></data-source>
+
+	<data-source
+	id="all"
+	auto-fetch="[[autoFetch]]"
+	fetching="{{loading}}"
+	path="/orders"
+	cache-key="orders-[[user.uid]]-all"
+	array="$key"
+	></data-source>
+
+	<div class="tile keepMinimalSpace">
+
+		<order-list-filters class="hidden"
+		id="filters"
+		categories="[[_computeCategories(fragments)]]"
+		on-close-filters="_closeFilters"
+		id-filter="{{idFilter}}"
+		date-filter="{{dateFilter}}"
+		state-filter="{{stateFilter}}"></order-list-filters>
+
+		<div id="controls">
+			<div id="number" class="color-accent">[[number]]</div>
+			<div id="actions">
+				<app-button online="[[online]]" disabled$="[[!online]]" raised class="color-white bg-action" on-tap="_getCSV" icon="cloud-download">CSV</app-button>
+				<app-button raised class="color-white bg-action" on-tap="_showFilters" icon="filter-list">Filtres</app-button>
+			</div>
+		</div>
+
+		<order-list cache-key="[[currentCacheKey]]" loading="[[loading]]" orders="[[orders]]" no-entry="[[noEntry]]"></order-list>
+	</div>
+</template>
+<script>
+'use strict';
+
+Polymer({
+	is: 'admin-order-list',
+	properties: {
+		user: Object,
+		backend: String,
+		online: Boolean,
+		autoFetch: {
+			type: Boolean,
+			value: false
+		}
+	},
+
+	behaviors: [window.DataPipeBehavior],
+
+	observers: [
+		'_pickOrders(stateFilter, idFilter, dateFilter)'
+	],
+
+	listeners: {
+		'data-source-update': '_onFragmentLoad'
+	},
+
+	attached: function() {
+		this.fragments = {
+			toShip: {
+				reqState: false,
+				display: 'A envoyer',
+				data: null,
+				size: null
+			},
+			shipped: {
+				reqState: false,
+				display: 'Envoyées',
+				data: null,
+				size: null
+			},
+			approved: {
+				reqState: false,
+				display: 'Payées',
+				data: null,
+				size: null
+			},
+			refunded: {
+				reqState: false,
+				display: 'Remboursées',
+				data: null,
+				size: null
+			},
+			waiting: {
+				reqState: false,
+				display: 'En attente',
+				data: null,
+				size: null
+			},
+			archived: {
+				reqState: false,
+				display: 'Archivées',
+				data: null,
+				size: null
+			},
+			all: {
+				reqState: false,
+				display: 'Toutes (sauf archivées)',
+				data: null,
+				size: null
+			}
+		};
+	},
+
+	_pickOrders: function(stateFilter, idFilter, dateFilter) {
+		if(!stateFilter) return;
+		this.currentCacheKey = this.$[stateFilter].cacheKey;
+		if(!this.fragments[stateFilter].reqState) {
+			this.$[stateFilter].fetch();
+		} else {
+			this._applyFilters(this.fragments[stateFilter], idFilter, dateFilter);
+		}
+	},
+
+	_applyFilters: function(fragment, idFilter, dateFilter) {
+
+		this.noEntry = !fragment || !fragment.data || !fragment.size;
+
+		if(!this.noEntry) {
+			this.orders = fragment.data;
+			if(idFilter !== '') {
+				this.orders = this.orders.filter(function(order) {
+					return order.$key === idFilter;
+				})
+			}
+
+			if(dateFilter) {
+				this.orders = this.orders.filter(function(order) {
+					return order.time.create >= dateFilter.start && order.time.create <= dateFilter.end;
+				})
+			}
+			this.number = this.orders.length;
+		} else {
+			this.number = 0;
+		}
+	},
+
+	_onFragmentLoad: function(e) {
+		e.stopPropagation();
+
+		var frag = e.detail.id;
+		var data = e.detail.data;
+		this.fragments[frag].reqState = true;
+		this.fragments[frag].data = data;
+		this.fragments[frag].size = this.fragments[frag].data !== null ? this.fragments[frag].data.length : 0;
+		this._pickOrders(this.stateFilter, this.idFilter, this.dateFilter);
+	},
+
+	_computeCategories: function(fragments) {
+		var buf = [];
+
+		for(var key in fragments) {
+			buf.push({
+				category: key,
+				display: fragments[key].display
+			});
+		}
+
+		return buf;
+	},
+
+	_closeFilters: function() {
+		this.$.filters.classList.add('hidden');
+	},
+
+	_showFilters: function() {
+		this.$.filters.classList.remove('hidden');
+	},
+
+	_getCSV: function() {
+		if(!this.orders || !this.orders.length) return;
+		var form = document.createElement('form');
+		form.method = 'POST',
+		form.action = this.backend+'/csv';
+		var input = document.createElement("input");
+		input.value = JSON.stringify(this.toObjectFromKey(this.orders, '$key'));
+		input.name = "json";
+		form.appendChild(input);
+		this.appendChild(form);
+		form.submit();
+		this.removeChild(form);
+	}
+});
+</script>
+</dom-module>

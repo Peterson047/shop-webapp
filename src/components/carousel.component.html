@@ -350,6 +350,14 @@ Polymer({
             var newIndex = this._findPosition(newItemName);
             var direction = this._computeDirection(newIndex);
             this._moveViewPort(newIndex, direction);
+            this._preventFreeze();
+      },
+
+      _preventFreeze: function() {
+            var _this = this;
+            setTimeout(function() {
+                  this.isAnimating = false;
+            }, 300)
       },
 
       _slide: function (e) {

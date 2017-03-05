@@ -31,6 +31,10 @@
       #days {
             margin-bottom: var(--app-space);
       }
+
+      #update {
+            margin-top: auto;
+      }
       </style>
 
       <data-source path="/schedules" once="true" cache-key="schedules" fetching="{{loading}}" output="{{schedules}}"></data-source>
@@ -48,7 +52,7 @@
                   <app-schedule data="[[schedule]]"></app-schedule>
             </template>
 
-            <app-button online="[[online]]" disabled$="[[!online]]" raised icon="check" class="color-white bg-validation" on-tap="_submit">Mettre à jour</app-button>
+            <app-button id="update" online="[[online]]" disabled$="[[!online]]" raised icon="check" class="color-white bg-validation" on-tap="_submit">Mettre à jour</app-button>
             <loading-layer show="[[loading]]"></loading-layer>
       </div>
 

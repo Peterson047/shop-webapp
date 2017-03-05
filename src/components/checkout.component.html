@@ -183,14 +183,13 @@ Polymer({
       _handleResponse: function(callRes) {
             var response = callRes.detail;
             if(response.success) {
-                  this.showToaster({
-                        text: 'Commande créee',
-                        state: true,
-                        actions: []
-                  });
-
                   var data = response.data;
                   if ('goto' == data.type) {
+                        this.showToaster({
+                              text: 'Commande payée',
+                              state: true,
+                              actions: []
+                        });
                         this.clearCart();
                         this.goTo(data.link);
                         this.loading = false;

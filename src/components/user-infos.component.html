@@ -17,12 +17,19 @@
 	<template>
 	<style include="shop-input colors-style">
 	:host {
-		display: block;
+		display: flex;
+		flex-direction: column;
+		flex-grow: 1;
+		justify-content: space-between;
 	}
 
 	shop-input, double-check-input {
 		width: 100%;
 		margin-top: var(--app-space);
+	}
+
+	.space {
+		margin: var(--app-space) 0;
 	}
 
 	</style>
@@ -38,7 +45,7 @@
 		</shop-md-decorator>
 	</shop-input>
 
-	<app-button icon="check" raised on-tap="_updateMail" class="color-white bg-validation">Mettre à jour</app-button>
+	<app-button icon="check" raised on-tap="_updateMail" class="space color-white bg-validation">Mettre à jour</app-button>
 
 	<dashed-title icon="perm-identity">Nom & prénom</dashed-title>
 	<shop-input>
@@ -49,7 +56,7 @@
 		</shop-md-decorator>
 	</shop-input>
 
-	<app-button icon="check" raised on-tap="_updateName" class="color-white bg-validation">Mettre à jour</app-button>
+	<app-button icon="check" raised on-tap="_updateName" class="space color-white bg-validation">Mettre à jour</app-button>
 
 	<dashed-title icon="hardware:security">Mot de passe</dashed-title>
 	<double-check-input id="newPassword" type="password" label="Nouveau mot de passe" name="password" error-message="6 caractères minimum" pattern=".{6,}"></double-check-input>

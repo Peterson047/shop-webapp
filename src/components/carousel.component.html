@@ -183,13 +183,13 @@
   </div>
 
   <div id="pictures">
-    <template is="dom-repeat" items="[[products]]" as="oneItem">
-      <div id="[[oneItem.id]]" class="picContainer">
+    <template is="dom-repeat" items="[[products]]" as="product">
+      <div id="[[product.id]]" class="picContainer">
         <iron-image
         style$="[[_computeInlineStyles(carouselHeight, carouselWidth)]]"
-        placeholder="[[oneItem.base64]]"
+        placeholder="[[product.base64]]"
         sizing="cover"
-        preload src="[[oneItem.src]]"
+        preload src="[[product.src]]"
         fade></iron-image>
       </div>
     </template>
@@ -199,15 +199,15 @@
   </div>
 
   <div id="ui" on-track='_touchHandler'>
-    <template is="dom-repeat" items="[[products]]" as="oneItem">
-      <template is="dom-if" if="[[_showTitle(oneItem)]]">
-        <a transparent$="[[_computeItemUiStyle(oneItem.id, selectedElement, isAnimating)]]" class="picLink" href="[[oneItem.href]]" tabindex="-1"><paper-button >[[oneItem.linkTitle]]</paper-button></a>
+    <template is="dom-repeat" items="[[products]]" as="product">
+      <template is="dom-if" if="[[_showTitle(product)]]">
+        <a transparent$="[[_computeItemUiStyle(product.id, selectedElement, isAnimating)]]" class="picLink" href="[[product.href]]" tabindex="-1"><paper-button >[[product.linkTitle]]</paper-button></a>
       </template>
     </template>
 
-    <template is="dom-repeat" items="[[products]]" as="oneItem">
-      <template is="dom-if" if="[[_showText(oneItem)]]">
-        <paper-button transparent$="[[_computeItemUiStyle(oneItem.id, selectedElement, isAnimating)]]" class="itemText">[[oneItem.text]]</paper-button>
+    <template is="dom-repeat" items="[[products]]" as="product">
+      <template is="dom-if" if="[[_showText(product)]]">
+        <paper-button transparent$="[[_computeItemUiStyle(product.id, selectedElement, isAnimating)]]" class="itemText">[[product.text]]</paper-button>
       </template>
     </template>
 

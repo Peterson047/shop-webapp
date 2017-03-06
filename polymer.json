@@ -15,6 +15,7 @@
     "src/views/admin-order-list.view.html",
     "src/views/admin-schedules.view.html",
     "src/views/contact.view.html",
+    "src/views/cgu.view.html",
     "src/views/cart.view.html",
     "src/views/order.view.html",
     "src/views/checkout.view.html",

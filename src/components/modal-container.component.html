@@ -49,14 +49,16 @@ Polymer({
 	loadModal: function(modalTag, cb) {
 		var _this = this;
 		if(~this.loadedModals.indexOf(modalTag)) {
-			cb();
+			return cb();
 		} else {
 			this.setOverlayLoading(true);
 			var onLoad = function() {
 				_this.loadedModals.push(modalTag);
 				_this.setOverlayLoading(false);
-				_this.$$(modalTag).style.transition = 'opacity 200ms ease-in 0s, transform 200ms ease-in 0s';
-				_this.async(cb, 100);
+				Polymer.RenderStatus.afterNextRender(_this.$$(modalTag), function() {
+					this.attachTransition();
+					return cb();
+				})
 			}
 			var resolvedModalUrl = this.resolveUrl('./' + modalTag + '.component.html');
 			this.importHref(resolvedModalUrl, onLoad, null, true);

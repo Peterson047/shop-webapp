@@ -124,6 +124,10 @@ window.ModalBehaviorImpl = {
             }
       },
 
+      attachTransition: function() {
+            this.style.transition = 'opacity 200ms ease-in 0s, transform 200ms ease-in 0s';
+      },
+
       _setModalStyles: function(state) {
             switch(state) {
                   case 'visible':

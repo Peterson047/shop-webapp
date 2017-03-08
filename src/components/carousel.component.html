@@ -419,13 +419,13 @@ Polymer({
     if(!this.hasPicturesReady || this.products.length < 2) return;
     switch(e.detail.state) {
       case 'start':
-        if (this.isAnimating) return this.touchInit = false;
+        if (this.isAnimating) return;
 
         this.isAnimating = true;
+        this.touchInit = true;
         this._turnOffPlayer();
         this._toggleUI(false);
         this.touchInvolvedElements = this._positionElements();
-        this.touchInit = true;
         break;
 
       case 'track':
@@ -471,6 +471,7 @@ Polymer({
 
       _this._toggleUI(true);
       _this.isAnimating = false;
+      this.touchInit = false;
     };
 
     this._attachTransitionEventListener(elem, onTransitionEnd);

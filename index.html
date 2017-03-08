@@ -96,6 +96,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                   document.body.classList.remove('no-overflow');
                   document.body.querySelector('my-app').showModal('disclaimer-modal');
             }
+            loader.running = false;
             layer.addEventListener('transitionend', onFinish);
             layer.style.opacity = 0;
       }
@@ -271,53 +272,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
       }
 
-      @keyframes ripple {
-            0% {
-                  opacity: 0;
-                  transform: scale(0.2);
-            }
-
-            50% {
-                  opacity: 1;
-            }
-
-            100% {
-                  opacity: 0;
-                  transform: scale(1);
-            }
-      }
-
-      #loading_animation {
+      #canvas {
             margin-top: 40px;
             margin-bottom: 40px;
-            width: 90px;
-            height: 90px;
-            position: relative;
-      }
-
-      #circle_one {
-            animation-duration: 2s;
-            animation-delay: 1s;
-            background-color: #26A69A;
-      }
-
-      #circle_two {
-            background-color: #4DB6AC;
-            animation-duration: 2s;
-      }
-
-
-      #loading_animation .circle {
-            animation-name: ripple;
-            animation-iteration-count: infinite;
-            animation-timing-function: ease-in;
-            transform-origin: center center;
-            opacity: 0;
-            transform: scale(0.2);
-            height: 100%;
-            width: 100%;
-            border-radius: 50%;
-            position: absolute;
       }
 
       /* OBSOLETE BROWSER */
@@ -405,10 +362,376 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         <g><path d="M19 4h-4L7.11 16.63 4.5 12 9 4H5L.5 12 5 20h4l7.89-12.63L19.5 12 15 20h4l4.5-8z"/></g>
                   </svg>
 
-                  <div id="loading_animation">
-                        <div id="circle_one" class="circle"></div>
-                        <div id="circle_two" class="circle"></div>
-                  </div>
+                  <canvas id="canvas" width="320" height="250"></canvas>
             </div>
+
+            <script type="text/javascript">
+
+            // Utility functions
+
+            function euclideanDistance(x1, y1, x2, y2) {
+                  return Math.sqrt( ( Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2) ) );
+            }
+
+            function KeySpline (mX1, mY1, mX2, mY2) {
+
+                  this.get = function(aX) {
+                        if (mX1 == mY1 && mX2 == mY2) return aX; // linear
+                        return CalcBezier(GetTForX(aX), mY1, mY2);
+                  }
+
+                  function A(aA1, aA2) { return 1.0 - 3.0 * aA2 + 3.0 * aA1; }
+                  function B(aA1, aA2) { return 3.0 * aA2 - 6.0 * aA1; }
+                  function C(aA1)      { return 3.0 * aA1; }
+
+                  // Returns x(t) given t, x1, and x2, or y(t) given t, y1, and y2.
+                  function CalcBezier(aT, aA1, aA2) {
+                        return ((A(aA1, aA2)*aT + B(aA1, aA2))*aT + C(aA1))*aT;
+                  }
+
+                  // Returns dx/dt given t, x1, and x2, or dy/dt given t, y1, and y2.
+                  function GetSlope(aT, aA1, aA2) {
+                        return 3.0 * A(aA1, aA2)*aT*aT + 2.0 * B(aA1, aA2) * aT + C(aA1);
+                  }
+
+                  function GetTForX(aX) {
+                        // Newton raphson iteration
+                        var aGuessT = aX;
+                        for (var i = 0; i < 4; ++i) {
+                              var currentSlope = GetSlope(aGuessT, mX1, mX2);
+                              if (currentSlope == 0.0) return aGuessT;
+                              var currentX = CalcBezier(aGuessT, mX1, mX2) - aX;
+                              aGuessT -= currentX / currentSlope;
+                        }
+                        return aGuessT;
+                  }
+            }
+
+            function computeAngle(cx, cy, r, x, y) {
+                  var TWO_PI = Math.PI * 2;
+                  var TWO_R_SQUARED = 2 * Math.pow(r, 2);
+                  return TWO_PI - Math.acos( ( TWO_R_SQUARED - Math.pow(euclideanDistance(cx + r, cy, x, y), 2) ) / TWO_R_SQUARED );
+            }
+
+            function computeArc(x1, y1, x2, y2, r) {
+
+                  var q = euclideanDistance(x1, x2, y1, y2);
+                  var x3 = (x1 + x2) / 2;
+                  var y3 = (y1 + y2) / 2;
+                  var k = Math.sqrt( Math.pow(r, 2) - Math.pow(q/2, 2) );
+
+
+                  var cx = x3 + k*(y1 - y2)/q;
+                  var cy = y3 + k*(x2 - x1)/q;
+
+
+                  var endAngle = computeAngle(cx, cy, r, x1, y1);
+                  var startAngle = computeAngle(cx, cy, r, x2, y2);
+
+                  return {
+                        x: cx,
+                        y: cy,
+                        startAngle: startAngle,
+                        endAngle: endAngle
+                  };
+
+            }
+
+            // Loop
+
+            var loader = new LoadingAnimation();
+
+            var canvas = document.getElementById('canvas');
+            var ctx = canvas.getContext('2d');
+
+            function draw(timestamp) {
+                  if (canvas.getContext) {
+                        ctx.clearRect(0,0, canvas.width, canvas.height);
+                        loader.draw(ctx, canvas.width/2 + 55, 0, timestamp);
+                        if(loader.running) window.requestAnimationFrame(draw);
+                  }
+            }
+
+            // Animation container
+
+            function LoadingAnimation() {
+                  this.soap = new Soap();
+                  this.foam = new Foam();
+                  this.bubbles = [];
+                  this.running = true;
+            }
+
+            LoadingAnimation.prototype.draw = function(ctx, x, y, timestamp) {
+
+                  //Soap
+
+                  this.soap.draw(ctx, x, y, timestamp);
+
+                  //Foam
+
+                  if(this.soap.translateThreshold < 0 && this.foam.scale < 1) {
+                        this.foam.scaleAnimationStart = -1;
+                        this.foam.scaleGoal = this.foam.scale + 0.2;
+                  }
+
+                  this.foam.draw(ctx, x - this.soap.width, this.soap.height, timestamp);
+
+
+                  //Bubbles
+
+                  var rangeMax = x - 65 - ( ( 130 - 65 ) * (1 - this.foam.scale) )
+                  var rangeMin = x - 180 + ( ( 130 - 65 ) * (1 - this.foam.scale) )
+                  if(this.foam.scale > 0.3 && Math.random() > 0.98) this.bubbles.push(new Bubble(Math.random() * (rangeMax - rangeMin) + rangeMin, this.soap.height, timestamp));
+
+                  for(var i = this.bubbles.length -1; i >= 0; i--) {
+                        var bubble = this.bubbles[i];
+                        if(bubble.y < 20 || timestamp - bubble.birth > bubble.lifespan) {
+                              if(bubble.exploded) this.bubbles.splice(i, 1);
+                              bubble.explode(ctx, timestamp);
+                        } else bubble.draw(ctx, timestamp);
+                  }
+            }
+
+            // Soap
+
+            function Soap() {
+                  this.height = 180;
+                  this.width = 100;
+                  this.offset = Math.min(this.height, this.width) * 0.25;
+                  this.velocity = 2;
+                  this.rotation = 45;
+                  this.bezier = new KeySpline(0.25, 0.1, 0.25, 1.0);
+                  this.logo = "M19 4h-4L7.11 16.63 4.5 12 9 4H5L.5 12 5 20h4l7.89-12.63L19.5 12 15 20h4l4.5-8z";
+                  this.logoColor = '#004D40';
+                  this.primaryColor = '#009688';
+                  this.lightColor = 'rgba(77, 182, 172, 0.4)';
+                  this.shadowColor = '#004D40';
+
+                  this.translateThreshold = 40;
+                  this.translateAnimationDuration = 800;
+                  this.translateAnimationStart = -1;
+            }
+
+            Soap.prototype.draw = function(ctx, x, y, timestamp) {
+                  ctx.save();
+
+                  // Main shape
+                  this.translateCtx(ctx, x, y, timestamp);
+                  ctx.rotate((Math.PI / 180) * this.rotation);
+
+                  ctx.beginPath();
+                  ctx.moveTo(0, this.offset);
+                  ctx.quadraticCurveTo(0, 0, this.offset, 0);
+                  ctx.lineTo(this.width - this.offset, 0);
+                  ctx.quadraticCurveTo(this.width, 0, this.width, this.offset);
+                  ctx.lineTo(this.width, this.height - this.offset);
+                  ctx.quadraticCurveTo(this.width, this.height, this.width - this.offset, this.height);
+                  ctx.lineTo(this.offset, this.height);
+                  ctx.quadraticCurveTo(0, this.height, 0, this.height - this.offset);
+                  ctx.closePath();
+                  ctx.fillStyle = this.primaryColor;
+                  ctx.fill();
+
+                  // Light effect
+                  var r = 90;
+                  ctx.beginPath();
+                  ctx.moveTo(0, this.offset);
+                  ctx.quadraticCurveTo(0, 0, this.offset, 0);
+
+                  var arc = computeArc(0, this.offset, this.offset, 0, r);
+                  ctx.arc(arc.x, arc.y, r, arc.startAngle, arc.endAngle, true);
+                  ctx.closePath();
+                  ctx.fillStyle = this.lightColor;
+                  ctx.fill();
+
+                  // Shadow
+                  ctx.beginPath();
+                  ctx.moveTo(this.width - this.offset, 0);
+                  ctx.quadraticCurveTo(this.width - 3, 0, this.width - 3, this.offset);
+                  ctx.lineTo(this.width - 3, this.height - this.offset);
+                  ctx.quadraticCurveTo(this.width - 3, this.height, this.width - this.offset, this.height);
+                  ctx.quadraticCurveTo(this.width, this.height, this.width, this.height - this.offset);
+                  ctx.lineTo(this.width, this.offset);
+                  ctx.quadraticCurveTo(this.width, 0, this.width - this.offset, 0);
+                  ctx.closePath();
+                  ctx.fillStyle = this.shadowColor;
+                  ctx.fill();
+
+                  // Logo
+                  ctx.save();
+                  ctx.translate(this.width / 2 + 24 , this.height / 2 - 24);
+                  ctx.rotate((Math.PI / 180) * this.rotation * 2);
+                  ctx.scale(2, 2);
+                  ctx.beginPath();
+                  var logo = new Path2D(this.logo);
+                  ctx.fillStyle = this.logoColor;
+                  ctx.fill(logo);
+
+                  ctx.restore();
+
+                  ctx.restore();
+            }
+
+            Soap.prototype.translateCtx = function(ctx, x, y, timestamp) {
+                  var progress = 0;
+
+                  if (this.translateAnimationStart < 0) {
+                        this.translateAnimationStart = timestamp;
+                  } else {
+                        progress = Math.min(1, (timestamp - this.translateAnimationStart)/this.translateAnimationDuration);
+                  }
+
+                  if(this.translateThreshold < 0) x += this.translateThreshold;
+
+                  if (progress < 1) {
+                        this.translateX = x - this.translateThreshold * this.bezier.get(progress);
+
+                  } else {
+                        this.translateX = x - this.translateThreshold;
+                        this.translateAnimationStart = -1;
+                        this.translateThreshold *= -1;
+                  }
+
+                  ctx.translate(this.translateX, y);
+            }
+
+            // Foam
+
+            function Foam() {
+                  this.shapes = [ [0, 0, 30], [15, -15, 30], [20, 10, 35], [30, -10, 20], [47, -15, 25], [47, 7, 35] ];
+                  this.scaleAnimationStart = -1;
+                  this.scaleAnimationDuration = 800;
+                  this.scale = 0;
+                  this.scaleGoal = null;
+                  this.bezier = new KeySpline(0.25, 0.1, 0.25, 1.0);
+            }
+
+            Foam.prototype.draw = function(ctx, x, y, timestamp) {
+
+                  if(this.scaleGoal) {
+                        var progress = 0;
+                        if (this.scaleAnimationStart < 0) {
+                              this.scaleAnimationStart = timestamp;
+                        } else {
+                              progress = Math.min(1, (timestamp - this.scaleAnimationStart)/this.scaleAnimationDuration);
+                        }
+
+                        if (progress < 1) {
+                              this.scale += (this.scaleGoal - this.scale) * this.bezier.get(progress);
+                        } else {
+                              this.scaleGoal =  null;
+                        }
+                  }
+
+                  ctx.save();
+                  ctx.translate(-this.width - 10, this.height);
+                  ctx.translate(x, y);
+                  ctx.translate(-this.scale * 65, -this.scale);
+                  ctx.scale(this.scale, this.scale)
+
+                  for(var i = 0; i < this.shapes.length; i++) {
+                        var current = this.shapes[i];
+                        this.drawShape(ctx, current[0], current[1], current[2]);
+                  }
+
+                  ctx.restore();
+            }
+
+            Foam.prototype.drawShape = function (ctx, x, y, r) {
+                  ctx.save();
+                  ctx.translate(x, y);
+
+                  ctx.beginPath();
+                  ctx.arc(x, y, r, 0, Math.PI*2);
+                  ctx.closePath();
+                  ctx.fillStyle = '#FFF'
+                  ctx.fill();
+                  ctx.strokeStyle = '#F5F5F5';
+                  ctx.stroke();
+
+                  ctx.restore();
+            }
+
+            // Bubble
+
+            function Bubble(x, y, timestamp) {
+                  this.r = Math.ceil(Math.random() * (6 - 2) + 2);
+                  this.acc = 0.5;
+                  this.x = x;
+                  this.y = y;
+                  this.birth = timestamp;
+                  this.lifespan = Math.random() * (5000 - 2000) + 2000;
+                  this.exploded = false;
+                  this.particleCount = 2;
+                  this.particles = [];
+            }
+
+            Bubble.prototype.draw = function(ctx, timestamp) {
+                  var elapsed = timestamp - this.birth;
+                  this.y -= this.acc;
+                  this.x += Math.sin(elapsed/200);
+                  ctx.beginPath();
+                  ctx.arc(this.x, this.y, this.r, 0, Math.PI*2);
+                  ctx.closePath();
+                  ctx.strokeStyle = '#FFF';
+                  ctx.stroke();
+            }
+
+            Bubble.prototype.explode = function(ctx) {
+
+                  if(!this.particles.length) {
+                        for(var i = 0; i < this.particleCount; i++) {
+                              var odd = i % 2;
+                              var angle = !odd ? Math.random() * Math.PI : Math.random() * (Math.PI * 2 - Math.PI) + Math.PI;
+                              this.particles.push(new Particle(this.x + this.r * Math.cos(angle), this.y + this.r * Math.sin(angle), angle));
+                        }
+                  } else {
+                        var oneAlive = false;
+                        for(var i = 0; i < this.particles.length; i++) {
+                              if(this.particles[i].alive) {
+                                    oneAlive = true;
+                                    this.particles[i].draw(ctx);
+                              }
+                        }
+                        if(!oneAlive) this.exploded = true;
+                  }
+
+            }
+
+            // Particle
+
+            function Particle(x, y, a) {
+                  this.x = x;
+                  this.y = y;
+                  this.xVel = a > Math.PI ? -3 : 3;
+                  this.yVel = 0.0001;
+                  this.opacity = 1;
+                  this.animationDuration = 500;
+                  this.alive = true;
+            }
+
+            Particle.prototype.draw = function(ctx) {
+                  if(this.opacity <= 0) return this.alive = false;
+
+                  this.x += this.xVel;
+
+                  this.yVel *= .99;
+                  this.yVel += .25;
+                  this.y += this.yVel;
+
+                  this.opacity -= .07;
+
+                  ctx.beginPath();
+                  ctx.arc(this.x, this.y, 1, 0, Math.PI*2);
+                  ctx.closePath();
+                  ctx.fillStyle = 'rgba(255, 255, 255, '+this.opacity+')';
+                  ctx.fill();
+            }
+
+            // Here we go !
+
+            window.requestAnimationFrame(draw);
+            </script>
+
       </body>
       </html>

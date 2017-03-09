@@ -24,6 +24,10 @@
     border-radius: var(--border-radius);
   }
 
+  :host * {
+    user-select: none;
+  }
+
   .noImageIcon {
     color: var(--app-white);
     height: 50px;
@@ -290,7 +294,12 @@ Polymer({
 
     autoplayInterval: {
       type: Number,
-      value: 4000
+      value: 4000,
+    },
+
+    lastTouch: {
+      type: Number,
+      value: 0,
     },
   },
 
@@ -359,9 +368,12 @@ Polymer({
   },
 
   _preventFreeze: function() {
-    setTimeout(function() {
-      this.isAnimating = false;
-    }.bind(this), this.transitionDuration)
+    if (performance.now() - this.lastTouch < 1000) return;
+    var _this = this;
+    var recover = function() {
+      _this.isAnimating = false;
+    }
+    this._waitTransition(recover);
   },
 
   _slide: function (e) {
@@ -395,6 +407,7 @@ Polymer({
     this.selectedElement.classList.add(shadowClass);
 
     var onTransitionEnd = function() {
+      _this.selectedElement.style.transition = 'none';
       // Replace old pic in stack + change focus
       oldElement.style.zIndex = 0;
       _this.selectedElement.style.zIndex = 1;
@@ -405,32 +418,38 @@ Polymer({
       _this.isAnimating = false;
     };
 
+    // The first requestAnimationFrame is needed for firefox, to start correctly the animation
     requestAnimationFrame(function() {
-      _this._attachTransitionEventListener(_this.selectedElement, onTransitionEnd);
+      _this._waitTransition(onTransitionEnd);
       requestAnimationFrame(function() {
         _this.selectedElement.style.transition = _this.transition;
         _this.transform('none', _this.selectedElement);
-      })
+      });
     })
   },
 
   _touchHandler: function (e) {
     var _this = this;
+    this.lastTouch = e.timeStamp;
     if(!this.hasPicturesReady || this.products.length < 2) return;
     switch(e.detail.state) {
       case 'start':
-        if (this.isAnimating) return;
+        if (_this.isAnimating) return _this.touchInit = false;
+        _this.isAnimating = true;
+        _this.touchInit = true;
+        _this._turnOffPlayer();
+        _this._toggleUI(false);
+        _this.touchInvolvedElements = _this._positionElements();
 
-        this.isAnimating = true;
-        this.touchInit = true;
-        this._turnOffPlayer();
-        this._toggleUI(false);
-        this.touchInvolvedElements = this._positionElements();
+        if ( document.selection ) {
+            document.selection.empty();
+        } else if ( window.getSelection ) {
+            window.getSelection().removeAllRanges();
+        }
         break;
 
       case 'track':
         if (!this.touchInit) return;
-
         if(Math.abs(e.detail.dx) <= this.carouselWidth) {
           if (0 < e.detail.dx) {
             this.transform( 'translateX(-100%)' , this.touchInvolvedElements.next);
@@ -444,14 +463,13 @@ Polymer({
         break;
 
       case 'end':
-        if(!this.touchInit) return;
+        if(!_this.touchInit) return;
         var capReached = Math.abs(e.detail.dx) > (_this.carouselWidth / 3);
         if (e.detail.dx > 0) {
           _this._endDrag(_this.touchInvolvedElements.prev, capReached, _this.touchInvolvedElements.prevIndex, 'left');
         } else {
           _this._endDrag(_this.touchInvolvedElements.next, capReached, _this.touchInvolvedElements.nextIndex, 'right');
         }
-
         break;
     }
   },
@@ -462,6 +480,7 @@ Polymer({
 
     // Callback when the transition end
     var onTransitionEnd = function () {
+      elem.style.transition = 'none';
       _this.touchInvolvedElements.next.classList.remove('leftShadow');
       _this.touchInvolvedElements.prev.classList.remove('rightShadow');
 
@@ -471,11 +490,9 @@ Polymer({
 
       _this._toggleUI(true);
       _this.isAnimating = false;
-      this.touchInit = false;
     };
 
-    this._attachTransitionEventListener(elem, onTransitionEnd);
-
+    this._waitTransition(onTransitionEnd);
     requestAnimationFrame(function () {
       elem.style.transition = _this.transition;
       if(capReached) {
@@ -488,19 +505,11 @@ Polymer({
     });
   },
 
-  _attachTransitionEventListener: function(elem, cb) {
-    // Create the callback for the listener
-    var overloadedCb = function() {
-      elem.removeEventListener('transitionend', overloadedCb, true);
-      elem.style.transition = 'none';
-      if(typeof cb === 'function') {
-        cb();
-      }
-    }
-
-    // Attach callback on transition end
-    elem.addEventListener('transitionend', overloadedCb, true);
-  },
+  _waitTransition: function(fn) {
+		// Tried an event driven approach, sadly this provide better results. T_T
+    clearTimeout(this.timeout);
+		this.timeout = setTimeout(fn, this.transitionDuration);
+	},
 
   _positionElements: function () {
     var lastIndex = this.products.length - 1;

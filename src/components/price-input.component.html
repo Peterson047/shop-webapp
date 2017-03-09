@@ -47,21 +47,24 @@ Polymer({
 		},
 		data: {
 			type: String,
-			observer: '_parse'
 		}
 	},
 
 	behaviors: [Polymer.IronFormElementBehavior, Polymer.IronValidatableBehavior],
 
+	attached: function() {
+		this.addEventListener('blur', this.validate);
+	},
+
 	_resetWatcher: function(newVal, oldVal) {
 		if(newVal === null && typeof oldVal !== 'undefined') this.reset();
 	},
 
-	_parse: function() {
-		if(this.data) {
-			if(typeof this.data === 'string') this.value = parseFloat( this.data.replace(',', '.') );
-			else if(typeof this.data === 'number') this.value = this.data;
-			this.validate();
+	_parse: function(newData) {
+		if(newData && newData !== this.value) {
+			if(typeof newData === 'string') this.value = parseFloat( newData.replace(',', '.') );
+			else if(typeof newData === 'number') this.value = newData;
+			this.data = isNaN(this.value) ? '' : this.value;
 		}
 	},
 
@@ -81,6 +84,7 @@ Polymer({
 	},
 
 	validate: function() {
+		this._parse(this.data);
 		var ok = !isNaN(this.value) && this.value > 0;
 		this._setInputState(ok);
 		return ok;

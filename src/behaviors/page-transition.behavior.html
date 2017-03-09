@@ -181,7 +181,8 @@ window.PageTransitionBehaviorImpl = {
 
 	_waitTransition: function(fn) {
 		// Tried an event driven approach, sadly this provide better results. T_T
-		setTimeout(fn, 450);
+		clearTimeout(this.timeout);
+		this.timeout = setTimeout(fn, 450);
 	},
 
 	_showPage404: function() {

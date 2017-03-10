@@ -1,0 +1,48 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../components/section.component.html">
+<link rel="import" href="../components/event-list.component.html">
+
+<link rel="import" href="../behaviors/page.behavior.html">
+
+<link rel="import" href="../styles/page.style.html">
+
+<dom-module id="event-list-view">
+  <template>
+  <style include="page-style">
+  :host {
+    display: block;
+  }
+  </style>
+
+  <app-section back="true" class="simpleSpace" heading="Évènements" main-background="--app-section-header-background-color" fill-background="--app-section-fill-color">
+    <event-list id="eventList" online="[[online]]" app-data="[[appData]]"></event-list>
+  </app-section>
+
+  </template>
+  <script>
+  'use strict';
+  Polymer({
+    is: 'event-list-view',
+
+    properties: {
+      pageData: {
+        type: Object,
+        value: {
+          category: "Évènements",
+          topic: null,
+        }
+      },
+
+      user: Object,
+      appData: Object
+    },
+
+    behaviors: [window.PageBehavior],
+
+    _onSelected: function () {
+      this.$.eventList.fetchEvents();
+    }
+  });
+  </script>
+</dom-module>

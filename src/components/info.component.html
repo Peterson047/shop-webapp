@@ -1,0 +1,48 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+
+<dom-module id="app-info">
+	<template>
+
+	<style>
+
+	:host {
+		display: flex;
+		align-items: center;
+	}
+
+	:host p {
+		width: 100%;
+		font-weight: 400;
+		box-sizing: border-box;
+		padding: 15px;
+		color: var(--app-white);
+		font-size: 1.1em;
+		background-color: var(--app-action-color);
+		border-radius: 3px;
+		box-shadow: var(--app-shadow);
+	}
+
+	iron-icon {
+		color: var(--app-white);
+	}
+
+	</style>
+
+	<p>
+		<iron-icon icon="info"></iron-icon>
+		<content></content>
+	</p>
+
+</template>
+<script>
+'use strict';
+
+Polymer({
+	is: 'app-info',
+	properties: {
+
+	},
+});
+</script>
+</dom-module>

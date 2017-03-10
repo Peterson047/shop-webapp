@@ -170,17 +170,20 @@ Polymer({
       },
 
       _submit: function() {
+
             var ok = this.validateForm();
-            if(!this._checkUserEmail()) return;
-            if(ok && this.user) {
+            if(ok && this.user && this._checkUserEmail()) {
                   var data = this.$.form.serialize();
                   data.cart = this.cart;
                   this.loading = true;
+                  this.preventCartNotifications();
                   this.$.placeCall.request(data);
             }
       },
 
       _handleResponse: function(callRes) {
+            this.restoreCartNotifications();
+            this.loading = false;
             var response = callRes.detail;
             if(response.success) {
                   var data = response.data;
@@ -192,13 +195,11 @@ Polymer({
                         });
                         this.clearCart();
                         this.goTo(data.link);
-                        this.loading = false;
                   }
                   else {
                         window.location.replace(data.link);
                   }
             } else {
-                  this.loading = false;
                   this.showToaster({
                         text: response.error,
                         state: false,

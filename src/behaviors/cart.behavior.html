@@ -25,11 +25,16 @@ function notify(prop, value) {
 
 var cart = JSON.parse(window.localStorage.getItem('cart')) || new Cart();
 var cartInit = false;
+var preventCartNotifications = false;
 
 window.CartBehaviorImpl = {
 
       properties: {
-            cart: Object
+            cart: Object,
+            paying: {
+                  type: Boolean,
+                  value: false
+            }
       },
 
       observers: ['_cartChange(items)'],
@@ -201,6 +206,10 @@ window.CartBehaviorImpl = {
 
             var toastText = '';
 
+            this._cartChange();
+
+            if(preventCartNotifications) return;
+
             if (cart.items[hashItem].quantity - quantity < 1) {
                   toastText = 'Item supprimé';
                   delete cart.items[hashItem];
@@ -218,7 +227,6 @@ window.CartBehaviorImpl = {
                   actions: [],
             });
 
-            this._cartChange();
       },
 
       // Update quantity (add or remove) of an already existing item in the cart
@@ -243,6 +251,8 @@ window.CartBehaviorImpl = {
       },
 
       stockChanges: function (hashItem, snapshot) {
+            if(preventCartNotifications) return;
+
             var stockQuantity = snapshot.val().quantity;
 
             // product no longer exists
@@ -279,6 +289,14 @@ window.CartBehaviorImpl = {
 
             cart.items[hashItem].stock.quantity = stockQuantity;
             this._cartChange();
+      },
+
+      preventCartNotifications: function() {
+            preventCartNotifications = true;
+      },
+
+      restoreCartNotifications: function() {
+            preventCartNotifications = false;
       },
 
       clearCart: function() {

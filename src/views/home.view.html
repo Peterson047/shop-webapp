@@ -14,135 +14,137 @@
 <link rel="import" href="../styles/colors.style.html">
 
 <dom-module id="home-view">
-  <template>
-  <style include="tile-style page-style colors-style">
-  :host {
-    display: block;
-  }
+      <template>
+      <style include="tile-style page-style colors-style">
+      :host {
+            display: block;
+      }
 
-  app-carousel {
-    display: flex;
-    width: 100%;
-    height: 270px;
-    margin-left: auto;
-    margin-right: auto;
-    box-shadow: 0px 2px 5px 0px rgba(0,0,0,0.16),0px 2px 5px 0px rgba(0,0,0,0.23);
-    z-index: 1;
-    --carousel-border-radius: 3px;
-  }
+      app-carousel {
+            display: flex;
+            width: 100%;
+            height: 270px;
+            margin-left: auto;
+            margin-right: auto;
+            box-shadow: 0px 2px 5px 0px rgba(0,0,0,0.16),0px 2px 5px 0px rgba(0,0,0,0.23);
+            z-index: 1;
+            --carousel-border-radius: 3px;
+      }
 
-  .containerCards {
-    margin-left: auto;
-    margin-right: auto;
+      .containerCards {
+            margin-left: auto;
+            margin-right: auto;
 
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
 
-    z-index: 1;
-  }
+            z-index: 1;
+      }
 
-  app-card, paper-card {
-    flex-shrink: 0;
-    flex-grow: 1;
-    margin-top: 10px;
-    width: 300px;
+      app-card, paper-card {
+            flex-shrink: 0;
+            flex-grow: 1;
+            margin-top: 10px;
+            width: 300px;
 
-    margin-left: 10px;
-    margin-right: 10px;
+            margin-left: 10px;
+            margin-right: 10px;
 
-    overflow: hidden;
-    position: relative;
-  }
+            overflow: hidden;
+            position: relative;
+      }
 
-  .card-bio {
-    --app-card-heading-color: #FFC107;
-  }
+      .card-bio {
+            --app-card-heading-color: #FFC107;
+      }
 
-  .card-friendly {
-    --app-card-heading-color: #CDDC39;
-  }
+      .card-friendly {
+            --app-card-heading-color: #CDDC39;
+      }
 
-  .card-sapo {
-    --app-card-heading-color: #00BCD4;
-  }
+      .card-sapo {
+            --app-card-heading-color: #00BCD4;
+      }
 
-  #who {
-        --app-card-header-height: 240px;
-  }
-  </style>
+      #who {
+            --app-card-header-height: 240px;
+      }
+      </style>
 
-  <highlight-data items="{{highlighted}}"></highlight-data>
+      <highlight-data items="{{highlighted}}"></highlight-data>
 
-  <app-section heading="Nos derniers savons" main-background="--app-section-header-background-color" fill-background="--app-section-fill-color">
-    <app-carousel products="[[highlighted]]"></app-carousel>
-  </app-section>
+      <app-section heading="Nos derniers savons" main-background="--app-section-header-background-color" fill-background="--app-section-fill-color">
+            <app-carousel products="[[highlighted]]"></app-carousel>
+      </app-section>
 
-  <app-section id="business" heading="Pourquoi nos savons ?" title-color="--app-white" main-background="--app-dark-grey" fill-background="--app-section-fill-color">
-    <div class="containerCards">
-      <app-card class="card-sapo" heading="Saponification à froid" icon="app-icons:snowflake">
-        <p>
-          Nous fabriquons notre savon de manière artisanale par saponification à froid.
-          Cette méthode écologique, sans cuisson, donne un savon très doux, naturellement riche en glycérine.
-        </p>
-      </app-card>
+      <app-section id="business" heading="Pourquoi nos savons ?" title-color="--app-white" main-background="--app-dark-grey" fill-background="--app-section-fill-color">
+            <div class="containerCards">
 
-      <app-card class="card-bio" heading="Matériaux bio" icon="app-icons:pot-mix">
-        <p>
-          Nos savons sont formulés à base d’huiles végétales, toutes en qualité bio,
-          parfumés aux huiles essentielles bio choisis pour leurs propriétés dermatologiques
-          et colorés naturellement avec des végétaux et argiles.
-        </p>
-      </app-card>
+                  <app-card class="card-friendly" heading="Des savons 'sans'" icon="app-icons:earth">
+                        <p>
+                              Sans :
+                              <ul>
+                                    <li>conservateurs</li>
+                                    <li>parfums de synthèse</li>
+                                    <li>colorants artificiels</li>
+                                    <li>huile de palme</li>
+                                    <li>emballages (en vente directe)</li>
+                              </ul>
+                        </p>
+                  </app-card>
 
-      <app-card class="card-friendly" heading="Des savons 'sans'" icon="app-icons:earth">
-        <p>
-          Sans :
-          <ul>
-            <li>conservateurs</li>
-            <li>parfums de synthèse</li>
-            <li>colorants artificiels</li>
-            <li>huile de palme</li>
-            <li>emballages (en vente directe)</li>
-          </ul>
-        </p>
-      </app-card>
-    </div>
-  </app-section>
+                  <app-card class="card-sapo" heading="Saponification à froid" icon="app-icons:snowflake">
+                        <p>
+                              Nous fabriquons notre savon de manière artisanale par saponification à froid.
+                              Cette méthode écologique, sans cuisson, donne un savon très doux, naturellement riche en glycérine.
+                        </p>
+                  </app-card>
 
-  <app-section id="workshop" heading="Qui sommes nous ?" main-background="--app-section-header-background-color" fill-background="--app-section-fill-color">
-    <div class="containerCards">
-      <app-card id="who"
-      image="https://firebasestorage.googleapis.com/v0/b/savon-1df9a.appspot.com/o/images%2F3MhEjgO4RnfWOw9r23vc9KV55Jt1-1487001650327-imageedit_2_2073141038.jpg?alt=media&token=6af03a7d-cdf3-47e0-97a1-66e5330b02e7"
-      placeholder="data:image/jpeg;base64,/9j/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAACAAoDASIAAhEBAxEB/8QAFgABAQEAAAAAAAAAAAAAAAAAAAUH/8QAHRAAAgIBBQAAAAAAAAAAAAAAAQIAAyEGBxEjUf/EABUBAQEAAAAAAAAAAAAAAAAAAAQF/8QAGxEAAgEFAAAAAAAAAAAAAAAAAAMBAgQyNHH/2gAMAwEAAhEDEQA/AJu1qK+g0DqG7nORz5MQvtsW+wLY4AYgAE4zEQic6ixfayOSf//Z">
-        <p>
-          Attention !
+                  <app-card class="card-bio" heading="Matériaux bio" icon="app-icons:pot-mix">
+                        <p>
+                              Nos savons sont formulés à base d’huiles végétales, toutes en qualité bio,
+                              parfumés aux huiles essentielles bio choisis pour leurs propriétés dermatologiques
+                              et colorés naturellement avec des végétaux et argiles.
+                        </p>
+                  </app-card>
 
-          Ici le dernier des mohicans. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-          <br><br>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-          <br><br>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-        </p>
-      </app-card>
-    </div>
-  </app-section>
+            </div>
+      </app-section>
 
-  </template>
-  <script>
-  'user strict';
-  Polymer({
-    is: 'home-view',
+      <app-section id="workshop" heading="Qui sommes nous ?" main-background="--app-section-header-background-color" fill-background="--app-section-fill-color">
+            <div class="containerCards">
+                  <app-card id="who"
+                  image="https://firebasestorage.googleapis.com/v0/b/savon-1df9a.appspot.com/o/images%2F3MhEjgO4RnfWOw9r23vc9KV55Jt1-1487001650327-imageedit_2_2073141038.jpg?alt=media&token=6af03a7d-cdf3-47e0-97a1-66e5330b02e7"
+                  placeholder="data:image/jpeg;base64,/9j/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAACAAoDASIAAhEBAxEB/8QAFgABAQEAAAAAAAAAAAAAAAAAAAUH/8QAHRAAAgIBBQAAAAAAAAAAAAAAAQIAAyEGBxEjUf/EABUBAQEAAAAAAAAAAAAAAAAAAAQF/8QAGxEAAgEFAAAAAAAAAAAAAAAAAAMBAgQyNHH/2gAMAwEAAhEDEQA/AJu1qK+g0DqG7nORz5MQvtsW+wLY4AYgAE4zEQic6ixfayOSf//Z">
+                  <p>
+                        Attention !
 
-    properties: {
-      pageData: {
-        type: Object,
-        value: {
-          category: 'Accueil',
-          topic: null
-        }
+                        Ici le dernier des mohicans. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                        <br><br>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+                        <br><br>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                  </p>
+            </app-card>
+      </div>
+</app-section>
+
+</template>
+<script>
+'user strict';
+Polymer({
+      is: 'home-view',
+
+      properties: {
+            pageData: {
+                  type: Object,
+                  value: {
+                        category: 'Accueil',
+                        topic: null
+                  }
+            },
       },
-    },
 
-    behaviors: [window.PageBehavior],
-  });
-  </script>
+      behaviors: [window.PageBehavior],
+});
+</script>
 </dom-module>

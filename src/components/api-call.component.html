@@ -13,7 +13,8 @@
     url="[[uri]]"
     method="[[method]]"
     on-response="_forwardResponse"
-    handle-as="json">
+    handle-as="json"
+    last-response="{{lastResponse}}">
   </iron-ajax>
 
 </template>
@@ -31,32 +32,57 @@ Polymer({
       type: String,
       value: "POST",
     },
+
+    lastResponse: {
+      type: Object,
+      notify: true,
+    },
+
+    loading: {
+      type: Boolean,
+      value: false,
+      notify: true,
+    }
   },
 
   request: function (data, freshFbt) {
     var _this = this;
     var ajax = this.$.ajax;
+    var authProcess;
 
-    var authProcess = (!freshFbt || typeof freshFbt == "undefined") ? firebase.auth().currentUser.getToken(true) : Promise.resolve(freshFbt);
-    authProcess.then(function(token) {
-        ajax.headers['x-user-fbt'] = token;
-        if ('GET' == _this.method) {
-          ajax.params = data;
-        }
-        else {
-          ajax.headers['content-type'] = 'application/json';
-          ajax.body = JSON.stringify(data);
-        };
-        ajax.generateRequest();
-    }).catch(function(err) {
-          console.log("Error with auth token ", err);
-    });
+    this.loading = true;
+
+    if (!this.hasAttribute('no-fbt-header')) {
+      authProcess = (!freshFbt || typeof freshFbt == "undefined") ? firebase.auth().currentUser.getToken(true) : Promise.resolve(freshFbt);
+      authProcess.then(function(token) {
+          ajax.headers['x-user-fbt'] = token;
+          _this._generateRequest(data);
+      }).catch(function(err) {
+            console.log("Error with auth token ", err);
+      });
+    }
+    else {
+      this._generateRequest(data);
+    }
+  },
+
+  _generateRequest: function (data) {
+    var ajax = this.$.ajax;
+    if ('GET' == this.method) {
+      ajax.params = data;
+    }
+    else {
+      ajax.headers['content-type'] = 'application/json';
+      ajax.body = JSON.stringify(data);
+    };
+    ajax.generateRequest();
   },
 
   _forwardResponse: function (e) {
     e.stopPropagation();
     var response = e.detail.__data__.response;
     this.fire('response', response);
+    this.loading = false;
   },
 
 });

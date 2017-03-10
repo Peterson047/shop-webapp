@@ -1,4 +1,5 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
 
 <dom-module id="app-date">
       <template>
@@ -13,7 +14,10 @@
       }
       </style>
 
-      <div>[[date]]</div>
+      <div>
+        <iron-icon icon="event"></iron-icon>
+        [[date]]
+    </div>
 
 </template>
 <script>
@@ -26,7 +30,7 @@ Polymer({
             },
             timestamp: {
                   type: Number,
-                  value: 0
+                  value: null
             },
             string: {
                   type: String,
@@ -44,17 +48,27 @@ Polymer({
       ],
 
       _computeDate: function(json, timestamp, string, months) {
-            if(!json.empty) {
-                  this.date = ' '+parseInt(json.day)+' '+this.months[parseInt(json.month) - 1]+' '+json.year+' ';
-            } else if(timestamp !== 0) {
-                  var a = new Date(timestamp);
-                  this.date = ' '+a.getDate()+' '+this.months[a.getMonth()]+' '+a.getFullYear()+' ';
-            } else if(string !== '') {
-                  this.date = ' '+string+' ';
-            }
-      }
+          if(!json.empty) {
+                this.date = ' '+parseInt(json.day)+' '+this.months[parseInt(json.month) - 1]+' '+json.year+' ';
+          } else if (timestamp) {
+            this.date = this._buildDate(new Date(timestamp));
+          } else if(string !== '') {
+            this.date = ' '+ string +'';
+          }
+      },
 
+      _buildDate: function (date) {
+        var builtDate = ' '+date.getDate()+' '+this.months[date.getMonth()]+' '+date.getFullYear()+' ';
+        if (this.hasAttribute('display-time')) {
+          builtDate += '- '+ this._prefixZero(date.getHours()) +'h'+ this._prefixZero(date.getMinutes());
+        }
+        return builtDate;
+      },
 
+      _prefixZero: function(val) {
+        if(parseInt(val) < 10 && val[0] !== "0") return "0"+val;
+        else return val;
+      },
 });
 </script>
 </dom-module>

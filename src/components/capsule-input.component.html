@@ -59,7 +59,7 @@
 	<paper-input-container id="paperContainer">
 		<label>[[label]]</label>
 		<div id="wrapper">
-			<template is="dom-repeat" items="[[data]]" as="capsule">
+			<template is="dom-repeat" items="[[array]]" as="capsule">
 				<app-capsule on-remove="_removeItemByIndex" removable index="[[index]]">[[capsule]]</app-capsule>
 			</template>
 			<input is="iron-input" tabable id="input" value="{{inputValue::input}}">
@@ -77,14 +77,13 @@ Polymer({
 
 	properties: {
 		data: {
-			type: Array,
-			value: [],
+			type: Object,
 			observer: '_onDataChange'
 		},
 
-		dataObject: {
-			type: Object,
-			observer: '_onDataObjectChange'
+		array: {
+			type: Array,
+			value: []
 		},
 
 		value: {
@@ -130,13 +129,11 @@ Polymer({
 		this.$.input.focus();
 	},
 
-	_onDataObjectChange: function(newVal) {
-		this.data =  this.toArrayFromKey(newVal);
-	},
-
 	_onDataChange: function (newVal, oldVal) {
-		if (newVal.length) {
-			this.value = (this.dataObject) ? this.toObjectFromKey(newVal) : newVal;
+		if(!newVal) newVal = {};
+		if (Object.keys(newVal).length) {
+			this.value = newVal;
+			this.array = this.toArrayFromKey(newVal);
 			this.$.paperContainer.setAttribute('always-float-label', true);
 			this.validate();
 		}
@@ -146,10 +143,9 @@ Polymer({
 	},
 
 	_inputValueWatcher: function(newVal) {
-		if(typeof this.data === 'undefined') this.data = [];
-		if(newVal !== '' && !this.data.length) {
+		if(newVal !== '' && !this.array.length) {
 			this.$.paperContainer.setAttribute('always-float-label', true);
-		} else if(newVal === '' && !this.data.length){
+		} else if(newVal === '' && !this.array.length){
 			this.$.paperContainer.setAttribute('always-float-label', false);
 		}
 	},
@@ -157,9 +153,9 @@ Polymer({
 	_addItem: function(e) {
 		var value = this.inputValue.trim();
 
-		if(value === '' || ~this.data.indexOf(value)) return;
-		this.push('data', value);
-		this.value = (this.dataObject) ? this.toObjectFromKey(this.data) : this.data;
+		if(value === '' || ~this.array.indexOf(value)) return;
+		this.push('array', value);
+		this.value = this.toObjectFromKey(this.array);
 		this.$.paperContainer.setAttribute('always-float-label', true);
 		this.inputValue = '';
 		this.validate();
@@ -171,14 +167,14 @@ Polymer({
 	},
 
 	_removeLastItem: function() {
-		if(this.data.length && this.inputValue === '') this._removeItem( ( this.data.length - 1 ) );
+		if(this.array.length && this.inputValue === '') this._removeItem( ( this.array.length - 1 ) );
 	},
 
 	_removeItem: function(index) {
-		this.splice('data', index, 1);
-		this.value = (this.dataObject) ? this.toObjectFromKey(this.data) : this.data;
+		this.splice('array', index, 1);
+		this.value = this.toObjectFromKey(this.array);
 		this.$.input.focus();
-		if(!this.data.length) this.$.paperContainer.removeAttribute('always-float-label');
+		if(!this.array.length) this.$.paperContainer.removeAttribute('always-float-label');
 		this.validate();
 	},
 
@@ -188,14 +184,13 @@ Polymer({
 
 	reset: function() {
 		this.inputValue = '';
-		this.data = [];
+		this.array = [];
 		this.$.paperContainer.removeAttribute('invalid');
 		this.error = null;
 	},
 
 	validate: function() {
-		if(!this.data) this.data = [];
-		var valid = this.data.length >= this.limitRule;
+		var valid = this.array.length >= this.limitRule;
 		if(valid) {
 			this.$.paperContainer.removeAttribute('invalid');
 			this.error = null;
@@ -203,7 +198,7 @@ Polymer({
 			this.$.paperContainer.setAttribute('invalid', true);
 			this.error = 'Au moins ' + this.limitRule + ' item(s) requis';
 		}
-		if(this.value === null) this.value = [];
+		if(this.value === null) this.value = {};
 		return valid;
 	},
 

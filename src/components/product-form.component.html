@@ -89,7 +89,7 @@
                         </div>
 
                         <div class="row input-row">
-                              <capsule-input name="ingredients" label="Ingrédients" data-object="[[product.ingredients]]"></capsule-input>
+                              <capsule-input name="ingredients" label="Ingrédients" data="[[product.ingredients]]"></capsule-input>
                         </div>
                   </section>
 
@@ -223,7 +223,11 @@ Polymer({
       _getFormAction: function(newVal) {
             if ("create" == newVal.__queryParams.action) {
                   this.isNew = true;
+                  this.buttonText = 'Créer le produit';
+                  this.buttonIcon = 'add';
             } else if ("edit" == newVal.__queryParams.action) {
+                  this.buttonText = 'Mettre à jour';
+                  this.buttonIcon = 'create';
                   this.isNew = false;
             }
       },
@@ -241,16 +245,12 @@ Polymer({
                   this.product = {name: ''};
                   this.$.standards.reset();
                   this._computeUploadPaths(false);
-                  this.buttonText = 'Créer le produit';
-                  this.buttonIcon = 'add';
             } else {
                   this.loading = true;
                   var ref = firebase.database().ref(this.allPath);
                   ref.once('value')
                   .then(function(snapshot) {
                         _this.product = snapshot.val();
-                        _this.buttonText = 'Mettre à jour';
-                        _this.buttonIcon = 'create';
                         _this._computeUploadPaths((_this.product && _this.product.active));
                         _this.loading = false;
                         _this.$.name.focus();

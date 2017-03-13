@@ -307,6 +307,7 @@ Polymer({
       },
 
       _onMessage: function(e, data) {
+            console.log(data)
             var notif = data.message.notification;
             this.showToaster({
                   text: notif.title,

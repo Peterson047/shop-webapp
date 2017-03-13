@@ -25,8 +25,7 @@ messaging.setBackgroundMessageHandler(function(payload) {
   // Customize notification here
   var notificationTitle = payload.notification.title;
   var notificationOptions = {
-    body: payload.notification.body,
-    icon: 'images/manifest/icon-192x192.png'
+    body: payload.notification.body
   };
   return self.registration.showNotification(notificationTitle,
       notificationOptions);

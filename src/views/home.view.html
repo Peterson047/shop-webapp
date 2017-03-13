@@ -12,10 +12,11 @@
 <link rel="import" href="../styles/page.style.html">
 <link rel="import" href="../styles/tile.style.html">
 <link rel="import" href="../styles/colors.style.html">
+<link rel="import" href="../styles/font.style.html">
 
 <dom-module id="home-view">
       <template>
-      <style include="tile-style page-style colors-style">
+      <style include="tile-style font-style page-style colors-style">
       :host {
             display: block;
       }
@@ -74,55 +75,83 @@
 
       <highlight-data items="{{highlighted}}"></highlight-data>
 
-      <app-section heading="Nos derniers savons" main-background="--app-section-header-background-color" fill-background="--app-section-fill-color">
+      <app-section heading="Mes derniers savons" main-background="--app-section-header-background-color" fill-background="--app-section-fill-color">
             <app-carousel products="[[highlighted]]"></app-carousel>
       </app-section>
 
       <app-section id="business" heading="Pourquoi nos savons ?" title-color="--app-white" main-background="--app-dark-grey" fill-background="--app-section-fill-color">
             <div class="containerCards">
 
-                  <app-card class="card-friendly" heading="Des savons 'sans'" icon="app-icons:earth">
+                  <app-card class="card-friendly" heading="Naturels et écologiques" icon="app-icons:earth">
                         <p>
-                              Sans :
+                              Tout mes savons sont :
                               <ul>
-                                    <li>conservateurs</li>
-                                    <li>parfums de synthèse</li>
-                                    <li>colorants artificiels</li>
-                                    <li>huile de palme</li>
-                                    <li>emballages (en vente directe)</li>
+                                    <li>SANS conservateurs</li>
+                                    <li>SANS parfums de synthèse</li>
+                                    <li>SANS colorants artificiels</li>
+                                    <li>SANS huile de palme</li>
+                                    <li>SANS emballages (en vente atelier)</li>
                               </ul>
+                        </p>
+                  </app-card>
+
+                  <app-card class="card-bio" heading="Matières premières bio" icon="app-icons:pot-mix">
+                        <p>
+                              Mes savons sont formulés à base
+                              d’huiles végétales bio de première
+                              qualité, délicatement parfumés
+                              aux huiles essentielles bio choisis
+                              pour leurs propriétés
+                              dermatologiques et colorés
+                              naturellement avec des végétaux
+                              et argiles.
                         </p>
                   </app-card>
 
                   <app-card class="card-sapo" heading="Saponification à froid" icon="app-icons:snowflake">
                         <p>
-                              Nous fabriquons notre savon de manière artisanale par saponification à froid.
-                              Cette méthode écologique, sans cuisson, donne un savon très doux, naturellement riche en glycérine.
-                        </p>
-                  </app-card>
-
-                  <app-card class="card-bio" heading="Matériaux bio" icon="app-icons:pot-mix">
-                        <p>
-                              Nos savons sont formulés à base d’huiles végétales, toutes en qualité bio,
-                              parfumés aux huiles essentielles bio choisis pour leurs propriétés dermatologiques
-                              et colorés naturellement avec des végétaux et argiles.
+                              Je fabrique mes savons de
+                              manière artisanale par
+                              saponification à froid. Cette
+                              méthode écologique, sans
+                              cuisson, préserve les propriétés
+                              des huiles et donne un savon très
+                              doux et hydratant car il est
+                              surgras et naturellement très
+                              riche en glycérine.
                         </p>
                   </app-card>
 
             </div>
       </app-section>
 
-      <app-section id="workshop" heading="Qui sommes nous ?" main-background="--app-section-header-background-color" fill-background="--app-section-fill-color">
+      <app-section id="workshop" heading="Comment est née la savonnerie ?" main-background="--app-section-header-background-color" fill-background="--app-section-fill-color">
             <div class="containerCards">
                   <app-card id="who"
                   image="https://firebasestorage.googleapis.com/v0/b/savon-1df9a.appspot.com/o/images%2F3MhEjgO4RnfWOw9r23vc9KV55Jt1-1487001650327-imageedit_2_2073141038.jpg?alt=media&token=6af03a7d-cdf3-47e0-97a1-66e5330b02e7"
                   placeholder="data:image/jpeg;base64,/9j/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAACAAoDASIAAhEBAxEB/8QAFgABAQEAAAAAAAAAAAAAAAAAAAUH/8QAHRAAAgIBBQAAAAAAAAAAAAAAAQIAAyEGBxEjUf/EABUBAQEAAAAAAAAAAAAAAAAAAAQF/8QAGxEAAgEFAAAAAAAAAAAAAAAAAAMBAgQyNHH/2gAMAwEAAhEDEQA/AJu1qK+g0DqG7nORz5MQvtsW+wLY4AYgAE4zEQic6ixfayOSf//Z">
                   <p>
-                        Attention !
+                        Il y a quelques années, cherchant un produit naturel et sain qui lave sans dessécher la peau, j’ai découvert la savonnerie à
+                        froid. Des savons faits main à la maison - ce fut une révélation !
+                  </p>
+                  <div class="color-primary font-big font-bold">DOUX et FAIT MAIN !</div>
+                  <p>J’ai commencé à fabriquer mes savons pour la famille et les amis et me suis formée auprès de Leanne & Sylvain Chevallier,
+                        pionniers de la savonnerie à froid en France. En parallèle, j’ai peaufiné mes formules et cherché les ingrédients les plus
+                        sains et écologiques possibles.
+                  </p>
+                  <div class="color-primary font-big font-bold">BIO et ECOLOGIQUES !</div>
+                  <p>
+                        Début 2017 j’ai décidé de faire de ma passion mon métier en créant un petit atelier de savonnerie et en privilégiant
+                        toujours la qualité des ingrédients : huiles végétales et essentielles bio. Le zéro emballage est possible si vous venez
+                        chercher les savons à la savonnerie !
 
-                        Ici le dernier des mohicans. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-                        <br><br>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-                        <br><br>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                        Mon objectif est d’obtenir la certification Nature & Progrès.
+                  </p>
+                  <div class="color-primary font-big font-bold">VEGAN et LOCAL !</div>
+                  <p>
+                        J’ai fait le choix d’utiliser exclusivement des matières grasses d’origine végétale que la nature nous offre en si grande
+                        variété. Je fabrique tous les savons dans mon atelier en région parisienne. La vente est avant tout locale et toujours
+                        directe, du producteur au consommateur.
                   </p>
             </app-card>
       </div>

@@ -1,4 +1,5 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-card/paper-card.html">
 
 <link rel="import" href="../behaviors/list-animation.behavior.html">
 
@@ -31,18 +32,48 @@
 		z-index: 1;
 	}
 
+	#noProductTile {
+		height: 300px;
+		width: 500px;
+	}
+
+	.card-content {
+		height: 150px;
+		display: flex;
+		flex-direction: column;
+		justify-content: space-around;
+		align-items: center;
+	}
+
+	.card-content iron-icon {
+		width: 70px;
+		height: 70px;
+	}
+
 	.item {
 		transform: translate(-20px, -20px) scale(0.9);
 	}
 
 	</style>
 
-	<data-source path="/active_products" cache-key="active-products" array="$key" output="{{data}}" fetching="{{loading}}"></data-source>
+	<data-source path="/active_products" cache-key="active-products" array="$key" output="{{data}}" empty="{{empty}}" fetching="{{loading}}"></data-source>
 
 	<div id="container">
 		<template id="list" is="dom-repeat" items="[[data]]">
 			<product-tile class="item" data="[[item]]"></product-tile>
 		</template>
+
+		<template is="dom-if" if="[[empty]]">
+			<product-tile filler></product-tile>
+			<paper-card id="noProductTile" heading="Aucun produit...">
+				<div class="card-content">
+						<div>...pour le moment !<br> Mais n'hésitez pas à repasser !</div>
+						<iron-icon icon="social:mood"></iron-icon>
+				</div>
+			</paper-card>
+			<product-tile filler></product-tile>
+		</template>
+
 		<product-tile filler></product-tile>
 		<product-tile filler></product-tile>
 	</div>

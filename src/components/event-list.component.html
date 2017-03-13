@@ -1,4 +1,5 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-card/paper-card.html">
 
 <link rel="import" href="../behaviors/list-animation.behavior.html">
 
@@ -39,28 +40,28 @@
 		height: 300px;
 		width: 500px;
 	}
-	.noEvent {
-    height: 150px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-around;
-    align-items: center;
-  }
+	.card-content {
+		height: 150px;
+		display: flex;
+		flex-direction: column;
+		justify-content: space-around;
+		align-items: center;
+	}
 
-  .noEvent iron-icon {
-    width: 70px;
-    height: 70px;
-  }
+	.card-content iron-icon {
+		width: 70px;
+		height: 70px;
+	}
 
 	</style>
 
 	<api-call id="eventsCall" uri="[[appData.backend]]/facebook/upcoming_events" no-fbt-header method="GET" loading="{{loading}}" last-response="{{data}}"></api-call>
 
 	<app-indexeddb-mirror
-    key="events"
-    data="{{data.data}}"
-    persisted-data="{{persistedData}}">
-	</app-indexeddb-mirror>
+	key="events"
+	data="{{data.data}}"
+	persisted-data="{{persistedData}}"
+	></app-indexeddb-mirror>
 
 	<div id="container">
 		<template id="list" is="dom-repeat" items="[[persistedData]]">
@@ -72,11 +73,9 @@
 		</template>
 		<template is="dom-if" if="[[!_hasEvents(persistedData)]]">
 			<paper-card id="noEventTile" heading="Aucun évènement prévu...">
-			  <div class="card-content">
-					<div class="noEvent">
-		        <div class="text">...pour le moment !<br> Mais n'hésitez pas à repasser !</div>
-		        <iron-icon icon="social:mood"></iron-icon>
-		      </div>
+				<div class="card-content">
+						<div>...pour le moment !<br> Mais n'hésitez pas à repasser !</div>
+						<iron-icon icon="social:mood"></iron-icon>
 				</div>
 			</paper-card>
 		</template>
@@ -98,8 +97,8 @@ Polymer({
 		},
 
 		online: {
-				type: Boolean,
-				observer: '_onlineChanges',
+			type: Boolean,
+			observer: '_onlineChanges',
 		},
 
 		appData: Object,

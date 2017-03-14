@@ -1,0 +1,54 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="app-logo">
+  <template>
+
+  <style>
+  :host {
+    height: 80px;
+    display: flex;
+    align-items: center;
+  }
+
+  #lined { display: none; }
+  #double { display: none; }
+  #onlyS {
+    display: block;
+    margin-left: -60px;
+    transform: translateY(-5px);
+    position: relative;
+    z-index: -1;
+  }
+
+  @media (min-width: 470px) {
+      #onlyS { display: none; }
+      #double { display: block; }
+  }
+
+  @media (min-width: 1075px) {
+    :host {
+      display: block;
+    }
+
+    #lined { display: block; }
+    #double { display: none; }
+    #onlyS { display: none; }
+  }
+  </style>
+
+  <img id="lined" src="/images/logo/logo_line_456x91.png"/>
+  <img id="double" src="/images/logo/logo_doubleline_204x130.png"/>
+  <img id="onlyS" src="/images/logo/logo_s_180x86.png"/>
+
+  </template>
+  <script>
+  'use strict';
+
+  Polymer({
+    is: 'app-logo',
+    properties: {
+
+    },
+  });
+  </script>
+</dom-module>

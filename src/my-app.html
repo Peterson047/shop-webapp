@@ -38,8 +38,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="./components/footer.component.html">
 <link rel="import" href="./components/highlighted-icon.component.html">
 <link rel="import" href="./components/api-call.component.html">
-<link rel="import" href="./components/logo-savonnerie.component.html">
-<link rel="import" href="./components/app-title.component.html">
+<link rel="import" href="./components/app-logo.component.html">
 <link rel="import" href="./components/separator.component.html">
 
 <link rel="import" href="./behaviors/navigation.behavior.html">
@@ -122,11 +121,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <modal-container app-data="[[appData]]" user="[[user]]"></modal-container>
 
       <!-- LAYOUT -->
-      <app-drawer-layout narrow="{{narrow}}" fullbleed>
+      <app-drawer-layout responsive-width="830px" narrow="{{narrow}}" fullbleed>
             <!-- Drawer content -->
             <app-drawer opened="{{drawerOpened}}" id="drawer" hidden$="[[!narrow]]">
                   <app-toolbar id="drawerHeader">
-                        <app-title></app-title>
+                        <img src="/images/logo/logo_doubleline_204x130.png"/>
                   </app-toolbar>
 
                   <div id="drawerMenu">
@@ -142,7 +141,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
                   <div id="drawerFooter">
                         <app-separator></app-separator>
-                        <logo-savonnerie class="logo"></logo-savonnerie>
+                        <img src="/images/logo/logo_tree_180x86.png"/>
                   </div>
             </app-drawer>
 
@@ -156,7 +155,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                                           <paper-icon-button id="burger" icon="menu" drawer-toggle></paper-icon-button>
                                     </div>
 
-                                    <app-title></app-title>
+                                    <app-logo></app-logo>
 
                                     <div class="right-bar-item">
                                           <div id="tabsContainer" hidden$="[[narrow]]">

@@ -15,7 +15,11 @@ module.exports = {
             '/bower_components/app-storage/app-indexeddb-mirror/app-indexeddb-mirror-worker.js',
             '/bower_components/app-storage/app-indexeddb-mirror/common-worker-scope.js',
             'images/providers/facebook.svg',
-            'images/providers/google.svg'
+            'images/providers/google.svg',
+            'images/logo/logo_doubleline_204x130.png',
+            'images/logo/logo_line_456x91.png',
+            'images/logo/logo_s_180x86.png',
+            'images/logo/logo_tree_180x86.png'
       ],
       navigateFallback: '/index.html'
 };

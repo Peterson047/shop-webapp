@@ -10,6 +10,10 @@
                         "headers": [
                               {"key": "Link", "value": "</src/my-app.html>;rel=import;as=document"},
                               {"key": "Link", "value": "</src/views/home.view.html>;rel=import;as=document"}
+                              {"key": "img", "value": "</images/logo/logo_doubleline_204x130.png>;rel=preload;as=image"}
+                              {"key": "img", "value": "</images/logo/logo_line_456x91.png>;rel=preload;as=image"}
+                              {"key": "img", "value": "</images/logo/logo_s_180x86.png>;rel=preload;as=image"}
+                              {"key": "img", "value": "</images/logo/logo_tree_180x86.png>;rel=preload;as=image"}
                         ]
                   },
                   {

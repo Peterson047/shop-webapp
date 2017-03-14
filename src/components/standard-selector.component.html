@@ -102,6 +102,7 @@ Polymer({
       },
 
       _onValueChange: function (val) {
+            if(!val.base.std) return this._setDefaultStandard();
             this.fire('update-standard-selector');
       },
 
@@ -113,7 +114,6 @@ Polymer({
             var std = null !== this.value.std;
             var price = this.$.price.validate();
             return std && price;
-
       },
 
 

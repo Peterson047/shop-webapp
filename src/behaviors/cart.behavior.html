@@ -116,7 +116,6 @@ window.CartBehaviorImpl = {
                   }
             };
             req.send(null);
-
       },
 
       _getDeliveryEstimation: function() {
@@ -206,8 +205,6 @@ window.CartBehaviorImpl = {
 
             var toastText = '';
 
-            this._cartChange();
-
             if(preventCartNotifications) return;
 
             if (cart.items[hashItem].quantity - quantity < 1) {
@@ -220,6 +217,8 @@ window.CartBehaviorImpl = {
                   toastText = 'Quantitée retirée';
                   cart.items[hashItem].quantity -= quantity;
             }
+
+            this._cartChange();
 
             this.showToaster({
                   text: toastText,

@@ -21,7 +21,7 @@
 		overflow: hidden;
 	}
 
-	#container {
+	.container {
 		margin-left: auto;
 		margin-right: auto;
 		min-height: 355px;
@@ -59,14 +59,14 @@
 
 	<data-source path="/active_products" cache-key="active-products" array="$key" output="{{data}}" empty="{{empty}}" fetching="{{loading}}"></data-source>
 
-	<div id="container">
-		<template id="list" is="dom-repeat" items="[[data]]">
+	<div class="container" id="list">
+		<template is="dom-repeat" items="[[data]]">
 			<product-tile class="item" data="[[item]]"></product-tile>
 		</template>
 
 		<template is="dom-if" if="[[empty]]">
 			<product-tile filler></product-tile>
-			<paper-card id="noProductTile" heading="Aucun produit...">
+			<paper-card class="item" id="noProductTile" heading="Aucun produit...">
 				<div class="card-content">
 						<div>...pour le moment !<br> Mais n'hésitez pas à repasser !</div>
 						<iron-icon icon="social:mood"></iron-icon>

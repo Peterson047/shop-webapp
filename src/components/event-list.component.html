@@ -21,7 +21,7 @@
 		overflow: hidden;
 	}
 
-	#container {
+	.container {
 		margin-left: auto;
 		margin-right: auto;
 		min-height: 355px;
@@ -64,8 +64,8 @@
 	persisted-data="{{persistedData}}"
 	></app-indexeddb-mirror>
 
-	<div id="container">
-		<template id="list" is="dom-repeat" items="[[persistedData]]">
+	<div id="list" class="container">
+		<template is="dom-repeat" items="[[persistedData]]">
 			<event-tile class="item" data=[[item]]></event-tile>
 		</template>
 		<template is="dom-if" if="[[_hasEvents(persistedData)]]">
@@ -73,7 +73,7 @@
 			<event-tile filler></event-tile>
 		</template>
 		<template is="dom-if" if="[[!_hasEvents(persistedData)]]">
-			<paper-card id="noEventTile" heading="Aucun évènement prévu...">
+			<paper-card class="item" id="noEventTile" heading="Aucun évènement prévu...">
 				<div class="card-content">
 						<div>...pour le moment !<br> Mais n'hésitez pas à repasser !</div>
 						<iron-icon icon="social:mood"></iron-icon>

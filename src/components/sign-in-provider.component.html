@@ -1,5 +1,6 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-fab/paper-fab.html">
+<link rel="import" href="../../bower_components/paper-tooltip/paper-tooltip.html">
 
 <link rel="import" href="../behaviors/tabindex.behavior.html">
 
@@ -28,6 +29,7 @@
 	</style>
 	<template is="dom-repeat" items="[[providers]]" as="provider">
 		<paper-fab tabable id="[[provider]]" provider="[[provider]]" on-tap="_fireSignInEvent" src="../../images/providers/[[provider]].svg"></paper-fab>
+		<paper-tooltip for="[[provider]]" position="top">Se connecter avec [[provider]]</paper-tooltip>
 	</template>
 
 </template>

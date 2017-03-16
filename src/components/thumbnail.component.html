@@ -13,7 +13,7 @@
 		border-radius: 3px;
 	}
 
-	.full, img {
+	.full {
 		width: 100%;
 		height: 100%;
 		position: absolute;
@@ -24,13 +24,13 @@
 		border-radius: 3px;
 	}
 
-	img {
+	.fadeIn {
 		will-change: opacity;
 		opacity: 0;
 		transition: opacity  .2s ease-in .2s;
 	}
 
-	#textual {
+	#name {
 		text-overflow: ellipsis;
 		text-align: center;
 		background-color: var(--app-secondary-color);
@@ -40,6 +40,18 @@
 		line-height: 100px;
 		padding: 5px;
 		box-sizing: border-box;
+	}
+
+	#base {
+		background-size: cover;
+	}
+
+	#src {
+		overflow: hidden;
+	}
+
+	#src img {
+		width: 100%;
 	}
 
 	.error {
@@ -59,7 +71,9 @@
 
 	</style>
 
-	<div class="full" id="textual">[[name]]</div>
+	<div class="full" id="name">[[name]]</div>
+	<div class="full fadeIn" id="base"></div>
+	<div class="full fadeIn" id="src"></div>
 	<iron-icon id="close" on-tap="_remove" icon="close"></iron-icon>
 
 </template>
@@ -87,7 +101,7 @@ Polymer({
 
 	_base64Changed: function(newVal, oldVal) {
 		if(!newVal) return;
-		var el = this.$.visual;
+		var el = this.$.base;
 		el.style.backgroundImage = 'url('+this.base64+')';
 		requestAnimationFrame(function() {
 			el.style.opacity = 1;
@@ -97,22 +111,23 @@ Polymer({
 	_srcChanged: function (newVal) {
 		if(!newVal) return;
 
-		var textual = this.$.textual;
+		var name = this.$.name;
 
-		var currentImage = this.querySelector('img');
-		if(currentImage) this.removeChild(currentImage);
+		var currentImage = this.$.src.querySelector('img');
+		if(currentImage) this.$.src.removeChild(currentImage);
 
 		var img = document.createElement('img');
+		img.id = "img";
 		img.src = newVal;
 
 		img.onload = function() {
-			Polymer.dom(this.root).insertBefore(img, this.$.close)
-			img.style.opacity = 1;
+			Polymer.dom(this.$.src).appendChild(img)
+			this.$.src.style.opacity = 1;
 		}.bind(this);
 
 		img.onerror = function() {
-			textual.classList.add('error');
-			textual.innerHTML = 'Echec';
+			name.classList.add('error');
+			name.innerHTML = 'Echec';
 		};
 	},
 

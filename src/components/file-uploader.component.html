@@ -96,7 +96,7 @@ Polymer({
 		},
 		maxSize: {
 			type: Number,
-			value: 1000000
+			value: 800
 		},
 		files: {
 			type: Object,
@@ -191,7 +191,7 @@ Polymer({
 		if(!this.files.length) this._resetState();
 	},
 	_bytesToKb: function(bytes) {
-		return Math.round(bytes / 1024);
+		return Math.round(bytes / 1000);
 	},
 	_canUpload: function(error, files, uploads) {
 		return files && files.length > 0 && !error && !uploads.length;
@@ -204,11 +204,11 @@ Polymer({
 		}
 
 		this.files.forEach(function(file) {
-			if(file.size > this.maxSize) {
-				return this.error = 'Le fichier '+file.name+' ne peut pas peser plus de '+( _this._bytesToKb(_this.maxSize) )+'ko (actuellement '+( _this._bytesToKb(file.size) )+'ko).';
+			if(_this._bytesToKb(file.size) > _this.maxSize) {
+				return _this.error = 'Le fichier '+file.name+' ne peut pas peser plus de '+( _this.maxSize )+'ko (actuellement '+( _this._bytesToKb(file.size) )+'ko).';
 			}
 			if(!~_this.allowedFormats.indexOf(file.type)) {
-				return this.error = "Le format "+file.type+" n'est pas supporté";
+				return _this.error = "Le format "+file.type+" n'est pas supporté";
 			}
 			_this.error = null;
 		})

@@ -4,10 +4,14 @@
 <link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../../bower_components/iron-icons/image-icons.html">
 <link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+
 <link rel="import" href="./api-call.component.html">
 <link rel="import" href="./upload-progress.component.html">
-<link rel="import" href="../behaviors/upload.behavior.html">
 <link rel="import" href="./thumbnail.component.html">
+
+<link rel="import" href="../behaviors/upload.behavior.html">
+<link rel="import" href="../behaviors/toaster-control.behavior.html">
+
 <link rel="import" href="../styles/fix-tap.style.html">
 <link rel="import" href="../styles/colors.style.html">
 
@@ -121,7 +125,7 @@ Polymer({
 			value: false
 		}
 	},
-	behaviors: [window.UploadBehavior],
+	behaviors: [window.UploadBehavior, window.ToasterControlBehavior],
 	ready: function() {
 		this.filesUid = 'files'+Date.now();
 		this.addEventListener("dragenter", this._dragEnter, false);
@@ -289,7 +293,20 @@ Polymer({
 			updates[path + '/' + newImgKey] = imageData;
 		}.bind(this))
 
-		return firebase.database().ref().update(updates);
+		firebase.database().ref().update(updates).then(function() {
+			this.showToaster({
+				text: "Upload terminé !",
+				src: imageData.url,
+				state: true,
+				actions: []
+			})
+		}.bind(this), function(err) {
+			this.showToaster({
+				text: err,
+				state: false,
+				actions: []
+			})
+		});
 	},
 
 

@@ -43,8 +43,12 @@
 		background-color: var(--app-error-color);
 	}
 
-	#icon {
+	#icon, #base {
 		margin-right: 10px;
+	}
+
+	#base {
+		width: 50px;
 	}
 
 	#close {
@@ -57,6 +61,9 @@
 		<div class="layout horizontal center">
 			<template is="dom-if" if="[[data.icon]]">
 				<iron-icon id="icon" icon="[[data.icon]]">
+			</template>
+			<template is="dom-if" if="[[data.src]]">
+				<img id="base" src="[[data.src]]"></div>
 			</template>
 			<div class="font-regular">[[data.text]]</div>
 		</div>
@@ -99,7 +106,8 @@
 			if(!this.data.state) {
 				this.classList.add('error');
 				if(!this.data.icon) this.set('data.icon', 'error');
-			} else if(!this.data.icon) {
+			}
+			else if(!this.data.icon && !this.data.src) {
 				this.set('data.icon', 'check');
 			}
 		},

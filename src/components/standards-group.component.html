@@ -35,7 +35,7 @@
       <data-source path="/standards" output="{{standards}}"></data-source>
 
       <div id="buttons">
-            <app-button class="color-action" id="addStd" disabled="[[blockAdd]]" on-tap="_addSelector" class="stickLeft" icon="add">Ajouter un standard au produit</app-button>
+            <app-button class="color-action" id="addStd" disabled$="[[blockAdd]]" on-tap="_addSelector" class="stickLeft" icon="add">Ajouter un standard au produit</app-button>
             <app-button class="color-action" id="createStd" icon="create" on-tap="_createNewStd">Créer un standard</app-button>
       </div>
 
@@ -126,6 +126,7 @@ Polymer({
       _addSelector: function () {
             var _this = this;
             this.push('selectors', this._newSelector());
+            this._tooMuchSelectors();
             this.async(function() {
                   if(_this.selectors.length) _this._getStandardEl(_this.selectors.length - 1).$$('#price').focus();
             })

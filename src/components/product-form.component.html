@@ -91,6 +91,10 @@
                         <div class="row input-row">
                               <capsule-input name="ingredients" label="Ingrédients" data="[[product.ingredients]]"></capsule-input>
                         </div>
+
+                        <div class="row input-row">
+                              <paper-textarea error-message="Contenu invalide" auto-validate name="notice" label="Notice informative" value="[[product.notice]]"></paper-textarea>
+                        </div>
                   </section>
 
                   <!-- BANNER -->
@@ -327,6 +331,7 @@ Polymer({
 
       _computeUpdates: function(path, updates, data, isNew) {
             updates[path+'/description'] = data.description;
+            updates[path+'/notice'] = data.notice || null;
             updates[path+'/ingredients'] = data.ingredients;
             updates[path+'/name'] = data.name;
             updates[path+'/active'] = typeof data.active !== 'undefined';

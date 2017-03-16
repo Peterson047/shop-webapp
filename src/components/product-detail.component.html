@@ -82,6 +82,16 @@
 	.content {
 		margin-top: 10px;
 		margin-bottom: 10px;
+		white-space: pre-wrap;
+	}
+
+	.notice {
+		margin-top: 30px;
+		margin-bottom: 10px;
+		white-space: pre-wrap;
+		font-style: italic;
+		font-size: 14px;
+		font-weight: 300;
 	}
 
 	#infos {
@@ -238,6 +248,10 @@
 						<app-capsule>[[item]]</app-capsule>
 					</template>
 				</div>
+
+				<template is="dom-if" if="[[data.notice]]">
+				  <div class="notice">[[data.notice]]</div>
+				</template>
 			</div>
 		</div>
 	</div>

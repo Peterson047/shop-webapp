@@ -200,7 +200,7 @@ Polymer({
 		else this._validate();
 	},
 	_bytesToKb: function(bytes) {
-		return Math.round(bytes / 1000);
+		return Math.round(bytes / 1024);
 	},
 	_canUpload: function(error, files, uploads) {
 		return files && files.length > 0 && !error && !uploads.length;
@@ -298,6 +298,7 @@ Polymer({
 			this.showToaster({
 				text: "Upload terminé !",
 				src: imageData.url,
+				base64: imageData.base64,
 				state: true,
 				actions: []
 			})

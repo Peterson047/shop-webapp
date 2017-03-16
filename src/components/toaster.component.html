@@ -2,6 +2,7 @@
 <link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../bower_components/iron-image/iron-image.html">
 
 <link rel="import" href="button.component.html">
 
@@ -43,12 +44,14 @@
 		background-color: var(--app-error-color);
 	}
 
-	#icon, #base {
+	#icon, iron-image {
 		margin-right: 10px;
 	}
 
-	#base {
+	iron-image {
 		width: 50px;
+		height: 50px;
+		border-radius: 3px;
 	}
 
 	#close {
@@ -61,20 +64,24 @@
 		<div class="layout horizontal center">
 			<template is="dom-if" if="[[data.icon]]">
 				<iron-icon id="icon" icon="[[data.icon]]">
-			</template>
-			<template is="dom-if" if="[[data.src]]">
-				<img id="base" src="[[data.src]]"></div>
-			</template>
-			<div class="font-regular">[[data.text]]</div>
+				</template>
+				<template is="dom-if" if="[[data.src]]">
+						<iron-image
+						placeholder="[[data.base64]]"
+						sizing="cover"
+						preload src="[[data.src]]"
+						fade></iron-image>
+				</template>
+				<div class="font-regular">[[data.text]]</div>
+			</div>
+			<paper-icon-button id="close" on-tap="remove" icon="close"></paper-icon-button>
 		</div>
-		<paper-icon-button id="close" on-tap="remove" icon="close"></paper-icon-button>
-	</div>
 
-	<div id="buttons" class="layout horizontal end-justified">
-		<template is="dom-repeat" items="[[data.actions]]" as="action">
-			<app-button icon="[[action.icon]]" class="color-white" index="[[index]]" on-tap="_triggerAction">[[action.text]]</app-button>
-		</template>
-	</div>
+		<div id="buttons" class="layout horizontal end-justified">
+			<template is="dom-repeat" items="[[data.actions]]" as="action">
+				<app-button icon="[[action.icon]]" class="color-white" index="[[index]]" on-tap="_triggerAction">[[action.text]]</app-button>
+			</template>
+		</div>
 
 	</template>
 	<script>

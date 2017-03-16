@@ -5,6 +5,7 @@
 <link rel="import" href="../../bower_components/iron-icons/image-icons.html">
 <link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
 
+<link rel="import" href="./info.component.html">
 <link rel="import" href="./api-call.component.html">
 <link rel="import" href="./upload-progress.component.html">
 <link rel="import" href="./thumbnail.component.html">
@@ -24,7 +25,8 @@
 	}
 
 	:host(.drag) {
-		border: 3px red solid;
+		border: 2px var(--app-action-color) dashed;
+		border-radius: 3px;
 	}
 
 	input[type=file] {
@@ -74,7 +76,7 @@
 		</template>
 	</div>
 	<template is="dom-if" if="[[error]]">
-		<div id="error">[[error]]</div>
+		<app-info>[[error]]</app-info>
 	</template>
 
 </template>
@@ -262,7 +264,6 @@ Polymer({
 	},
 
 	_handleResponse: function(response) {
-
 		var data = response.detail.data;
 		var encoded = 'data:'+data.type+';base64,'+data.buffer;
 		var metadata = JSON.parse(data.metadata);

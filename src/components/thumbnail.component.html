@@ -13,7 +13,7 @@
 		border-radius: 3px;
 	}
 
-	.full {
+	.full, img {
 		width: 100%;
 		height: 100%;
 		position: absolute;
@@ -22,6 +22,12 @@
 		right: 0;
 		bottom: 0;
 		border-radius: 3px;
+	}
+
+	img {
+		will-change: opacity;
+		opacity: 0;
+		transition: opacity  .2s ease-in .2s;
 	}
 
 	#textual {
@@ -40,13 +46,6 @@
 		background-color: var(--app-error-color) !important;
 	}
 
-	#visual {
-		will-change: opacity;
-		opacity: 0;
-		transition: opacity  .2s ease-in .2s;
-		background-size: cover;
-	}
-
 	iron-icon {
 		position: absolute;
 		top: 5px;
@@ -61,8 +60,7 @@
 	</style>
 
 	<div class="full" id="textual">[[name]]</div>
-	<div class="full" id="visual"></div>
-	<iron-icon on-tap="_remove" icon="close"></iron-icon>
+	<iron-icon id="close" on-tap="_remove" icon="close"></iron-icon>
 
 </template>
 <script>
@@ -99,15 +97,18 @@ Polymer({
 	_srcChanged: function (newVal) {
 		if(!newVal) return;
 
-		var visual = this.$.visual;
 		var textual = this.$.textual;
 
-		var img = new Image();
-		img.src = this.src;
+		var currentImage = this.querySelector('img');
+		if(currentImage) this.removeChild(currentImage);
+
+		var img = document.createElement('img');
+		img.src = newVal;
+
 		img.onload = function() {
-			visual.style.backgroundImage = 'url('+ newVal+')';
-			visual.style.opacity = 1;
-		};
+			Polymer.dom(this.root).insertBefore(img, this.$.close)
+			img.style.opacity = 1;
+		}.bind(this);
 
 		img.onerror = function() {
 			textual.classList.add('error');

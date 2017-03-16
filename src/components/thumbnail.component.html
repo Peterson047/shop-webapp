@@ -110,7 +110,7 @@ Polymer({
 
 	_srcChanged: function (newVal) {
 		if(!newVal) return;
-
+		this.$.src.style.opacity = 0;
 		var name = this.$.name;
 
 		var currentImage = this.$.src.querySelector('img');

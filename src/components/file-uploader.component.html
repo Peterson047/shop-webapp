@@ -23,7 +23,7 @@
 		border: 3px red solid;
 	}
 
-	#files {
+	input[type=file] {
 		display: none;
 	}
 
@@ -50,8 +50,8 @@
 
 	<api-call id="encodeCall" uri="[[backend]]/images/encode" method="GET" on-response="_handleResponse"></api-call>
 
-	<input type="file" id="files" on-change="_fileChange">
-	<label for="files">
+	<input type="file" id="[[filesUid]]" on-change="_fileChange">
+	<label for$="[[filesUid]]">
 		<paper-icon-button id="chose" class="color-action" icon="image:add-a-photo"></paper-icon-button>
 		<paper-tooltip for="chose" position="bottom">Choisir des photos</paper-tooltip>
 	</label>
@@ -123,6 +123,7 @@ Polymer({
 	},
 	behaviors: [window.UploadBehavior],
 	ready: function() {
+		this.filesUid = 'files'+Date.now();
 		this.addEventListener("dragenter", this._dragEnter, false);
 		this.addEventListener("dragleave", this._dragLeave, false);
 		this.addEventListener("dragover", this._dragOver, false);
@@ -155,7 +156,7 @@ Polymer({
 		e.preventDefault();
 		this.classList.remove('drag');
 		var dt = e.dataTransfer;
-		this._fileChange(null, dt.files)
+		this._fileChange(e, dt.files)
 	},
 
 	_onUploadsChange: function(newVal) {
@@ -164,8 +165,9 @@ Polymer({
 
 	_fileChange: function(e, droppedFiles) {
 		var _this = this;
-		this.files = (typeof droppedFiles !== 'undefined') ? this._preprocessFiles(Array.from(droppedFiles)) : this._preprocessFiles(Array.from(this.$.files.files));
-		this.$.files.value = '';
+		this.fileInput = e.target;
+		this.files = (typeof droppedFiles !== 'undefined') ? this._preprocessFiles(Array.from(droppedFiles)) : this._preprocessFiles(Array.from(this.fileInput.files));
+		this.fileInput.value = '';
 		this._validate();
 		var domChanged = function(){
 			var thumbnails = Polymer.dom(_this.root).querySelectorAll('upload-thumbnail');
@@ -189,6 +191,7 @@ Polymer({
 	_removeFile: function(e) {
 		this.splice('files', e.detail.index, 1);
 		if(!this.files.length) this._resetState();
+		else this._validate();
 	},
 	_bytesToKb: function(bytes) {
 		return Math.round(bytes / 1000);
@@ -245,7 +248,7 @@ Polymer({
 		}
 	},
 	_resetState: function() {
-		this.$.files.value = '';
+		this.fileInput.value = '';
 		this.files = null;
 		this.error = null;
 	},

@@ -131,6 +131,7 @@ Polymer({
       },
 
       _checkUserEmail: function() {
+            console.log(this.user)
             if(!this.user.emailVerified) {
 
                   var _this = this;
@@ -174,7 +175,7 @@ Polymer({
       _submit: function() {
 
             var ok = this.validateForm();
-            if(ok && this.user && this._checkUserEmail()) {
+            if(this.user && this._checkUserEmail() && ok) {
                   var data = this.$.form.serialize();
                   data.cart = this.cart;
                   this.loading = true;

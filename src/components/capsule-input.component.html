@@ -133,7 +133,16 @@ Polymer({
 		if(!newVal) newVal = {};
 		if (Object.keys(newVal).length) {
 			this.value = newVal;
-			this.array = this.toArrayFromKey(newVal);
+
+			// Sort display
+			var temp = this.toArrayFromKey(newVal);
+			temp.sort(function (a, b) {
+				if (newVal[a] > newVal[b]) return 1;
+				else if (newVal[a] < newVal[b]) return -1;
+				else return 0;
+			});
+			this.array = temp;
+
 			this.$.paperContainer.setAttribute('always-float-label', true);
 			this.validate();
 		}
@@ -153,9 +162,10 @@ Polymer({
 	_addItem: function(e) {
 		var value = this.inputValue.trim();
 
-		if(value === '' || ~this.array.indexOf(value)) return;
+		if(value === '' || this.value.hasOwnProperty(value)) return;
+
 		this.push('array', value);
-		this.value = this.toObjectFromKey(this.array);
+		this.value[value] = Date.now();
 		this.$.paperContainer.setAttribute('always-float-label', true);
 		this.inputValue = '';
 		this.validate();
@@ -171,8 +181,8 @@ Polymer({
 	},
 
 	_removeItem: function(index) {
-		this.splice('array', index, 1);
-		this.value = this.toObjectFromKey(this.array);
+		var toRemove = this.splice('array', index, 1);
+		delete this.value[toRemove];
 		this.$.input.focus();
 		if(!this.array.length) this.$.paperContainer.removeAttribute('always-float-label');
 		this.validate();

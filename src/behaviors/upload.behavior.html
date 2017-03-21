@@ -5,7 +5,7 @@
 'use strict';
 
 /*
-Problematic : Since we are using a single page application, uploads are problematic.
+Problematic :
 Imagine a form (who coresponds to a view and a url ) who can upload images to a server for a product (lets say the product id is in the url).
 You go to your form, fill it and send it. The process is not instantaneous (uploads have to complete). Imagine now
 that while uploading, your user decides to go again to the same form but with another product id.
@@ -13,11 +13,10 @@ What you should be displaying to your user is a form without any uploads running
 Yet, the user will see the uploads of the precedent product he modified.
 This behavior (coupled with the file-upload component) is designed to attend this problem by providing contexts.
 You can even track an upload (and alter it, like pause and play) in a totally different page if you have its context.
-Context are themselves divided in properties. An example would be upload with context = product id and upload
-banners or pictures. Those would be the properties.
+Context can contain sub properties. An example would be upload with context = productId and sub property =
+'banners' or 'pictures'.
 
 Uploads are stored globally, and each components pulls what it needs and store the data locally
-
 */
 
 // We set the globalUploads object outside the behavior, it is a singleton

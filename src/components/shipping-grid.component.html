@@ -39,7 +39,7 @@
             <div id="list" hidden$="[[empty]]">
                   <template is="dom-repeat" items="[[sort(grid, 'weight')]]">
                         <div class="item">
-                              Poids : <span class="color-accent">[[item.weight]] grammes</span> Prix : <span class="color-accent">[[item.price]] €</span>
+                              Poids : <span class="color-accent">[[item.weight]] g</span> Prix : <span class="color-accent">[[item.price]] €</span>
                               <paper-icon-button class="color-action" disabled$="[[!online]]" data-key="[[item.$key]]" on-tap="_confirm" icon="close"></paper-icon-button>
                         </div>
                   </template>

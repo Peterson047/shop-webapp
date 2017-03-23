@@ -14,7 +14,7 @@
 	:host {
 		display: block;
 		max-width: 460px;
-		min-width: 360px;
+		min-width: 330px;
 		width: 90%;
 		margin-bottom: var(--app-space);
 	}
@@ -131,7 +131,7 @@ Polymer({
 					_this.debounce(_this.data.$key, _this._ellipsizeTextBox, 500);
 				}
 			})
-			Polymer.RenderStatus.afterNextRender(this.$.itemDesc, this._ellipsizeTextBox.bind(this));
+			Polymer.RenderStatus.afterNextRender(this, this._ellipsizeTextBox);
 		}
 		else if (this.hasAttribute('filler')) {
 			this.$.seeButton.setAttribute('tabindex', '-1');
@@ -153,6 +153,7 @@ Polymer({
 
 	_ellipsizeTextBox: function () {
 		var el = this.$.itemDesc;
+		if(this.data && !el.scrollHeight && !el.offsetHeight) return this.debounce('ellipse', this._ellipsizeTextBox, 100);
 		el.innerHTML = this.data.description;
 		var wordArray = el.innerHTML.split(' ');
 		while(el.scrollHeight > el.offsetHeight) {

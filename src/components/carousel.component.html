@@ -10,590 +10,599 @@
 <link rel="import" href="../styles/fix-tap.style.html">
 
 <dom-module id="app-carousel">
-  <template>
-  <style include="fix-tap-style">
-  :host {
-    display: flex;
-    position: relative;
-    --carousel-height: 100%;
-    --carousel-ui-color: var(--app-white);
-    --carousel-ui-ink-color: var(--app-primary-color);
-    --border-radius: var(--carousel-border-radius, 3px);
-    contain: paint;
-    overflow: hidden;
-    border-radius: var(--border-radius);
-  }
+      <template>
+      <style include="fix-tap-style">
+      :host {
+            display: flex;
+            position: relative;
+            --carousel-height: 100%;
+            --carousel-ui-color: var(--app-white);
+            --carousel-ui-ink-color: var(--app-primary-color);
+            --border-radius: var(--carousel-border-radius, 3px);
+            contain: paint;
+            overflow: hidden;
+            border-radius: var(--border-radius);
+      }
 
-  :host * {
-    user-select: none;
-  }
+      :host * {
+            user-select: none;
+      }
 
-  .noImageIcon {
-    color: var(--app-white);
-    height: 50px;
-    width: 50px;
-  }
+      .noImageIcon {
+            color: var(--app-white);
+            height: 50px;
+            width: 50px;
+      }
 
-  .noPicture {
-    width: 100%;
-    height: 100%;
-    background-color: var(--app-light-grey);
-    transition: opacity .2s ease;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 5;
-    position: absolute;
-    top: 0;
-    left: 0;
-  }
+      .noPicture {
+            width: 100%;
+            height: 100%;
+            background-color: var(--app-light-grey);
+            transition: opacity .2s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 5;
+            position: absolute;
+            top: 0;
+            left: 0;
+      }
 
-  #pictures {
-    display: flex;
-    overflow: hidden;
-    height: var(--carousel-height);
-    width: 100%;
-    position: relative;
+      #pictures {
+            display: flex;
+            overflow: hidden;
+            height: var(--carousel-height);
+            width: 100%;
+            position: relative;
 
-    border-radius: var(--border-radius);
-  }
+            border-radius: var(--border-radius);
+      }
 
-  #pictures > .picContainer {
-    flex-shrink: 0;
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 0;
-    will-change: transform;
+      #pictures > .picContainer {
+            flex-shrink: 0;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 0;
+            will-change: transform;
 
-    border-radius: var(--border-radius);
-  }
+            border-radius: var(--border-radius);
+      }
 
-  .picLink {
-    display: block;
-    position: absolute;
-    top: 10px;
-    right: 18px;
-    z-index: 100;
-    color: var(--app-white);
-    text-decoration: none;
+      .picLink {
+            display: block;
+            position: absolute;
+            top: 10px;
+            right: 18px;
+            z-index: 100;
+            color: var(--app-white);
+            text-decoration: none;
 
-    transition: opacity .2s ease;
-  }
+            transition: opacity .2s ease;
+      }
 
-  .itemText {
-    position: absolute;
-    top: 10px;
-    left: 18px;
-    z-index: 100;
-    color: var(--app-white);
-    display: none;
-    transition: opacity .2s ease;
-  }
+      .itemText {
+            position: absolute;
+            top: 10px;
+            left: 18px;
+            z-index: 100;
+            color: var(--app-white);
+            display: none;
+            transition: opacity .2s ease;
+      }
 
-  #pictures iron-image {
-    border-radius: var(--border-radius);
-  }
+      #pictures iron-image {
+            border-radius: var(--border-radius);
+      }
 
-  .leftShadow {
-    box-shadow: -6px 0px 12px -3px rgba(0, 0, 0, 0.4);
-  }
+      .leftShadow {
+            box-shadow: -6px 0px 12px -3px rgba(0, 0, 0, 0.4);
+      }
 
-  .rightShadow {
-    box-shadow: 6px 0px 12px -3px rgba(0, 0, 0, 0.4);
-  }
+      .rightShadow {
+            box-shadow: 6px 0px 12px -3px rgba(0, 0, 0, 0.4);
+      }
 
-  .gradientLayer {
-    width: 100%;
-    height: 100%;
-    background-image:
-    -webkit-linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0)),
-    -webkit-linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.3));
-    pointer-events: none;
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 3;
-  }
+      .gradientLayer {
+            width: 100%;
+            height: 100%;
+            background-image:
+            -webkit-linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0)),
+            -webkit-linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.3));
+            pointer-events: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 3;
+      }
 
-  #ui {
-    position: absolute;
-    left: 0;
-    z-index: 4;
+      #ui {
+            position: absolute;
+            left: 0;
+            z-index: 4;
 
-    height: var(--carousel-height);
-    width: 100%;
+            height: var(--carousel-height);
+            width: 100%;
 
-    display: flex;
-    flex-direction: column;
+            display: flex;
+            flex-direction: column;
 
-    transition: opacity .2s ease;
-  }
+            transition: opacity .2s ease;
+      }
 
-  #mainActions {
-    display: flex;
-    flex-grow: 1;
-    align-items: center;
-  }
+      #mainActions {
+            display: flex;
+            flex-grow: 1;
+            align-items: center;
+      }
 
-  #navButtons{
-    display: flex;
-    flex-grow: 1;
-    justify-content: space-between;
-  }
+      #navButtons{
+            display: flex;
+            flex-grow: 1;
+            justify-content: space-between;
+      }
 
-  #bottomActions {
-    display: flex;
-    justify-content: space-between;
-  }
+      #bottomActions {
+            display: flex;
+            justify-content: space-between;
+      }
 
-  #autoplayer, #spacer {
-    height: 40px;
-    width: 40px;
-  }
+      #autoplayer, #spacer {
+            height: 40px;
+            width: 40px;
+      }
 
-  #bullets {
-    display: inline-block;
-  }
+      #bullets {
+            display: inline-block;
+      }
 
-  paper-radio-button {
-    --paper-radio-button-checked-color: var(--carousel-ui-color, white);
-    --paper-radio-button-checked-ink-color: var(--carousel-ui-ink-color, white);
-    --paper-radio-button-unchecked-color: var(--carousel-ui-color, white);
-    --paper-radio-button-unchecked-ink-color: var(--carousel-ui-ink-color, white);
-  }
+      paper-radio-button {
+            --paper-radio-button-checked-color: var(--carousel-ui-color, white);
+            --paper-radio-button-checked-ink-color: var(--carousel-ui-ink-color, white);
+            --paper-radio-button-unchecked-color: var(--carousel-ui-color, white);
+            --paper-radio-button-unchecked-ink-color: var(--carousel-ui-ink-color, white);
+      }
 
-  paper-icon-button {
-    height: 70px;
-    width: 70px;
-    color: var(--carousel-ui-color, white);
-    --paper-icon-button-ink-color: var(--carousel-ui-ink-color, white);
-  }
+      paper-icon-button {
+            height: 70px;
+            width: 70px;
+            color: var(--carousel-ui-color, white);
+            --paper-icon-button-ink-color: var(--carousel-ui-ink-color, white);
+      }
 
-  [transparent] {
-    opacity: 0;
-    pointer-events: none;
-  }
+      [transparent] {
+            opacity: 0;
+            pointer-events: none;
+      }
 
-  @media (min-width: 640px) {
-    .itemText {
-      display: block !important;
-    }
-  }
-  </style>
+      @media (min-width: 640px) {
+            .itemText {
+                  display: block !important;
+            }
+      }
+      </style>
 
-  <div class="noPicture" transparent$="[[hasPicturesReady]]">
-    <iron-icon class="noImageIcon" icon="visibility-off"></iron-icon>
-  </div>
-
-  <div id="pictures">
-    <template is="dom-repeat" items="[[products]]" as="product">
-      <div id="[[product.id]]" class="picContainer">
-        <iron-image
-        style$="[[_computeInlineStyles(carouselHeight, carouselWidth)]]"
-        placeholder="[[product.base64]]"
-        sizing="cover"
-        preload src="[[product.src]]"
-        fade></iron-image>
+      <div class="noPicture" transparent$="[[hasPicturesReady]]">
+            <iron-icon class="noImageIcon" icon="visibility-off"></iron-icon>
       </div>
-    </template>
-  </div>
 
-  <div class="gradientLayer">
-  </div>
-
-  <div id="ui" on-track='_touchHandler'>
-    <template is="dom-repeat" items="[[products]]" as="product">
-      <template is="dom-if" if="[[_showTitle(product)]]">
-        <a transparent$="[[_computeItemUiStyle(product.id, selectedElement, isAnimating)]]" class="picLink" href="[[product.href]]" tabindex="-1"><paper-button >[[product.linkTitle]]</paper-button></a>
-      </template>
-    </template>
-
-    <template is="dom-repeat" items="[[products]]" as="product">
-      <template is="dom-if" if="[[_showText(product)]]">
-        <paper-button transparent$="[[_computeItemUiStyle(product.id, selectedElement, isAnimating)]]" class="itemText">[[product.text]]</paper-button>
-      </template>
-    </template>
-
-    <div id="mainActions">
-      <div id="navButtons">
-        <paper-icon-button disabled='[[_disableUi(isAnimating, products)]]' on-tap="_slide" data-direction="left" icon="icons:chevron-left"></paper-icon-button>
-        <paper-icon-button disabled='[[_disableUi(isAnimating, products)]]' on-tap="_slide" data-direction="right" icon="icons:chevron-right"></paper-icon-button>
+      <div id="pictures">
+            <template is="dom-repeat" items="[[products]]" as="product">
+                  <div id="[[product.id]]" class="picContainer">
+                        <iron-image
+                        style$="[[_computeInlineStyles(carouselHeight, carouselWidth)]]"
+                        placeholder="[[product.base64]]"
+                        sizing="cover"
+                        preload data-src$="[[product.src]]"
+                        fade></iron-image>
+                  </div>
+            </template>
       </div>
-    </div>
 
-    <div id="bottomActions">
-      <paper-icon-button id="autoplayer" disabled='[[_disableUi(isAnimating, products)]]' on-tap="_togglePlayer" icon$="[[_computePlayerIcon(isPlaying)]]"></paper-icon-button>
+      <div class="gradientLayer">
+      </div>
 
-      <paper-radio-group id="bullets" selected="{{currIndex}}">
-        <template is="dom-repeat" items="[[products]]" as="product">
-          <paper-radio-button on-tap="_turnOffPlayer" disabled="[[_disableUi(isAnimating, products)]]" name="[[index]]"></paper-radio-button>
-        </template>
-      </paper-radio-group>
-      <div id="spacer"></div>
-    </div>
-  </div>
+      <div id="ui" on-track='_touchHandler'>
+            <template is="dom-repeat" items="[[products]]" as="product">
+                  <template is="dom-if" if="[[_showTitle(product)]]">
+                        <a transparent$="[[_computeItemUiStyle(product.id, selectedElement, isAnimating)]]" class="picLink" href="[[product.href]]" tabindex="-1"><paper-button >[[product.linkTitle]]</paper-button></a>
+                  </template>
+            </template>
+
+            <template is="dom-repeat" items="[[products]]" as="product">
+                  <template is="dom-if" if="[[_showText(product)]]">
+                        <paper-button transparent$="[[_computeItemUiStyle(product.id, selectedElement, isAnimating)]]" class="itemText">[[product.text]]</paper-button>
+                  </template>
+            </template>
+
+            <div id="mainActions">
+                  <div id="navButtons">
+                        <paper-icon-button disabled='[[_disableUi(isAnimating, products)]]' on-tap="_slide" data-direction="left" icon="icons:chevron-left"></paper-icon-button>
+                        <paper-icon-button disabled='[[_disableUi(isAnimating, products)]]' on-tap="_slide" data-direction="right" icon="icons:chevron-right"></paper-icon-button>
+                  </div>
+            </div>
+
+            <div id="bottomActions">
+                  <paper-icon-button id="autoplayer" disabled='[[_disableUi(isAnimating, products)]]' on-tap="_togglePlayer" icon$="[[_computePlayerIcon(isPlaying)]]"></paper-icon-button>
+
+                  <paper-radio-group id="bullets" selected="{{currIndex}}">
+                        <template is="dom-repeat" items="[[products]]" as="product">
+                              <paper-radio-button on-tap="_turnOffPlayer" disabled="[[_disableUi(isAnimating, products)]]" name="[[index]]"></paper-radio-button>
+                        </template>
+                  </paper-radio-group>
+                  <div id="spacer"></div>
+            </div>
+      </div>
 
 </template>
 <script>
 'use strict';
 Polymer({
-  is: 'app-carousel',
+      is: 'app-carousel',
 
-  properties: {
+      properties: {
 
-    hasPicturesReady: {
-      type: Boolean,
-      value: false,
-      reflectToAttribute: true,
-    },
+            hasPicturesReady: {
+                  type: Boolean,
+                  value: false,
+                  reflectToAttribute: true,
+            },
 
-    products: {
-      type: Array,
-      observer: '_onProductsChange',
-      value: [],
-    },
+            products: {
+                  type: Array,
+                  observer: '_onProductsChange',
+                  value: [],
+            },
 
-    currIndex: {
-      type: Number,
-      observer: '_currIndexChange',
-    },
+            currIndex: {
+                  type: Number,
+                  observer: '_currIndexChange',
+            },
 
-    activeDirection: {
-      type: String,
-      value: 'none',
-    },
+            activeDirection: {
+                  type: String,
+                  value: 'none',
+            },
 
-    isAnimating: {
-      type: Boolean,
-      value: false,
-    },
+            isAnimating: {
+                  type: Boolean,
+                  value: false,
+            },
 
-    carouselWidth: Number,
-    carouselHeight: Number,
+            carouselWidth: Number,
+            carouselHeight: Number,
 
-    selectedElement: {
-      type: Object,
-      observer: '_onSelectionChange',
-    },
+            selectedElement: {
+                  type: Object,
+                  observer: '_onSelectionChange',
+            },
 
-    isPlaying: {
-      type: Boolean,
-      value: true,
-    },
+            isPlaying: {
+                  type: Boolean,
+                  value: true,
+            },
 
-    transitionDuration : {
-      type: Number,
-      value: 300
-    },
+            transitionDuration : {
+                  type: Number,
+                  value: 300
+            },
 
-    transition: {
-      type: String,
-      computed: '_computeTransition(transitionDuration)'
-    },
+            transition: {
+                  type: String,
+                  computed: '_computeTransition(transitionDuration)'
+            },
 
-    autoplayInterval: {
-      type: Number,
-      value: 4000,
-    },
+            autoplayInterval: {
+                  type: Number,
+                  value: 4000,
+            },
 
-    lastTouch: {
-      type: Number,
-      value: 0,
-    },
-  },
+            lastTouch: {
+                  type: Number,
+                  value: 0,
+            },
+      },
 
-  behaviors: [ Polymer.IronResizableBehavior ],
-  listeners: {
-    "iron-resize": "onResize",
-    "iron-select": "onIronSelect"
-  },
+      behaviors: [ Polymer.IronResizableBehavior ],
+      listeners: {
+            "iron-resize": "onResize",
+            "iron-select": "onIronSelect"
+      },
 
-  ready: function() {
-    this.setScrollDirection('y', this.$.ui);
-    this._initAutoPlay();
-  },
+      ready: function() {
+            this.setScrollDirection('y', this.$.ui);
+            this._initAutoPlay();
+      },
 
-  onResize: function (e) {
-    if(this.offsetParent) {
-      this.carouselWidth = this.offsetWidth;
-      this.carouselHeight = this.offsetHeight;
-    }
-  },
+      onResize: function (e) {
+            if(this.offsetParent) {
+                  this.carouselWidth = this.offsetWidth;
+                  this.carouselHeight = this.offsetHeight;
+            }
+      },
 
-  onIronSelect: function (e) {
-    e.stopPropagation();
-  },
+      onIronSelect: function (e) {
+            e.stopPropagation();
+      },
 
-  _showTitle: function(product) {
-    return typeof product.linkTitle !== 'undefined';
-  },
+      _showTitle: function(product) {
+            return typeof product.linkTitle !== 'undefined';
+      },
 
-  _showText: function(product) {
-    return typeof product.text !== 'undefined';
-  },
+      _showText: function(product) {
+            return typeof product.text !== 'undefined';
+      },
 
-  _disableUi: function(anim, products) {
-    return anim || products.length < 2;
-  },
+      _disableUi: function(anim, products) {
+            return anim || products.length < 2;
+      },
 
-  _onProductsChange: function (newProducts, oldProducts) {
-    if (!(newProducts instanceof Array) || 0 == newProducts.length) {
-      this.hasPicturesReady = false;
-      return;
-    }
+      _onProductsChange: function (newProducts, oldProducts) {
+            if (!(newProducts instanceof Array) || 0 == newProducts.length) {
+                  this.hasPicturesReady = false;
+                  return;
+            }
 
-    this.currIndex = 0;
+            this.currIndex = 0;
+            var init = function () {
+                  this.selectedElement = this._getDomElement(this.currIndex);
+                  this.selectedElement.style.zIndex = 1;
+                  this.hasPicturesReady = true;
+                  this._loadImage();
+            }.bind(this);
 
-    var init = function () {
-      this.selectedElement = this._getDomElement(this.currIndex);
-      this.selectedElement.style.zIndex = 1;
-      this.hasPicturesReady = true;
-    }.bind(this);
+            Polymer.RenderStatus.afterNextRender(this, init);
+      },
 
-    Polymer.RenderStatus.afterNextRender(this, init);
-  },
+      _loadImage: function() {
+            var ironImage = this.selectedElement.querySelector('iron-image');
+            ironImage.src = ironImage.getAttribute('data-src');
+            ironImage.removeAttribute('data-src');
+      },
 
-  _currIndexChange: function (newIndex, oldIndex) {
-    this.selectedElement = this._getDomElement(newIndex);
-  },
+      _currIndexChange: function (newIndex, oldIndex) {
+            this.selectedElement = this._getDomElement(newIndex);
+            if(this.selectedElement && this.selectedElement.querySelector('iron-image').hasAttribute('data-src')){
+                  this._loadImage();
+            }
+      },
 
-  _onSelectionChange: function (newProduct, oldProduct) {
-    if(!newProduct || !oldProduct || this.isAnimating) return;
-    this.isAnimating = true;
-    var prevIndex = this._findProductIndex(oldProduct.id);
-    var direction = this._computeDirection(prevIndex);
-    this._preventFreeze();
-    this._translate(oldProduct, direction);
-  },
+      _onSelectionChange: function (newProduct, oldProduct) {
+            if(!newProduct || !oldProduct || this.isAnimating) return;
+            this.isAnimating = true;
+            var prevIndex = this._findProductIndex(oldProduct.id);
+            var direction = this._computeDirection(prevIndex);
+            this._preventFreeze();
+            this._translate(oldProduct, direction);
+      },
 
-  _preventFreeze: function() {
-    if (performance.now() - this.lastTouch < 1000) return;
-    var _this = this;
-    var recover = function() {
-      _this.isAnimating = false;
-    }
-    this._waitTransition(recover);
-  },
+      _preventFreeze: function() {
+            if (performance.now() - this.lastTouch < 1000) return;
+            var _this = this;
+            var recover = function() {
+                  _this.isAnimating = false;
+            }
+            this._waitTransition(recover);
+      },
 
-  _slide: function (e) {
-    this._turnOffPlayer();
-    this.activeDirection = Polymer.dom(e).rootTarget.getAttribute('data-direction');
-    'left' == this.activeDirection ? this.$$('#bullets').selectPrevious() : this.$$('#bullets').selectNext();
-  },
+      _slide: function (e) {
+            this._turnOffPlayer();
+            this.activeDirection = Polymer.dom(e).rootTarget.getAttribute('data-direction');
+            'left' == this.activeDirection ? this.$$('#bullets').selectPrevious() : this.$$('#bullets').selectNext();
+      },
 
-  _translate: function (oldElement, direction) {
-    if (this.selectedElement == oldElement) {
-      return this.isAnimating = false;
-    }
-    var _this = this;
+      _translate: function (oldElement, direction) {
+            if (this.selectedElement == oldElement) {
+                  return this.isAnimating = false;
+            }
+            var _this = this;
 
-    // Set transitional position according to direction
-    var transitionalPos, shadowClass;
-    if ('left' == direction) {
-      transitionalPos = '-100';
-      shadowClass = 'rightShadow';
-    }
-    else {
-      transitionalPos = '100';
-      shadowClass = 'leftShadow';
-    }
+            // Set transitional position according to direction
+            var transitionalPos, shadowClass;
+            if ('left' == direction) {
+                  transitionalPos = '-100';
+                  shadowClass = 'rightShadow';
+            }
+            else {
+                  transitionalPos = '100';
+                  shadowClass = 'leftShadow';
+            }
 
-    // Move next pic to the correct position (left or right)
-    this.selectedElement.style.transition = 'none';
-    this.transform('translateX('+ transitionalPos +'%)', this.selectedElement);
-    this.selectedElement.style.zIndex = 2;
-    oldElement.style.zIndex = 1;
-    this.selectedElement.classList.add(shadowClass);
+            // Move next pic to the correct position (left or right)
+            this.selectedElement.style.transition = 'none';
+            this.transform('translateX('+ transitionalPos +'%)', this.selectedElement);
+            this.selectedElement.style.zIndex = 2;
+            oldElement.style.zIndex = 1;
+            this.selectedElement.classList.add(shadowClass);
 
-    var onTransitionEnd = function() {
-      _this.selectedElement.style.transition = 'none';
-      // Replace old pic in stack + change focus
-      oldElement.style.zIndex = 0;
-      _this.selectedElement.style.zIndex = 1;
-      _this.selectedElement.classList.remove(shadowClass);
+            var onTransitionEnd = function() {
+                  _this.selectedElement.style.transition = 'none';
+                  // Replace old pic in stack + change focus
+                  oldElement.style.zIndex = 0;
+                  _this.selectedElement.style.zIndex = 1;
+                  _this.selectedElement.classList.remove(shadowClass);
 
-      // Update current status
-      _this.activeDirection = 'none';
-      _this.isAnimating = false;
-    };
+                  // Update current status
+                  _this.activeDirection = 'none';
+                  _this.isAnimating = false;
+            };
 
-    // The first requestAnimationFrame is needed for firefox, to start correctly the animation
-    requestAnimationFrame(function() {
-      _this._waitTransition(onTransitionEnd);
-      requestAnimationFrame(function() {
-        _this.selectedElement.style.transition = _this.transition;
-        _this.transform('none', _this.selectedElement);
-      });
-    })
-  },
+            // The first requestAnimationFrame is needed for firefox, to start correctly the animation
+            requestAnimationFrame(function() {
+                  _this._waitTransition(onTransitionEnd);
+                  requestAnimationFrame(function() {
+                        _this.selectedElement.style.transition = _this.transition;
+                        _this.transform('none', _this.selectedElement);
+                  });
+            })
+      },
 
-  _touchHandler: function (e) {
-    var _this = this;
-    this.lastTouch = e.timeStamp;
-    if(!this.hasPicturesReady || this.products.length < 2) return;
-    switch(e.detail.state) {
-      case 'start':
-        if (_this.isAnimating) return _this.touchInit = false;
-        _this.isAnimating = true;
-        _this.touchInit = true;
-        _this._turnOffPlayer();
-        _this._toggleUI(false);
-        _this.touchInvolvedElements = _this._positionElements();
+      _touchHandler: function (e) {
+            var _this = this;
+            this.lastTouch = e.timeStamp;
+            if(!this.hasPicturesReady || this.products.length < 2) return;
+            switch(e.detail.state) {
+                  case 'start':
+                  if (_this.isAnimating) return _this.touchInit = false;
+                  _this.isAnimating = true;
+                  _this.touchInit = true;
+                  _this._turnOffPlayer();
+                  _this._toggleUI(false);
+                  _this.touchInvolvedElements = _this._positionElements();
 
-        if ( document.selection ) {
-            document.selection.empty();
-        } else if ( window.getSelection ) {
-            window.getSelection().removeAllRanges();
-        }
-        break;
+                  if ( document.selection ) {
+                        document.selection.empty();
+                  } else if ( window.getSelection ) {
+                        window.getSelection().removeAllRanges();
+                  }
+                  break;
 
-      case 'track':
-        if (!this.touchInit) return;
-        if(Math.abs(e.detail.dx) <= this.carouselWidth) {
-          if (0 < e.detail.dx) {
-            this.transform( 'translateX(-100%)' , this.touchInvolvedElements.next);
-            this.transform( 'translateX(calc(-100% + '+ e.detail.dx +'px))' , this.touchInvolvedElements.prev);
-          }
-          else {
-            this.transform( 'translateX(100%)' , this.touchInvolvedElements.prev);
-            this.transform( 'translateX(calc(100% - '+ Math.abs(e.detail.dx) +'px))' , this.touchInvolvedElements.next);
-          }
-        }
-        break;
+                  case 'track':
+                  if (!this.touchInit) return;
+                  if(Math.abs(e.detail.dx) <= this.carouselWidth) {
+                        if (0 < e.detail.dx) {
+                              this.transform( 'translateX(-100%)' , this.touchInvolvedElements.next);
+                              this.transform( 'translateX(calc(-100% + '+ e.detail.dx +'px))' , this.touchInvolvedElements.prev);
+                        }
+                        else {
+                              this.transform( 'translateX(100%)' , this.touchInvolvedElements.prev);
+                              this.transform( 'translateX(calc(100% - '+ Math.abs(e.detail.dx) +'px))' , this.touchInvolvedElements.next);
+                        }
+                  }
+                  break;
 
-      case 'end':
-        if(!_this.touchInit) return;
-        var capReached = Math.abs(e.detail.dx) > (_this.carouselWidth / 3);
-        if (e.detail.dx > 0) {
-          _this._endDrag(_this.touchInvolvedElements.prev, capReached, _this.touchInvolvedElements.prevIndex, 'left');
-        } else {
-          _this._endDrag(_this.touchInvolvedElements.next, capReached, _this.touchInvolvedElements.nextIndex, 'right');
-        }
-        break;
-    }
-  },
+                  case 'end':
+                  if(!_this.touchInit) return;
+                  var capReached = Math.abs(e.detail.dx) > (_this.carouselWidth / 3);
+                  if (e.detail.dx > 0) {
+                        _this._endDrag(_this.touchInvolvedElements.prev, capReached, _this.touchInvolvedElements.prevIndex, 'left');
+                  } else {
+                        _this._endDrag(_this.touchInvolvedElements.next, capReached, _this.touchInvolvedElements.nextIndex, 'right');
+                  }
+                  break;
+            }
+      },
 
-  _endDrag: function (elem, capReached, nextIndex, direction) {
-    var _this = this;
-    var previousSelectedElem = _this.selectedElement;
+      _endDrag: function (elem, capReached, nextIndex, direction) {
+            var _this = this;
+            var previousSelectedElem = _this.selectedElement;
 
-    // Callback when the transition end
-    var onTransitionEnd = function () {
-      elem.style.transition = 'none';
-      _this.touchInvolvedElements.next.classList.remove('leftShadow');
-      _this.touchInvolvedElements.prev.classList.remove('rightShadow');
+            // Callback when the transition end
+            var onTransitionEnd = function () {
+                  elem.style.transition = 'none';
+                  _this.touchInvolvedElements.next.classList.remove('leftShadow');
+                  _this.touchInvolvedElements.prev.classList.remove('rightShadow');
 
-      // Stack correctly the pics
-      previousSelectedElem.style.zIndex = 0;
-      _this.selectedElement.style.zIndex = 1;
+                  // Stack correctly the pics
+                  previousSelectedElem.style.zIndex = 0;
+                  _this.selectedElement.style.zIndex = 1;
 
-      _this._toggleUI(true);
-      _this.isAnimating = false;
-    };
+                  _this._toggleUI(true);
+                  _this.isAnimating = false;
+            };
 
-    this._waitTransition(onTransitionEnd);
-    requestAnimationFrame(function () {
-      elem.style.transition = _this.transition;
-      if(capReached) {
-        _this.currIndex = nextIndex;
-        _this.transform('none', elem);
-      } else {
-        var translateValue = direction == 'left' ? '-100%' : '100%';
-        _this.transform('translateX(' + translateValue + ')', elem);
-      }
-    });
-  },
+            this._waitTransition(onTransitionEnd);
+            requestAnimationFrame(function () {
+                  elem.style.transition = _this.transition;
+                  if(capReached) {
+                        _this.currIndex = nextIndex;
+                        _this.transform('none', elem);
+                  } else {
+                        var translateValue = direction == 'left' ? '-100%' : '100%';
+                        _this.transform('translateX(' + translateValue + ')', elem);
+                  }
+            });
+      },
 
-  _waitTransition: function(fn) {
-		// Tried an event driven approach, sadly this provide better results. T_T
-    clearTimeout(this.timeout);
-		this.timeout = setTimeout(fn, this.transitionDuration);
-	},
+      _waitTransition: function(fn) {
+            // Tried an event driven approach, sadly this provide better results. T_T
+            clearTimeout(this.timeout);
+            this.timeout = setTimeout(fn, this.transitionDuration);
+      },
 
-  _positionElements: function () {
-    var lastIndex = this.products.length - 1;
-    var prevIndex = (0 == this.currIndex) ? lastIndex : this.currIndex - 1;
-    var nextIndex = (lastIndex == this.currIndex) ? 0 : this.currIndex + 1;
-    // Get products and place them
-    var prevProduct = this._getDomElement(prevIndex);
-    var nextProduct = this._getDomElement(nextIndex);
+      _positionElements: function () {
+            var lastIndex = this.products.length - 1;
+            var prevIndex = (0 == this.currIndex) ? lastIndex : this.currIndex - 1;
+            var nextIndex = (lastIndex == this.currIndex) ? 0 : this.currIndex + 1;
+            // Get products and place them
+            var prevProduct = this._getDomElement(prevIndex);
+            var nextProduct = this._getDomElement(nextIndex);
 
-    this.transform('translateX(-100%)', prevProduct);
-    this.transform('translateX(100%)', nextProduct);
-    prevProduct.classList.add('rightShadow');
-    nextProduct.classList.add('leftShadow');
-    prevProduct.style.zIndex = 2;
-    nextProduct.style.zIndex = 2;
+            this.transform('translateX(-100%)', prevProduct);
+            this.transform('translateX(100%)', nextProduct);
+            prevProduct.classList.add('rightShadow');
+            nextProduct.classList.add('leftShadow');
+            prevProduct.style.zIndex = 2;
+            nextProduct.style.zIndex = 2;
 
-    return {
-      next: nextProduct,
-      nextIndex: nextIndex,
-      prev: prevProduct,
-      prevIndex: prevIndex,
-    }
-  },
+            return {
+                  next: nextProduct,
+                  nextIndex: nextIndex,
+                  prev: prevProduct,
+                  prevIndex: prevIndex,
+            }
+      },
 
-  _getDomElement: function (index) {
-    return this.$$('#'+this.products[index].id);
-  },
+      _getDomElement: function (index) {
+            return this.$$('#'+this.products[index].id);
+      },
 
-  _toggleUI: function (isVisible) {
-    this.$.ui.style.opacity = (isVisible) ? 1 : 0;
-  },
+      _toggleUI: function (isVisible) {
+            this.$.ui.style.opacity = (isVisible) ? 1 : 0;
+      },
 
-  _findProductIndex: function (productId) {
-    for (var i = 0; i < this.products.length; i++) {
-      if (productId == this.products[i].id) {
-        return i;
-      }
-    }
-    return -1;
-  },
+      _findProductIndex: function (productId) {
+            for (var i = 0; i < this.products.length; i++) {
+                  if (productId == this.products[i].id) {
+                        return i;
+                  }
+            }
+            return -1;
+      },
 
-  _computeTransition: function (transitionTime) {
-    return 'transform '+ transitionTime +'ms ease-in-out';
-  },
+      _computeTransition: function (transitionTime) {
+            return 'transform '+ transitionTime +'ms ease-in-out';
+      },
 
-  _computeDirection: function (prevIndex) {
-    if ('none' != this.activeDirection) {
-      return this.activeDirection
-    }
-    else {
-      return prevIndex > this.currIndex ? 'left' : 'right';
-    }
-  },
+      _computeDirection: function (prevIndex) {
+            if ('none' != this.activeDirection) {
+                  return this.activeDirection
+            }
+            else {
+                  return prevIndex > this.currIndex ? 'left' : 'right';
+            }
+      },
 
-  _computeInlineStyles: function (height, width) {
-    return 'height: '+ height +'px; width: '+ width +'px;';
-  },
+      _computeInlineStyles: function (height, width) {
+            return 'height: '+ height +'px; width: '+ width +'px;';
+      },
 
-  _computeItemUiStyle: function (id, selectedElement, isAnimating) {
-    if (!selectedElement) return false;
-    return (isAnimating || id != selectedElement.id);
-  },
+      _computeItemUiStyle: function (id, selectedElement, isAnimating) {
+            if (!selectedElement) return false;
+            return (isAnimating || id != selectedElement.id);
+      },
 
-  _computePlayerIcon: function (isPlaying) {
-    return isPlaying ? 'av:pause' : 'av:play-arrow';
-  },
+      _computePlayerIcon: function (isPlaying) {
+            return isPlaying ? 'av:pause' : 'av:play-arrow';
+      },
 
-  _turnOffPlayer: function () {
-      this.isPlaying = false;
-  },
+      _turnOffPlayer: function () {
+            this.isPlaying = false;
+      },
 
-  _togglePlayer: function (e) {
-    this.isPlaying = ! this.isPlaying;
-  },
+      _togglePlayer: function (e) {
+            this.isPlaying = ! this.isPlaying;
+      },
 
-  _initAutoPlay: function () {
-    var _this = this;
-    setInterval(function () {
-      if (_this.offsetParent !== null && _this.isPlaying && !_this.isAnimating) {
-        _this.activeDirection = 'right';
-        _this.$$('#bullets').selectNext();
-      }
-    }, this.autoplayInterval);
-  },
+      _initAutoPlay: function () {
+            var _this = this;
+            setInterval(function () {
+                  if (_this.offsetParent !== null && _this.isPlaying && !_this.isAnimating) {
+                        _this.activeDirection = 'right';
+                        _this.$$('#bullets').selectNext();
+                  }
+            }, this.autoplayInterval);
+      },
 
 });
 </script>

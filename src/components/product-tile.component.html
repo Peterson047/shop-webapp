@@ -118,6 +118,7 @@ Polymer({
 	properties: {
 		data: {
 			type: Object,
+			observer: '_ellipsizeTextBox'
 		}
 	},
 
@@ -131,7 +132,6 @@ Polymer({
 					_this.debounce(_this.data.$key, _this._ellipsizeTextBox, 500);
 				}
 			})
-			Polymer.RenderStatus.afterNextRender(this, this._ellipsizeTextBox);
 		}
 		else if (this.hasAttribute('filler')) {
 			this.$.seeButton.setAttribute('tabindex', '-1');

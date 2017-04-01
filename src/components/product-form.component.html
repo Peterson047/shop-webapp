@@ -99,14 +99,23 @@
 
                   <!-- BANNER -->
                   <section id="banner">
-                        <data-source path="/all_products/[[idProduct]]/banner/pictures" output="{{picsBanner}}"></data-source>
+                        <data-source path="/all_products/[[idProduct]]/banner/pictures" empty="{{noBanner}}" output="{{picsBanner}}"></data-source>
+
                         <div class="row">
                               <dashed-title icon="image:landscape">Bannière</dashed-title>
                         </div>
 
-                        <paper-toggle-button name="bannerActive" checked="[[product.banner.active]]">
+                        <paper-toggle-button disabled="[[noBanner]]" name="bannerActive" checked="[[product.banner.active]]">
                               Faire apparaitre ce produit dans le kiosque dynamique
                         </paper-toggle-button>
+
+                        <template is="dom-if" if="[[noBanner]]">
+                              <h3>Aucune bannière uploadée</h3>
+                        </template>
+
+                        <template is="dom-if" if="[[!noBanner]]">
+                              <h3>Bannière uploadée</h3>
+                        </template>
 
                         <div id="displayPics">
                               <template is="dom-repeat" items="[[toArray(picsBanner, 'key')]]" as="oneBan">
@@ -128,11 +137,19 @@
                   <!-- PHOTOS -->
                   <section id="pictures">
 
-                        <data-source path="/all_products/[[idProduct]]/pictures" output="{{picsProduct}}"></data-source>
+                        <data-source path="/all_products/[[idProduct]]/pictures" empty="{{noPhotos}}" output="{{picsProduct}}"></data-source>
 
                         <div class="row">
                               <dashed-title icon="image:photo-library">Photos</dashed-title>
                         </div>
+
+                        <template is="dom-if" if="[[noPhotos]]">
+                              <h3>Aucune photo uploadée</h3>
+                        </template>
+
+                        <template is="dom-if" if="[[!noPhotos]]">
+                              <h3>Photos uploadées</h3>
+                        </template>
 
                         <div id="displayPics">
                               <template is="dom-repeat" items="[[toArray(picsProduct, 'key')]]" as="onePic">

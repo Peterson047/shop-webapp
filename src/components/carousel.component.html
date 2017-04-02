@@ -356,13 +356,15 @@ Polymer({
 
       _loadImage: function() {
             var ironImage = this.selectedElement.querySelector('iron-image');
-            ironImage.src = ironImage.getAttribute('data-src');
-            ironImage.removeAttribute('data-src');
+            if(ironImage.hasAttribute('data-src')) {
+                  ironImage.src = ironImage.getAttribute('data-src');
+                  ironImage.removeAttribute('data-src');
+            }
       },
 
       _currIndexChange: function (newIndex, oldIndex) {
             this.selectedElement = this._getDomElement(newIndex);
-            if(this.selectedElement && this.selectedElement.querySelector('iron-image').hasAttribute('data-src')){
+            if(this.selectedElement){
                   this._loadImage();
             }
       },

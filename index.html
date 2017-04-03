@@ -710,5 +710,40 @@
             window.requestAnimationFrame(draw);
             </script>
 
-      </body>
-      </html>
+            <script type='application/ld+json'>
+            {
+              "@context": "http://www.schema.org",
+              "@type": "Organization",
+              "name": "Un p'tit coin d'savonnerie",
+              "description": "",
+              "logo": "",
+              "url": "https://ptitcoinsavonnerie.fr",
+              "address": {
+                "@type": "PostalAddress",
+                "streetAddress": "4 bis avenue des Sorbiers",
+                "addressLocality": "La Varenne Saint-Hilaire",
+                "postalCode": "94210",
+                "addressCountry": "France"
+              },
+              "location": {
+                "@type": "Place",
+                "geo": {
+                  "@type": "GeoCoordinates",
+                  "latitude": "48.788697",
+                  "longitude": "2.497371"
+                }
+              },
+              "contactPoint" : [
+                { "@type" : "ContactPoint",
+                  "telephone" : "+33 1 01 01 01",
+                  "email": "contact(at)ptitcoinsavonnerie.fr",
+                  "contactType" : "customer service"
+                }],
+              "founder": {
+              	  "@type": "Person",
+                  "name": "Christine Douhard"
+              }
+            }
+             </script>
+    </body>
+</html>

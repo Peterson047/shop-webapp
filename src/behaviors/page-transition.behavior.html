@@ -74,7 +74,7 @@ window.PageTransitionBehaviorImpl = {
 
 	_updateMetaTags: function(e) {
 		if(e) e.stopPropagation();
-		if(this.pageItem.pageData.title) document.title = this.appData.name+' - '+this.pageItem.pageData.title;
+		if(this.pageItem.pageData.title) document.title = this.appData.name+' | '+this.pageItem.pageData.title;
 		if(this.pageItem.pageData.description) document.querySelector('meta[name=description]').content = this.pageItem.pageData.description;
 	},
 

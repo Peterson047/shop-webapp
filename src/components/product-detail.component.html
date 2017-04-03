@@ -250,7 +250,7 @@
 				</div>
 
 				<template is="dom-if" if="[[data.notice]]">
-				  <div class="notice">[[data.notice]]</div>
+					<div class="notice">[[data.notice]]</div>
 				</template>
 			</div>
 		</div>
@@ -289,20 +289,21 @@ Polymer({
 
 	_createStructuredData: function (data, price, outOfStock, pictures) {
 		console.log(pictures);
-			return {
-				"@context": "http://schema.org",
-			  "@type": "Product",
-			  "description": data.description,
-			  "name": data.name,
-			  "image": (pictures[0]) ? pictures[0].src : "",
-			  "offers":
-					{
-				    "@type": "Offer",
-				    "availability": (outOfStock) ? "http://schema.org/OutOfStock" : "http://schema.org/InStock",
-				    "price": price,
-				    "priceCurrency": "EUR"
-				  }
-			};
+		return {
+			"@context": "http://schema.org",
+			"@type": "Product",
+			"description": data.description,
+			"name": data.name,
+			"image": (pictures[0]) ? pictures[0].src : "",
+			"offers":
+			{
+				"@type": "Offer",
+				"availability": (outOfStock) ? "http://schema.org/OutOfStock" : "http://schema.org/InStock",
+				"price": price,
+				"priceCurrency": "EUR",
+				"url": window.location.href
+			}
+		};
 	},
 
 	_addStructuredData: function (data, price, outOfStock, pictures) {
@@ -316,9 +317,9 @@ Polymer({
 
 	_deleteStructuredData: function () {
 		var struc = this.querySelector('#structuredData');
-			if (struc) {
-				this.removeChild(struc);
-			}
+		if (struc) {
+			this.removeChild(struc);
+		}
 	},
 
 	_computeButtonState: function(online, outOfStock) {

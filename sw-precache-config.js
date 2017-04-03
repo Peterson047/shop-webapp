@@ -11,6 +11,8 @@ module.exports = {
       staticFileGlobs: [
             '/index.html',
             '/manifest.json',
+            '/robots.txt',
+            '/sitemap.xml',
             '/bower_components/webcomponentsjs/webcomponents-lite.min.js',
             '/bower_components/app-storage/app-indexeddb-mirror/app-indexeddb-mirror-worker.js',
             '/bower_components/app-storage/app-indexeddb-mirror/common-worker-scope.js',

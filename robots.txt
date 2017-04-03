@@ -1,0 +1,4 @@
+User-agent: *
+Disallow: *github.com*
+
+Sitemap: https://ptitcoinsavonnerie.fr/sitemap.xml

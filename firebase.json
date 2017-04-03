@@ -31,7 +31,7 @@
             ],
             "rewrites": [
                   {
-                        "source": "**!(/bower_components/**|/images/**)",
+                        "source": "**!(/bower_components/**|/images/**|/robots.txt|sitemap.xml)",
                         "destination": "/index.html"
                   }
             ]

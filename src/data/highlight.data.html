@@ -19,7 +19,7 @@
   'use strict';
   Polymer({
     is: 'highlight-data',
-    
+
     properties: {
       items: {
         type: Array,
@@ -42,9 +42,8 @@
             id: item.$key,
             src: banner.url,
             base64: banner.base64,
-            text: item.name,
-            href: 'product-detail/'+item.$key,
-            linkTitle: 'Voir le produit'
+            name: item.name,
+            href: 'product-detail/'+item.$key
           });
         }
       })

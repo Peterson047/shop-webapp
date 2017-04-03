@@ -19,7 +19,15 @@
   'use strict';
   Polymer({
     is: 'admin-schedules-view',
-
+    properties: {
+      pageData: {
+        type: Object,
+        value: {
+             title: "Horaires",
+             description: null
+        }
+      }
+    },
     behaviors: [window.PageBehavior],
 
     _onSelected: function() {

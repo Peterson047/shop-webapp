@@ -267,6 +267,10 @@ Polymer({
 		productId: {
 			type: String
 		},
+		data: {
+			type: Object,
+			notify: true
+		},
 		loading: {
 			type: Boolean,
 			observer: '_onLoadingChange'

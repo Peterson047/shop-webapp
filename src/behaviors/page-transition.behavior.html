@@ -5,6 +5,10 @@
 
 window.PageTransitionBehaviorImpl = {
 
+	listeners: {
+		'update-meta-tags': '_updateMetaTags'
+	},
+
 	properties: {
 		route: {
 			type: Object,
@@ -61,11 +65,17 @@ window.PageTransitionBehaviorImpl = {
 		}
 		// Update current page
 		this.pageItem = newPageItem;
-		if(this.pageItem.pageData) document.title = this.pageItem.pageData.category
+		this._updateMetaTags();
 		// Passing the part of the route that is not consumed yet to the selected page
 		if(this.subroute && this.subroute.path === '' && this.pageItem.defaultPage) this.subroute.path = '/'+this.pageItem.defaultPage;
 		this.pageItem.set('route', this.subroute);
 		this.pageItem.set('disabled', false);
+	},
+
+	_updateMetaTags: function(e) {
+		if(e) e.stopPropagation();
+		if(this.pageItem.pageData.title) document.title = this.appData.name+' - '+this.pageItem.pageData.title;
+		if(this.pageItem.pageData.description) document.querySelector('meta[name=description]').content = this.pageItem.pageData.description;
 	},
 
 	_pageIsReady: function(target, e) {

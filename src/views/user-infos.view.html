@@ -31,7 +31,14 @@
 		properties: {
 			provider: String,
 			appData: Object,
-			user: Object
+			user: Object,
+			pageData: {
+				type: Object,
+				value: {
+					title: "Vos informations",
+					description: null
+				}
+			},
 		},
 
 		behaviors: [window.PageBehavior, window.NavigationBehavior],

@@ -288,7 +288,6 @@ Polymer({
 	observers: ['_dataChanged(data)', '_addStructuredData(data, price, outOfStock, pictures)'],
 
 	_createStructuredData: function (data, price, outOfStock, pictures) {
-		console.log(pictures);
 		return {
 			"@context": "http://schema.org",
 			"@type": "Product",

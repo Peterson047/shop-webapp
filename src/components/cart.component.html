@@ -89,6 +89,11 @@
             color: var(--app-white);
       }
 
+      [no-event] {
+            pointer-events: none;
+      }
+
+
       @media (min-width: 500px) {
 
             .product {
@@ -166,8 +171,9 @@
                               <div class="solo">[[cart.estimateDelivery]]</div>
                         </div>
                   </div>
-
-                  <app-button on-tap="_checkout" online="[[online]]" disabled$="[[!online]]" raised icon="arrow-forward">Payer</app-button>
+                  <a href="/checkout" no-event$="[[!online]]">
+                        <app-button online="[[online]]" disabled$="[[!online]]" raised icon="arrow-forward">Payer</app-button>
+                  </a>
 
             </template>
       </div>
@@ -210,10 +216,6 @@ Polymer({
 
       toDisplayItems: function () {
             this.displayItems = this.toArray(this.cart.items);
-      },
-
-      _checkout: function() {
-            this.goTo('/checkout');
       },
 
       productQuantityChange: function (e) {

@@ -37,6 +37,10 @@
             min-width: 84px;
       }
 
+      [no-event] {
+            pointer-events: none;
+      }
+
       </style>
 
       <data-source path="/all_products" cache-key="all_products" array="$key" fetching="{{loading}}" empty="{{empty}}" output="{{data}}"></data-source>
@@ -49,14 +53,19 @@
                                     <iron-icon class="label" active$="[[item.active]]" icon="label"></iron-icon> [[item.name]]
                               </div>
                               <div class="actionsButtons layout-horizontal end-justified color-action">
-                                    <paper-icon-button id="see[[index]]" disabled$="[[!item.active]]" product-id="[[item.$key]]" on-tap="_seeProduct" icon="visibility"></paper-icon-button>
-                                    <paper-tooltip for="see[[index]]" position="left">Voir le produit</paper-tooltip>
+
+                                    <a href="/product-detail/[[item.$key]]" no-event$="[[!item.active]]" class="color-action">
+                                          <paper-icon-button id="see[[index]]" disabled$="[[!item.active]]" icon="visibility"></paper-icon-button>
+                                          <paper-tooltip for="see[[index]]" position="left">Voir le produit</paper-tooltip>
+                                    </a>
 
                                     <paper-icon-button disabled$="[[_canUpdateStock(item.stock, online)]]" id="stock[[index]]" data-index="[[index]]" on-tap="_stock" icon="store"></paper-icon-button>
                                     <paper-tooltip for="stock[[index]]" position="left">Gérer le stock</paper-tooltip>
 
-                                    <paper-icon-button product-id="[[item.$key]]" on-tap="_editProduct" disabled$="[[!online]]" id="edit[[index]]" icon="create"></paper-icon-button>
-                                    <paper-tooltip for="edit[[index]]" offset="0" position="left">Gérer le produit</paper-tooltip>
+                                    <a href="/product-form/[[item.$key]]?action=edit" no-event$="[[!online]]" class="color-action">
+                                          <paper-icon-button disabled$="[[!online]]" id="edit[[index]]" icon="create"></paper-icon-button>
+                                          <paper-tooltip for="edit[[index]]" offset="0" position="left">Gérer le produit</paper-tooltip>
+                                    </a>
                               </div>
                         </div>
                   </template>
@@ -86,18 +95,6 @@ Polymer({
       },
 
       behaviors: [window.ListAnimationBehavior, window.NavigationBehavior, window.ModalControlBehavior],
-
-      _seeProduct: function(e) {
-            e.stopPropagation();
-            var id = Polymer.dom(e).rootTarget.productId;
-            this.goTo('/product-detail/'+id);
-      },
-
-      _editProduct: function(e) {
-            e.stopPropagation();
-            var id = Polymer.dom(e).rootTarget.productId;
-            this.goTo('/product-form/'+id+'?action=edit');
-      },
 
       _add: function(e) {
             e.stopPropagation();

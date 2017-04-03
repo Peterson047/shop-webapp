@@ -106,7 +106,9 @@
 		<div id="itemDesc"></div>
 	</div>
 	<div class="card-actions">
-		<app-button id="seeButton" on-tap="_goToProduct" class="color-action" icon="visibility">Voir le produit</app-button>
+		<a href="/product-detail/[[data.$key]]">
+			<app-button id="seeButton" class="color-action" icon="visibility">Voir le produit</app-button>
+		</a>
 	</div>
 </paper-card>
 
@@ -160,10 +162,6 @@ Polymer({
 			wordArray.pop();
 			el.innerHTML = wordArray.join(' ') + '...';
 		}
-	},
-
-	_goToProduct: function() {
-		this.goTo('/product-detail/'+this.data.$key);
 	}
 
 });

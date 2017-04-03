@@ -257,7 +257,6 @@
 	</div>
 
 	<loading-layer transparent show="[[loading]]"></loading-layer>
-
 </template>
 <script>
 'use strict';
@@ -276,8 +275,7 @@ Polymer({
 			observer: '_onLoadingChange'
 		},
 		pictures: {
-			type: Array,
-			value: []
+			type: Array
 		},
 		outOfStock: {
 			type: Boolean,
@@ -287,7 +285,41 @@ Polymer({
 
 	behaviors: [window.DataPipeBehavior, window.CartBehavior],
 
-	observers: ['_dataChanged(data)'],
+	observers: ['_dataChanged(data)', '_addStructuredData(data, price, outOfStock, pictures)'],
+
+	_createStructuredData: function (data, price, outOfStock, pictures) {
+		console.log(pictures);
+			return {
+				"@context": "http://schema.org",
+			  "@type": "Product",
+			  "description": data.description,
+			  "name": data.name,
+			  "image": (pictures[0]) ? pictures[0].src : "",
+			  "offers":
+					{
+				    "@type": "Offer",
+				    "availability": (outOfStock) ? "http://schema.org/OutOfStock" : "http://schema.org/InStock",
+				    "price": price,
+				    "priceCurrency": "EUR"
+				  }
+			};
+	},
+
+	_addStructuredData: function (data, price, outOfStock, pictures) {
+		this._deleteStructuredData();
+		var script = document.createElement('script');
+		script.setAttribute('type', 'application/ld+json');
+		script.id = 'structuredData';
+		script.text = JSON.stringify(this._createStructuredData(data, price, outOfStock, pictures));
+		this.appendChild(script);
+	},
+
+	_deleteStructuredData: function () {
+		var struc = this.querySelector('#structuredData');
+			if (struc) {
+				this.removeChild(struc);
+			}
+	},
 
 	_computeButtonState: function(online, outOfStock) {
 		return !online || outOfStock ;

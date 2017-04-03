@@ -86,21 +86,27 @@ Polymer({
 				this._updateEndpoint(true);
 			} else {
 				this.showToaster({
-					text: 'Veuillez activer les notifications',
+					text: "Veuillez activer les notifications pour être prévenu de l'avancement de votre commande",
 					icon: 'social:notifications',
 					state: true,
-					actions: []
+					autoClose: false,
+					actions: [{
+						text: "activer",
+						fn: function() {
+							this.$.messaging.requestPermission()
+							.then(function(){
+								_this.showToaster({
+									text: 'Notifications activées',
+									state: true,
+									actions: []
+								});
+							}, function(err) {
+								console.log(err);
+							});
+						}.bind(this)
+					}]
 				});
-				this.$.messaging.requestPermission()
-				.then(function(){
-					_this.showToaster({
-						text: 'Notifications activées',
-						state: true,
-						actions: []
-					});
-				}, function(err) {
-					console.log(err);
-				});
+
 			}
 		}
 	},

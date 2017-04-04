@@ -96,6 +96,7 @@
 		<div class="card-content">
 			<template is="dom-if" if="[[_hasPicture(data)]]">
 				<iron-image
+				alt="Image du savon [[data.name]]"
 				placeholder="[[_grabDisplayPic(data, 'base64')]]"
 				sizing="cover"
 				preload src="[[_grabDisplayPic(data, 'url')]]"
@@ -109,9 +110,9 @@
 		<div id="itemTitle">[[data.name]]</div>
 		<div id="itemDesc"></div>
 	</div>
-	<div class="card-actions">
+	<div class="card-actions bg-action">
 		<a href="/product-detail/[[data.$key]]">
-			<app-button id="seeButton" class="color-action" icon="visibility">Voir le produit</app-button>
+			<app-button id="seeButton" class="color-secondary" icon="visibility">Voir le produit</app-button>
 		</a>
 	</div>
 </paper-card>

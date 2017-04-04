@@ -78,7 +78,6 @@
             top: 10px;
             right: 18px;
             z-index: 100;
-            color: var(--app-white);
             text-decoration: none;
 
             transition: all .2s ease;
@@ -192,7 +191,7 @@
                         placeholder="[[product.base64]]"
                         sizing="cover"
                         preload data-src$="[[product.src]]"
-                        alt="Image d'un savon artisanal et biologique"
+                        alt="Image du savon [[product.name]]"
                         fade></iron-image>
                   </div>
             </template>
@@ -204,9 +203,9 @@
       <div id="ui" on-track='_touchHandler'>
 
             <template is="dom-repeat" items="[[products]]" as="product">
-                  <template is="dom-if" if="[[_showName(product)]]">
+                  <template is="dom-if" if="[[product.href]]">
                         <a transparent$="[[_computeItemUiStyle(product.id, selectedElement, isAnimating)]]" class="picLink" href="[[product.href]]" tabindex="-1">
-                              <app-button class="color-white bg-action" icon="visibility">[[product.name]]</app-button>
+                              <app-button class="color-secondary bg-action" icon="visibility">[[product.name]]</app-button>
                         </a>
                   </template>
             </template>
@@ -319,10 +318,6 @@ Polymer({
 
       onIronSelect: function (e) {
             e.stopPropagation();
-      },
-
-      _showName: function(product) {
-            return typeof product.name !== 'undefined';
       },
 
       _disableUi: function(anim, products) {

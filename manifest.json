@@ -3,8 +3,8 @@
   "short_name": "Savons",
   "start_url": "/?homescreen=1",
   "display": "standalone",
-  "theme_color": "#009688",
-  "background_color": "#009688",
+  "theme_color": "#A1B481",
+  "background_color": "#A1B481",
   "gcm_sender_id": "103953800507",
   "icons": [
     {

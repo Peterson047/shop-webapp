@@ -62,6 +62,7 @@
                   placeholder="[[placeholder]]"
                   sizing="cover"
                   preload src="[[image]]"
+                  alt="[[alt]]"
                   fade></iron-image>
             </template>
       </div>
@@ -79,7 +80,8 @@ Polymer({
             icon: String,
             image: String,
             placeholder: String,
-            heading: String
+            heading: String,
+            alt: String
       },
 
       _needPadding: function(icon) {

@@ -351,7 +351,8 @@ Polymer({
 			var temp = {
 				id: key,
 				base64: this.data.pictures[key].base64,
-				src: this.data.pictures[key].url
+				src: this.data.pictures[key].url,
+				name: this.data.name
 			}
 			buf.push(temp);
 		}

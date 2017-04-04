@@ -24,6 +24,10 @@
             align-items: center;
       }
 
+      app-button {
+            margin: 5px;
+      }
+
       @media (min-width: 640px) {
             #buttons {
                   flex-direction: row;
@@ -35,8 +39,8 @@
       <data-source path="/standards" output="{{standards}}"></data-source>
 
       <div id="buttons">
-            <app-button class="color-action" id="addStd" disabled$="[[blockAdd]]" on-tap="_addSelector" class="stickLeft" icon="add">Ajouter un standard au produit</app-button>
-            <app-button class="color-action" id="createStd" icon="create" on-tap="_createNewStd">Créer un standard</app-button>
+            <app-button class="color-secondary bg-action space-right" id="addStd" disabled$="[[blockAdd]]" on-tap="_addSelector" class="stickLeft" icon="add">Ajouter un standard au produit</app-button>
+            <app-button class="color-secondary bg-action" id="createStd" icon="create" on-tap="_createNewStd">Créer un standard</app-button>
       </div>
 
       <template is="dom-repeat" items="[[selectors]]" as="selector">

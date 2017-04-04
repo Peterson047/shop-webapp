@@ -60,10 +60,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <template>
       <style include="app-style drawer-style transition-block-style tabs-style">
       :host {
-            --app-primary-color: #009688;
-            --app-secondary-color: #004446;
-            --app-accent-color: #00796B;
-            --app-action-color: #C2185B;
+            --app-primary-color: #A1B481;
+            --app-secondary-color: #1F2D18;
+            --app-accent-color: #758150;
+            --app-action-color: #FFE578;
             --app-white: #fff;
             --app-black: #000;
             --app-dark-grey: #455A64;
@@ -76,7 +76,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
             --app-menu-icon-color: var(--app-secondary-color);
 
-            --app-background-color: #f5f5f5;
+            --app-background-color: #FEFAE9;
             --app-section-fill-color: var(--app-background-color);
             --app-section-header-background-color: var(--app-primary-color);
             --app-link-color: var(--app-primary-color);
@@ -242,7 +242,7 @@ Polymer({
             appData: {
                   type: Object,
                   value: {
-                        name: "Un p'tit coin d'savonnerie",
+                        name: "Un petit coin de savonnerie",
                         backend: 'https://api.ptitcoinsavonnerie.fr',
                         domain: 'ptitcoinsavonnerie.fr'
                   }
@@ -261,6 +261,13 @@ Polymer({
             window.onpopstate = function(event) {
                   if(event.state && !event.state.message) window.preventScrollTop = true;
             }
+
+            window.addEventListener('scroll', this._setAppHeaderOverflow.bind(this));
+      },
+
+      _setAppHeaderOverflow: function() {
+            var overflow = this.$.header.isOnScreen() ? 'initial' : 'hidden';
+            this.$.header.style.overflow = overflow;
       },
 
       _networkStateChanged: function(state) {
@@ -306,7 +313,6 @@ Polymer({
       },
 
       _onMessage: function(e, data) {
-            console.log(data)
             var notif = data.message.notification;
             this.showToaster({
                   text: notif.title,

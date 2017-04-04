@@ -4,6 +4,7 @@ Shop-webapp is a single page progressive web app created - in the first place - 
 
 You can see the live version running here : [https://ptitcoinsavonnerie.fr](https://ptitcoinsavonnerie.fr).
 *Please note that the running app is only in french (but the whole code is in english), and it delivers only in France.*
+*We are not responsible for color choices.*
 
 It is build with polymer, rely on firebase, and goes with its own [backend API](https://github.com/cursed-duo/backend-shop-webapp).
 As an e-shop, it presents all the features for selling online goods :

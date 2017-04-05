@@ -8,41 +8,45 @@
 <link rel="import" href="../styles/page.style.html">
 
 <dom-module id="event-list-view">
-  <template>
-  <style include="page-style">
-  :host {
-    display: block;
-  }
-  </style>
+      <template>
+      <style include="page-style">
+      :host {
+            display: block;
+      }
+      </style>
 
-  <app-section back="true" class="simpleSpace" heading="Évènements" main-background="--app-section-header-background-color" fill-background="--app-section-fill-color">
-    <event-list id="eventList" online="[[online]]" app-data="[[appData]]"></event-list>
-  </app-section>
+      <app-section back="true" class="simpleSpace" heading="Évènements" main-background="--app-section-header-background-color" fill-background="--app-section-fill-color">
+            <event-list id="eventList" online="[[online]]" app-data="[[appData]]"></event-list>
+      </app-section>
 
-  </template>
-  <script>
-  'use strict';
-  Polymer({
-    is: 'event-list-view',
+</template>
+<script>
+'use strict';
+Polymer({
+      is: 'event-list-view',
 
-    properties: {
-      pageData: {
-        type: Object,
-        value: {
-             title: "Évènements",
-             description: "Retrouvez tout les évènements prévus à l'atelier d'Un Petit Coin De Savonnerie."
-        }
+      properties: {
+            pageData: {
+                  type: Object,
+                  computed: '_computePageData(appData)'
+            },
+
+            user: Object,
+            appData: Object
       },
 
-      user: Object,
-      appData: Object
-    },
+      behaviors: [window.PageBehavior],
 
-    behaviors: [window.PageBehavior],
+      _computePageData: function(appData) {
+            return {
+                  title: 'Évènements',
+                  description: "Retrouvez tout les évènements prévus à l'atelier de "+appData.name+"."
+            }
+      },
 
-    _onSelected: function () {
-      this.$.eventList.fetchEvents();
-    }
-  });
-  </script>
+      _onSelected: function () {
+            this.$.eventList.fetchEvents();
+      }
+});
+</script>
 </dom-module>

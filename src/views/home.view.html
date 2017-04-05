@@ -75,7 +75,7 @@
 
       <highlight-data items="{{highlighted}}"></highlight-data>
 
-      <app-section heading="Mes derniers savons" main-background="--app-section-header-background-color" fill-background="--app-section-fill-color">
+      <app-section heading="Les derniers savons" main-background="--app-section-header-background-color" fill-background="--app-section-fill-color">
             <app-carousel products="[[highlighted]]"></app-carousel>
       </app-section>
 
@@ -167,11 +167,15 @@ Polymer({
       properties: {
             pageData: {
                   type: Object,
-                  value: {
-                        title: "Accueil",
-                        description: "Un Petit Coin De Savonnerie vous propose toute une gamme de savons biologiques, véganes et artisanaux, en accord avec votre corps et l'environnement."
-                  }
-            },
+                  computed: '_computePageData(appData)'
+            }
+      },
+
+      _computePageData: function(appData) {
+            return {
+                  title: 'Accueil',
+                  description: appData.name+" vous propose toute une gamme de savons biologiques, véganes et artisanaux, en accord avec votre corps et l'environnement."
+            }
       },
 
       behaviors: [window.PageBehavior],

@@ -66,7 +66,7 @@ Polymer({
 
       _dataChanged: function(data) {
             this.pageData.title = data.name;
-            this.pageData.description = "Retrouvez toutes les informations concernant le savon "+data.name+". Biologique, végane, artisanal. Uniquement chez Un Petit Coin De Savonnerie.";
+            this.pageData.description = "Retrouvez toutes les informations concernant le savon "+data.name+". Biologique, végane, artisanal et uniquement chez "+this.appData.name+".";
             this.fire('update-meta-tags');
       }
 

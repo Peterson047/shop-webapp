@@ -364,14 +364,18 @@ Polymer({
 	properties: {
 		pageData: {
 			type: Object,
-			value: {
-				title: "Conditions générales d'utilisation",
-				description: "Conditions générales d'utilisation."
-			}
+			computed: '_computePageData(appData)'
 		},
 	},
 
 	behaviors: [window.PageBehavior],
+
+	_computePageData: function(appData) {
+		return {
+			title: 'CGU',
+			description: "Conditions générales d'utilisation de "+appData.name+"."
+		}
+	},
 });
 </script>
 </dom-module>

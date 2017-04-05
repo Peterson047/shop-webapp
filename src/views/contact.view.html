@@ -19,25 +19,29 @@
 		<app-contact app-data="[[appData]]" online="[[online]]"></app-contact>
 	</app-section>
 
-	</template>
-	<script>
-	'use strict';
-	Polymer({
-		is: 'contact-view',
+</template>
+<script>
+'use strict';
+Polymer({
+	is: 'contact-view',
 
-		properties: {
-			pageData: {
-				type: Object,
-				value: {
-					title: "Contact",
-		                  description: "Retrouvez toutes les coordonnées et les horaires d'Un Petit Coin De Savonnerie. 4 bis avenue des Sorbiers, 94210 La Varenne Saint-Hilaire"
-				}
-			},
-
-			appData: Object
+	properties: {
+		pageData: {
+			type: Object,
+			computed: '_computePageData(appData)'
 		},
 
-		behaviors: [window.PageBehavior],
-	});
-	</script>
+		appData: Object
+	},
+
+	behaviors: [window.PageBehavior],
+
+	_computePageData: function(appData) {
+		return {
+			title: 'Contact',
+			description: "Retrouvez toutes les coordonnées et les horaires de "+appData.name+", "+appData.address+"."
+		}
+	},
+});
+</script>
 </dom-module>

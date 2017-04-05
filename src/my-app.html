@@ -190,7 +190,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         fallback-selection="404"
                         id="pages"
                         role="main">
-                        <home-view name="home"></home-view>
+                        <home-view app-data="[[appData]]" name="home"></home-view>
                         <customer-product-list-view app-data="[[appData]]" user="[[user]]" name="customer-product-list"></customer-product-list-view>
                         <event-list-view app-data="[[appData]]" user="[[user]]" name="event-list"></event-list-view>
                         <order-view app-data="[[appData]]" user="[[user]]" name="order"></order-view>
@@ -199,7 +199,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         <cart-view app-data="[[appData]]" user="[[user]]" name="cart"></cart-view>
                         <checkout-view app-data="[[appData]]" user="[[user]]" name="checkout"></checkout-view>
                         <contact-view app-data="[[appData]]" name="contact"></contact-view>
-                        <cgu-view name="cgu"></cgu-view>
+                        <cgu-view app-data="[[appData]]" name="cgu"></cgu-view>
                         <user-view app-data="[[appData]]" user="[[user]]" name="user"></user-view>
                         <admin-view app-data="[[appData]]" user="[[user]]" name="admin"></admin-view>
                         <error-404-view name="404"></error-404-view>
@@ -242,7 +242,8 @@ Polymer({
             appData: {
                   type: Object,
                   value: {
-                        name: "Un petit coin de savonnerie",
+                        name: "Un Petit Coin De Savonnerie",
+                        address: "4 bis avenue des Sorbiers, 94210 La Varenne Saint-Hilaire, FRANCE",
                         backend: 'https://api.ptitcoinsavonnerie.fr',
                         domain: 'ptitcoinsavonnerie.fr'
                   }

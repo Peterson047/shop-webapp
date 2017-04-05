@@ -8,36 +8,39 @@
 <link rel="import" href="../styles/page.style.html">
 
 <dom-module id="customer-product-list-view">
-  <template>
-  <style include="page-style">
-  :host {
-    display: block;
-  }
-  </style>
+      <template>
+      <style include="page-style">
+      :host {
+            display: block;
+      }
+      </style>
 
-  <app-section back="true" class="simpleSpace" heading="Mes savons" main-background="--app-section-header-background-color" fill-background="--app-section-fill-color">
-    <customer-product-list online="[[online]]"></customer-product-list>
-  </app-section>
+      <app-section back="true" class="simpleSpace" heading="Mes savons" main-background="--app-section-header-background-color" fill-background="--app-section-fill-color">
+            <customer-product-list online="[[online]]"></customer-product-list>
+      </app-section>
 
-  </template>
-  <script>
-  'use strict';
-  Polymer({
-    is: 'customer-product-list-view',
+</template>
+<script>
+'use strict';
+Polymer({
+      is: 'customer-product-list-view',
 
-    properties: {
-      pageData: {
-        type: Object,
-        value: {
-             title: "Nos savons",
-             description: "Retrouvez le catalogue de savons artisanaux, véganes et biologiques de Un Petit Coin de Savonnerie."
-        }
+      properties: {
+            pageData: {
+                  type: Object,
+                  computed: '_computePageData(appData)'
+            },
+            user: Object,
+            appData: Object
       },
+      behaviors: [window.PageBehavior],
 
-      user: Object,
-      appData: Object
-    },
-    behaviors: [window.PageBehavior]
-  });
-  </script>
+      _computePageData: function(appData) {
+            return {
+                  title: 'Les savons',
+                  description: "Retrouvez le catalogue de savons artisanaux, véganes et biologiques de "+appData.name+"."
+            }
+      },
+});
+</script>
 </dom-module>

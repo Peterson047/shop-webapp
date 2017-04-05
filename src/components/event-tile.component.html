@@ -33,32 +33,36 @@
 		overflow: hidden;
 	}
 
+	a {
+		text-decoration: none;
+	}
+
 	#itemDesc {
 		display: block;
 		font-size: 14px;
 		height: 180px;
 	}
 
-  #rangeDate {
-    display: flex;
-    justify-content: space-between;
+	#rangeDate {
+		display: flex;
+		justify-content: space-between;
 
-    margin-top: 15px;
-  }
+		margin-top: 15px;
+	}
 
-  #endDate > .labelDate {
-    text-align: right;
-  }
+	#endDate > .labelDate {
+		text-align: right;
+	}
 
-  .labelDate {
-    text-transform: uppercase;
-    font-size: 12px;
-    font-weight: 500;
-  }
+	.labelDate {
+		text-transform: uppercase;
+		font-size: 12px;
+		font-weight: 500;
+	}
 
-  .date {
-    font-size: 14px;
-  }
+	.date {
+		font-size: 14px;
+	}
 
 	@media (min-width: 940px) {
 		:host {
@@ -73,28 +77,28 @@
 	}
 	</style>
 
-  <paper-card heading="[[data.name]]">
+	<paper-card heading="[[data.name]]">
 		<div class="card-content">
-  		<div id="itemDesc"></div>
-      <div id="rangeDate">
-        <template is="dom-if" if="[[data.start_time]]">
-          <div id="startDate">
-            <div class="labelDate">Début</div>
-            <div class="date"><app-date display-time timestamp="[[data.start_time]]"></app-date></div>
-          </div>
-        </template>
-        <template is="dom-if" if="[[data.end_time]]">
-          <div id="endDate">
-            <div class="labelDate">Fin</div>
-            <div class="date"><app-date display-time timestamp="[[data.end_time]]"></app-date></div>
-          </div>
-        </template>
-      </div>
-  	</div>
-  	<div class="card-actions">
-  		<a target="_blank" href="[[data.link]]"><app-button id="seeButton" class="color-action" icon="visibility">Voir l'évènement</app-button></a>
-  	</div>
-  </paper-card>
+			<div id="itemDesc"></div>
+			<div id="rangeDate">
+				<template is="dom-if" if="[[data.start_time]]">
+					<div id="startDate">
+						<div class="labelDate">Début</div>
+						<div class="date"><app-date display-time timestamp="[[data.start_time]]"></app-date></div>
+					</div>
+				</template>
+				<template is="dom-if" if="[[data.end_time]]">
+					<div id="endDate">
+						<div class="labelDate">Fin</div>
+						<div class="date"><app-date display-time timestamp="[[data.end_time]]"></app-date></div>
+					</div>
+				</template>
+			</div>
+		</div>
+		<div class="card-actions bg-action">
+			<a target="_blank" href="[[data.link]]"><app-button id="seeButton" class="color-secondary" icon="visibility">Voir l'évènement</app-button></a>
+		</div>
+	</paper-card>
 
 </template>
 <script>
@@ -122,7 +126,7 @@ Polymer({
 	},
 
 	_ellipsizeTextBox: function () {
-    var el = this.$.itemDesc;
+		var el = this.$.itemDesc;
 		el.innerHTML = this.data.description;
 		var wordArray = el.innerHTML.split(' ');
 		while(el.scrollHeight > el.offsetHeight) {

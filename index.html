@@ -67,7 +67,7 @@
       }
 
       function filterSuggestedBrowsers() {
-            var os = getOS();
+            var os = 'data-'+getOS();
 
             var browsers = document.body.querySelector('#select_browsers');
             var suggestions = browsers.querySelectorAll('.suggestion');
@@ -321,10 +321,10 @@
                         <div id="obsolete_dispBrowsers">
                               <table>
                                     <tr id="select_browsers">
-                                          <td class="suggestion" windows macos linux><a href="https://www.google.fr/chrome/browser/desktop/index.html" target="blank">Chrome</a></td>
-                                          <td class="suggestion" windows macos linux><a href="https://www.mozilla.org/fr/firefox/new/" target="blank">Firefox</a></td>
-                                          <td class="suggestion" windows><a href="https://www.microsoft.com/fr-fr/windows/microsoft-edge" target="blank">Edge</a></td>
-                                          <td class="suggestion" macos><a href="http://www.apple.com/fr/safari/" target="blank">Safari</a></td>
+                                          <td class="suggestion" data-windows data-macos data-linux><a href="https://www.google.fr/chrome/browser/desktop/index.html" target="blank">Chrome</a></td>
+                                          <td class="suggestion" data-windows data-macos data-linux><a href="https://www.mozilla.org/fr/firefox/new/" target="blank">Firefox</a></td>
+                                          <td class="suggestion" data-windows><a href="https://www.microsoft.com/fr-fr/windows/microsoft-edge" target="blank">Edge</a></td>
+                                          <td class="suggestion" data-macos><a href="http://www.apple.com/fr/safari/" target="blank">Safari</a></td>
                                     </tr>
                               </table>
                         </div>

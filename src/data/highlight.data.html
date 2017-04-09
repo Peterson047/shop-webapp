@@ -28,14 +28,14 @@
     },
 
     observers: [
-      '_dataChanged(data.length)'
+      '_dataChanged(data)'
     ],
 
-    _dataChanged: function(len) {
-      if(!len) return;
+    _dataChanged: function(data) {
+      if(!data) return;
       var _this = this;
       var buf = [];
-      this.data.forEach(function(item) {
+      data.forEach(function(item) {
         var banner = item.banner.pictures ? _this._getBanner(item) : null;
         if(banner) {
           buf.push({

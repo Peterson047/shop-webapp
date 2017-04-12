@@ -100,7 +100,7 @@ Polymer({
 
 	_getStandardName: function(stds, key) {
 		if(this.everythingOk) {
-			return stds[key].name;
+			return stds[key].name+' - '+stds[key].value+' '+stds[key].unit;
 		}
 	},
 

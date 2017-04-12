@@ -29,8 +29,8 @@
 	</style>
 
 	<paper-radio-group tabable-container selected="{{method}}" aria-labelledby="methodLabel">
-		<paper-radio-button id="cc" tabable name="cc">Carte de crédit</paper-radio-button>
 		<paper-radio-button id="paypal" tabable name="paypal">Paypal</paper-radio-button>
+		<paper-radio-button disabled id="cc" tabable name="cc">Carte de crédit</paper-radio-button>
 	</paper-radio-group>
 
 </template>
@@ -44,7 +44,7 @@ Polymer({
 		},
 		method: {
 			type: String,
-			value: 'cc',
+			value: 'paypal',
 			notify: true,
 			observer: '_methodChanged'
 		},
@@ -58,7 +58,7 @@ Polymer({
 	behaviors: [Polymer.IronFormElementBehavior, Polymer.IronValidatableBehavior],
 
 	focus: function() {
-		if(this.displayCc) this.$.cc.focus();
+		if(this.displayCc && !this.$.cc.disabled) this.$.cc.focus();
 		else this.$.paypal.focus();
 	},
 

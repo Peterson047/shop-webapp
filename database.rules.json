@@ -51,7 +51,7 @@
 		"active_products": {
 			".read": "true",
 			".write": "root.child('users/'+auth.uid+'/role').val() === 'admin'",
-			".indexOn": ["banner/active"],
+			".indexOn": ["banner/active", "slug"],
 			"$pid": {
 				"stock": {
 					"$sid": {

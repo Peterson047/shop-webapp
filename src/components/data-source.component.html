@@ -35,14 +35,24 @@
 				value: false,
 				notify: true
 			},
+			cacheDepth: {
+				type: Number,
+				value: 0
+			},
 			cacheKey: String,
 			cacheProp: String,
 			path: {
 				type: String,
 				observer: '_onPathChange'
 			},
-			orderByChild: String,
-			equalTo: String,
+			orderByChild: {
+				type: String,
+				value: null
+			},
+			equalTo: {
+				type: String,
+				value: null
+			},
 			array: String,
 			once: {
 				type: Boolean,
@@ -58,7 +68,7 @@
 		},
 
 		behaviors: [Polymer.AppNetworkStatusBehavior, window.DataPipeBehavior],
-		observers: ['_networkStateChanged(online)'],
+		observers: ['_networkStateChanged(online)', '_onParamChange(equalTo, orderByChild)'],
 
 		attached: function() {
 			// Ensure that we have all the input variables set before fetching
@@ -83,16 +93,24 @@
 			if(this.autoFetch) this.fetch();
 		},
 
+		_onParamChange: function (equalTo, orderByChild) {
+			if(this.path) firebase.database().ref(this.path).off();
+			if(this.autoFetch) this.fetch();
+		},
+
 		_checkPath: function(path) {
 			return path && path[path.length-1] !== '/' && !~path.indexOf("//") && !~path.indexOf("/null") && !~path.indexOf("/undefined");
 		},
 
 		_buildQuery: function() {
+			if (this.orderByChild ? !this.equalTo : this.equalTo) return false;
+
 			var query = firebase.database().ref(this.path);
 			if(this.orderByChild) {
 				query = query.orderByChild(this.orderByChild);
 			}
-			if(this.equalTo) {
+
+			if (this.equalTo) {
 				if(this.equalTo === 'true') this.equalTo = true;
 				if(this.equalTo === 'false') this.equalTo = false;
 				query = query.equalTo(this.equalTo);
@@ -108,12 +126,14 @@
 			this.autoFetch = true;
 			this.fetching = true;
 
+			var query = this._buildQuery();
+			if (!query) return;
+
 			if(this.cacheKey) {
 				if(this.online !== false) this._readFromCache();
 				else return this._readFromCache();
 			}
 
-			var query = this._buildQuery();
 			if(this.once) {
 				query.once("value")
 				.then(function(snapshot) {
@@ -142,7 +162,8 @@
 		},
 
 		_setOutput: function(data) {
-			this.empty = !Object.keys(data).length;
+			var length = Object.keys(data).length;
+			this.empty = !length;
 			if(this.array) this.output = this.toArray(data, this.array);
 			else this.output = data;
 			this.fire('data-source-update', {id: this.id, data: this.output});
@@ -157,7 +178,17 @@
 				cache.getStoredValue()
 				.then(function(cachedData) {
 					if(!cachedData) cachedData = {};
-					cachedData[_this.cacheProp] = data;
+
+					// If depth, we might get multiple results
+					if (_this.cacheDepth) {
+						for (var key in data) {
+							cachedData[key] = data[key];
+						}
+					}
+					// If not, just get this object by key
+					else {
+						cachedData[_this.cacheProp] = data;
+					}
 					cache.data = cachedData;
 				}, function(err) {
 					_this.fire('error', err);
@@ -168,14 +199,21 @@
 		},
 
 		_readFromCache: function() {
-
 			var _this = this;
 			var cache = this.$.cache;
 			cache.key = this.cacheKey;
 
 			cache.getStoredValue()
 			.then(function(cachedData) {
-				if(_this.cacheProp && cachedData) cachedData = cachedData[_this.cacheProp];
+				// Look inside cache with depth
+				if(_this.cacheProp && cachedData) {
+					if (0 == _this.cacheDepth) cachedData = cachedData[_this.cacheProp];
+					else {
+						if (!_this.equalTo) console.error('No cache val given for depth ', _this.cacheDepth);
+						cachedData = _this._lookByValue(cachedData, _this.cacheDepth, _this.cacheDepth, _this.cacheProp, _this.equalTo);
+					}
+				}
+
 				if(!cachedData || !Object.keys(cachedData).length) {
 					if(_this.online === false) {
 						_this.fetching = false;
@@ -188,6 +226,23 @@
 			}, function(err) {
 				_this.fire('error', err);
 			})
+		},
+
+		_lookByValue: function (obj, startDepth, depth, prop, val) {
+			if (0 == depth) {
+				return (obj.hasOwnProperty(prop) && obj[prop] == val) ? true : false;
+			}
+
+			if(depth === startDepth) var buffer = {};
+
+			for (var key in obj) {
+				var res = this._lookByValue(obj[key], startDepth, depth - 1, prop, val);
+				if (depth === startDepth && res) buffer[key] = obj[key];
+				else if(res) return res;
+			}
+
+			if(depth === startDepth) return Object.keys(buffer).length ? buffer : false;
+			else return false;
 		}
 	});
 	</script>

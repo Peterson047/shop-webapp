@@ -187,7 +187,14 @@
 
 	</style>
 
-	<data-source path="/active_products/[[productId]]" cache-key="active-products" cache-prop="[[productId]]" empty="{{empty}}" fetching="{{loading}}" output="{{data}}"></data-source>
+	<data-source
+		path="/active_products"
+		order-by-child="slug"
+    equal-to="[[productSlug]]"
+		cache-depth="1"
+		cache-key="active-products"
+		cache-prop="slug"
+		empty="{{empty}}" fetching="{{loading}}" output="{{temp}}"></data-source>
 
 	<div id="container">
 		<div id="visual">
@@ -266,6 +273,14 @@ Polymer({
 		productId: {
 			type: String
 		},
+		productSlug: {
+			type: String,
+			value: null,
+		},
+		temp: {
+			type: Object,
+			observer: '_receivedTemp'
+		},
 		data: {
 			type: Object,
 			notify: true
@@ -331,6 +346,14 @@ Polymer({
 			this.$.container.classList.remove('show');
 		}
 
+	},
+
+	_receivedTemp: function (newTemp, oldTemp) {
+		if (1 > Object.keys(newTemp).length) return console.error('Slug collision with products ', newTemp);
+		for(var key in newTemp) {
+			this.productId = key;
+			this.data = newTemp[key];
+		}
 	},
 
 	_dataChanged: function(data) {

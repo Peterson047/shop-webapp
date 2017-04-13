@@ -16,7 +16,7 @@
       </style>
 
       <app-section back="true" main-background="--app-section-header-background-color" fill-background="--app-section-fill-color">
-            <product-detail id="detail" online="[[online]]" app-data="[[appData]]" product-id="[[productId]]" data="{{data}}"></product-detail>
+            <product-detail id="detail" online="[[online]]" app-data="[[appData]]" product-slug="[[productSlug]]" data="{{data}}"></product-detail>
       </app-section>
 
 </template>
@@ -26,7 +26,7 @@ Polymer({
       is: 'product-view',
 
       properties: {
-            productId : {
+            productSlug : {
                   type: String,
                   value: null,
             },
@@ -51,12 +51,12 @@ Polymer({
       behaviors: [window.PageBehavior],
 
       _onSelected: function () {
-            if(this.productId === this.route.path.slice(1)) {
+            if(this.productSlug === this.route.path.slice(1)) {
                   this.$.detail._shapePictures();
             } else {
                   this.$.detail.standard = null;
                   this.$.detail.quantity = null;
-                  this.productId = this.route.path.slice(1);
+                  this.productSlug = this.route.path.slice(1);
             }
       },
 
@@ -67,7 +67,7 @@ Polymer({
       _dataChanged: function(data) {
             this.pageData.title = data.name;
             this.pageData.description = "Retrouvez toutes les informations concernant le savon "+data.name+". Biologique, végane, artisanal et uniquement chez "+this.appData.name+".";
-            this.fire('update-meta-tags');
+            this.fire('update-meta-tags', {title: this.pageData.title, description: this.pageData.description});
       }
 
 });

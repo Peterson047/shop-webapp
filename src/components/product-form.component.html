@@ -313,6 +313,8 @@ Polymer({
                   var _this = this;
                   this.loading = true;
                   var data = this.$.form.serialize();
+                  data.slug = this._buildSlug(data.name);
+                  console.log(data.slug);
                   var updates = {};
                   this._computeUpdates(this.allPath, updates, data, this.isNew);
                   if(typeof data.active !== 'undefined') {
@@ -351,6 +353,7 @@ Polymer({
             updates[path+'/notice'] = data.notice || null;
             updates[path+'/ingredients'] = data.ingredients;
             updates[path+'/name'] = data.name;
+            updates[path+'/slug'] = data.slug;
             updates[path+'/active'] = typeof data.active !== 'undefined';
             updates[path+'/banner/active'] = typeof data.bannerActive !== 'undefined';
             updates[path+'/standards'] = data.standards;
@@ -394,6 +397,23 @@ Polymer({
                   // File storage purging
                   firebase.storage().ref().child(refStorage).delete();
             });
+      },
+
+      _buildSlug: function (name) {
+        var str = name.trim().toLowerCase();
+
+        // remove accents, swap ñ for n, etc
+        var from = "àáäâèéëêìíïîòóöôùúüûñç·/_,:;";
+        var to   = "aaaaeeeeiiiioooouuuunc------";
+        for (var i=0, l=from.length ; i<l ; i++) {
+          str = str.replace(new RegExp(from.charAt(i), 'g'), to.charAt(i));
+        }
+
+        return str.replace(/\s+/g, "-")
+                  .replace(/[^\w\-]+/g, "")
+                  .replace(/\-\-+/g, "-")
+                  .replace(/^-+/, "")
+                  .replace(/-+$/, "");
       },
 
 });

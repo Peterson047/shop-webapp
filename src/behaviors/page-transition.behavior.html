@@ -73,9 +73,21 @@ window.PageTransitionBehaviorImpl = {
 	},
 
 	_updateMetaTags: function(e) {
-		if(e) e.stopPropagation();
-		if(this.pageItem.pageData.title) document.title = this.appData.name+' | '+this.pageItem.pageData.title;
-		if(this.pageItem.pageData.description) document.querySelector('meta[name=description]').content = this.pageItem.pageData.description;
+		var title = this.appData.name+' | ';
+		var desc;
+
+		if(e) {
+			e.stopPropagation();
+			title += e.detail.title;
+			desc = e.detail.description;
+		} 
+		else {
+			title += this.pageItem.pageData.title;
+			desc = this.pageItem.pageData.description;
+		}
+
+		document.title = title;
+		if(desc) document.querySelector('meta[name=description]').content = desc;
 	},
 
 	_pageIsReady: function(target, e) {

@@ -349,7 +349,7 @@ Polymer({
 	},
 
 	_receivedTemp: function (newTemp, oldTemp) {
-		if (1 > Object.keys(newTemp).length) return console.error('Slug collision with products ', newTemp);
+		if (1 < Object.keys(newTemp).length) return console.error('Slug collision with products ', newTemp);
 		for(var key in newTemp) {
 			this.productId = key;
 			this.data = newTemp[key];

@@ -4,9 +4,9 @@
   "fragments": [
     "src/views/home.view.html",
     "src/views/admin-product-list.view.html",
-    "src/views/customer-product-list.view.html",
-    "src/views/event-list.view.html",
-    "src/views/product-detail.view.html",
+    "src/views/shop.view.html",
+    "src/views/events.view.html",
+    "src/views/product.view.html",
     "src/views/product-form.view.html",
     "src/views/user.view.html",
     "src/views/admin.view.html",

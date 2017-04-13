@@ -1,0 +1,75 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../components/product-detail.component.html">
+<link rel="import" href="../components/section.component.html">
+
+<link rel="import" href="../behaviors/page.behavior.html">
+
+<link rel="import" href="../styles/page.style.html">
+
+<dom-module id="product-view">
+      <template>
+      <style include="page-style">
+      :host {
+            display: block;
+      }
+      </style>
+
+      <app-section back="true" main-background="--app-section-header-background-color" fill-background="--app-section-fill-color">
+            <product-detail id="detail" online="[[online]]" app-data="[[appData]]" product-id="[[productId]]" data="{{data}}"></product-detail>
+      </app-section>
+
+</template>
+<script>
+'use strict';
+Polymer({
+      is: 'product-view',
+
+      properties: {
+            productId : {
+                  type: String,
+                  value: null,
+            },
+
+            data: {
+                  type: Object,
+                  observer: '_dataChanged'
+            },
+
+            pageData: {
+                  type: Object,
+                  value: {
+                        title: null,
+                        description: null
+                  }
+            },
+
+            user: Object,
+            appData: Object,
+      },
+
+      behaviors: [window.PageBehavior],
+
+      _onSelected: function () {
+            if(this.productId === this.route.path.slice(1)) {
+                  this.$.detail._shapePictures();
+            } else {
+                  this.$.detail.standard = null;
+                  this.$.detail.quantity = null;
+                  this.productId = this.route.path.slice(1);
+            }
+      },
+
+      _onLeave: function() {
+            this.$.detail.reset();
+      },
+
+      _dataChanged: function(data) {
+            this.pageData.title = data.name;
+            this.pageData.description = "Retrouvez toutes les informations concernant le savon "+data.name+". Biologique, végane, artisanal et uniquement chez "+this.appData.name+".";
+            this.fire('update-meta-tags');
+      }
+
+});
+</script>
+</dom-module>

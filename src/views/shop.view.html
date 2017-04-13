@@ -1,0 +1,46 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../components/section.component.html">
+<link rel="import" href="../components/shop.component.html">
+
+<link rel="import" href="../behaviors/page.behavior.html">
+
+<link rel="import" href="../styles/page.style.html">
+
+<dom-module id="shop-view">
+      <template>
+      <style include="page-style">
+      :host {
+            display: block;
+      }
+      </style>
+
+      <app-section back="true" class="simpleSpace" heading="Boutique" main-background="--app-section-header-background-color" fill-background="--app-section-fill-color">
+            <app-shop online="[[online]]"></app-shop>
+      </app-section>
+
+</template>
+<script>
+'use strict';
+Polymer({
+      is: 'shop-view',
+
+      properties: {
+            pageData: {
+                  type: Object,
+                  computed: '_computePageData(appData)'
+            },
+            user: Object,
+            appData: Object
+      },
+      behaviors: [window.PageBehavior],
+
+      _computePageData: function(appData) {
+            return {
+                  title: 'Les savons',
+                  description: "Retrouvez le catalogue de savons artisanaux, véganes et biologiques de "+appData.name+"."
+            }
+      },
+});
+</script>
+</dom-module>

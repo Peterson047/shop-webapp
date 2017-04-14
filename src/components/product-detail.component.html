@@ -5,6 +5,7 @@
 
 <link rel="import" href="../behaviors/data-pipe.behavior.html">
 <link rel="import" href="../behaviors/cart.behavior.html">
+<link rel="import" href="../behaviors/navigation.behavior.html">
 
 <link rel="import" href="../styles/tile.style.html">
 <link rel="import" href="../styles/font.style.html">
@@ -188,13 +189,13 @@
 	</style>
 
 	<data-source
-		path="/active_products"
-		order-by-child="slug"
-    equal-to="[[productSlug]]"
-		cache-depth="1"
-		cache-key="active-products"
-		cache-prop="slug"
-		empty="{{empty}}" fetching="{{loading}}" output="{{temp}}"></data-source>
+	path="/active_products"
+	order-by-child="slug"
+	equal-to="[[productSlug]]"
+	cache-depth="1"
+	cache-key="active-products"
+	cache-prop="slug"
+	empty="{{empty}}" fetching="{{loading}}" output="{{temp}}"></data-source>
 
 	<div id="container">
 		<div id="visual">
@@ -217,6 +218,7 @@
 						<label class="font-bold">Format</label>
 						<iron-icon id="helper" class="color-accent" icon="help"></iron-icon>
 					</div>
+
 					<product-choices
 					product-standards="[[data.standards]]"
 					product-stock="[[data.stock]]"
@@ -226,9 +228,8 @@
 					grammage="{{grammage}}"
 					description="{{description}}"
 					></product-choices>
+
 					<paper-tooltip for="helper" position="left">[[description]]</paper-tooltip>
-
-
 
 					<label class="font-bold">Quantité</label>
 					<product-quantity class="full" out-of-stock="{{outOfStock}}" product-stock="[[_getStock(data.stock, standard)]]" product-standard="[[standard]]" quantity="{{quantity}}"></product-quantity>
@@ -298,7 +299,7 @@ Polymer({
 		},
 	},
 
-	behaviors: [window.DataPipeBehavior, window.CartBehavior],
+	behaviors: [window.DataPipeBehavior, window.CartBehavior, window.NavigationBehavior],
 
 	observers: ['_dataChanged(data)', '_addStructuredData(data, price, outOfStock, pictures)'],
 
@@ -345,15 +346,14 @@ Polymer({
 			this.fire('update-heading', {heading: 'Chargement'});
 			this.$.container.classList.remove('show');
 		}
-
 	},
 
 	_receivedTemp: function (newTemp, oldTemp) {
-		if (1 < Object.keys(newTemp).length) return console.error('Slug collision with products ', newTemp);
-		for(var key in newTemp) {
-			this.productId = key;
-			this.data = newTemp[key];
-		}
+		if(this.empty) return this.goTo('/shop');
+		var keys = Object.keys(newTemp);
+		if (1 < keys.length) return console.error('Slug collision with products ', newTemp);
+		this.productId = keys[0];
+		this.data = newTemp[keys[0]];
 	},
 
 	_dataChanged: function(data) {

@@ -314,7 +314,6 @@ Polymer({
                   this.loading = true;
                   var data = this.$.form.serialize();
                   data.slug = this._buildSlug(data.name);
-                  console.log(data.slug);
                   var updates = {};
                   this._computeUpdates(this.allPath, updates, data, this.isNew);
                   if(typeof data.active !== 'undefined') {

@@ -84,7 +84,6 @@
             var onFinish = function() {
                   document.body.removeChild(layer);
                   document.body.classList.remove('no-overflow');
-                  document.body.querySelector('my-app').showModal('disclaimer-modal');
             }
             loader.running = false;
             layer.addEventListener('transitionend', onFinish);

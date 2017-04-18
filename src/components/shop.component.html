@@ -65,18 +65,20 @@
 		</template>
 
 		<template is="dom-if" if="[[empty]]">
-			<product-tile filler></product-tile>
+			<div></div>
 			<paper-card class="item" id="noProductTile" heading="Aucun produit...">
 				<div class="card-content">
-						<div>...pour le moment !<br> Mais n'hésitez pas à repasser !</div>
-						<iron-icon icon="social:mood"></iron-icon>
+					<div>...pour le moment !<br> Mais n'hésitez pas à repasser !</div>
+					<iron-icon icon="social:mood"></iron-icon>
 				</div>
 			</paper-card>
-			<product-tile filler></product-tile>
+			<div></div>
 		</template>
 
-		<product-tile filler></product-tile>
-		<product-tile filler></product-tile>
+		<template is="dom-if" if="[[!empty]]">
+			<product-tile filler></product-tile>
+			<product-tile filler></product-tile>
+		</template>
 	</div>
 
 	<loading-layer transparent show="[[loading]]"></loading-layer>

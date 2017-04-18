@@ -4,6 +4,7 @@
 <link rel="import" href="../components/checkout.component.html">
 <link rel="import" href="../components/force-sign-in.component.html">
 
+<link rel="import" href="../behaviors/cart.behavior.html">
 <link rel="import" href="../behaviors/page.behavior.html">
 <link rel="import" href="../behaviors/navigation.behavior.html">
 
@@ -44,10 +45,10 @@
       appData: Object,
     },
 
-    behaviors: [window.PageBehavior, window.NavigationBehavior],
+    behaviors: [window.PageBehavior, window.NavigationBehavior, window.CartBehavior],
 
     _onSelected: function() {
-      if(this.online === false) this.goBack();
+      if(this.online === false || !this.cart.items.length) this.goBack();
     },
   });
   </script>

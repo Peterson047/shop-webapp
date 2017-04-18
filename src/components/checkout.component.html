@@ -77,17 +77,7 @@
                               <dashed-title icon="maps:place">Adresse de livraison</dashed-title>
                         </div>
                         <address-input name="shippingAddress"></address-input>
-
-                        <div class="row">
-                              <paper-checkbox checked="{{billingAddress}}">Utiliser une adresse de facturation</paper-checkbox>
-                        </div>
-
-                        <template is="dom-if" if="[[billingAddress]]">
-                              <div class="row">
-                                    <dashed-title icon="maps:place">Adresse de facturation</dashed-title>
-                              </div>
-                              <address-input disabled="[[!billingAddress]]" name="billingAddress"></address-input>
-                        </template>
+                        
                   </div>
 
                   <div class="column">

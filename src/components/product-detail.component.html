@@ -87,7 +87,6 @@
 	}
 
 	.notice {
-		margin-top: 30px;
 		margin-bottom: 10px;
 		white-space: pre-wrap;
 		font-style: italic;
@@ -113,10 +112,6 @@
 
 	product-choices {
 		margin-bottom: var(--app-space);
-	}
-
-	product-quantity {
-
 	}
 
 	app-button {
@@ -257,6 +252,7 @@
 					</template>
 				</div>
 
+				<div class="title font-bold">Ingrédients :</div>
 				<template is="dom-if" if="[[data.notice]]">
 					<div class="notice">[[data.notice]]</div>
 				</template>

@@ -251,11 +251,11 @@ window.CartBehaviorImpl = {
 
       stockChanges: function (hashItem, snapshot) {
             if(preventCartNotifications) return;
-
-            var stockQuantity = snapshot.val().quantity;
+            var snap = snapshot.val();
+            var stockQuantity = snap.quantity;
 
             // product no longer exists
-            if(typeof stockQuantity === 'undefined') {
+            if(!snap || !stockQuantity) {
                   var reversed = this.reverseHash(hashItem);
                   this.removeStockListener(reversed[0], reversed[1]);
                   return this.setItemQuantity(hashItem, -cart.items[hashItem].quantity);

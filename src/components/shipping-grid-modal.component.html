@@ -77,6 +77,7 @@ Polymer({
                   var data = this.$.form.serialize();
                   data.unit = 'g';
                   data.currency = '€';
+                  data.weight = parseFloat(data.weight);
                   var key = firebase.database().ref().child('shipping_grid').push().key;
                   var updates = {};
                   updates['/shipping_grid/' + key] = data;

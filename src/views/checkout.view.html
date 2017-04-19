@@ -48,7 +48,7 @@
     behaviors: [window.PageBehavior, window.NavigationBehavior, window.CartBehavior],
 
     _onSelected: function() {
-      if(this.online === false || !this.cart.items.length) this.goBack();
+      if(this.online === false || !Object.keys(this.cart.items).length) this.goBack();
     },
   });
   </script>

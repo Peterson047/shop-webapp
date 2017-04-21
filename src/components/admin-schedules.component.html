@@ -72,7 +72,7 @@ Polymer({
       behaviors: [window.DataPipeBehavior, window.ToasterControlBehavior],
 
       _isChecked: function(schedules, day) {
-            if(!schedules) return;
+            if(!schedules ) return false;
             return schedules[day];
       },
 

@@ -4,6 +4,7 @@ node_modules/
 
 # Build & tools generations
 build/
+test/
 
 # Logs & stuff
 npm-debug.log

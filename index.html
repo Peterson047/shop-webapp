@@ -125,10 +125,12 @@
 
             window.addEventListener('app-ready', function(e) {
                   document.body.removeChild(document.body.querySelector('#obsoleteBrowser'));
+                  var app = document.body.querySelector('my-app');
                   // Removing the loading layer
                   hideLoadingLayer();
                   // Load pre-caching Service Worker
                   registerSw();
+                  app.cookies();
             });
 
             // Load webcomponentsjs polyfill if browser does not support native Web Components

@@ -200,6 +200,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         <checkout-view app-data="[[appData]]" user="[[user]]" name="checkout"></checkout-view>
                         <contact-view app-data="[[appData]]" name="contact"></contact-view>
                         <cgu-view app-data="[[appData]]" name="cgu"></cgu-view>
+                        <legal-notices-view app-data="[[appData]]" name="legal-notices"></legal-notices-view>
                         <user-view app-data="[[appData]]" user="[[user]]" name="user"></user-view>
                         <admin-view app-data="[[appData]]" user="[[user]]" name="admin"></admin-view>
                         <error-404-view name="404"></error-404-view>
@@ -263,12 +264,25 @@ Polymer({
                   if(event.state && !event.state.message) window.preventScrollTop = true;
             }
 
-            //window.addEventListener('scroll', this._setAppHeaderOverflow.bind(this));
       },
 
-      _setAppHeaderOverflow: function() {
-            var overflow = this.$.header.isOnScreen() ? 'initial' : 'hidden';
-            this.$.header.style.overflow = overflow;
+      cookies: function() {
+            if(!localStorage.getItem('agreed_to_cookie_policy')) {
+                  this.showToaster({
+                        text: "En poursuivant votre navigation sur ce site, vous acceptez l’utilisation de cookies.",
+                        icon: 'info',
+                        autoClose: false,
+                        state: true,
+                        actions: [
+                              {
+                                    "text": "Ok",
+                                    "fn": function() {
+                                          localStorage.setItem('agreed_to_cookie_policy', Date.now());
+                                    }
+                              }
+                        ]
+                  })
+            }
       },
 
       _networkStateChanged: function(state) {

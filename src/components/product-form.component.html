@@ -241,14 +241,6 @@ Polymer({
             this.fire('update-heading', {heading: name});
       },
 
-      _newProduct: function() {
-        return {
-          name: '',
-          standards: {},
-          ingredients: {}
-        }
-      },
-
       _getFormAction: function(newVal) {
             if ("create" == newVal.__queryParams.action) {
                   this.isNew = true;

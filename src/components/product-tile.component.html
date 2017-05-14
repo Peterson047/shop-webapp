@@ -1,5 +1,6 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../../bower_components/paper-ripple/paper-ripple.html">
 
 <link rel="import" href="../behaviors/data-pipe.behavior.html">
 <link rel="import" href="../behaviors/navigation.behavior.html">
@@ -34,7 +35,6 @@
 
 	#itemTitle {
 		font-weight: bold;
-		margin-top: 180px;
 	}
 
 	#itemDesc {
@@ -46,14 +46,7 @@
 
 	.card-content {
 		position: relative;
-	}
-
-	iron-image {
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 170px;
+		padding: 0 !important;
 	}
 
 	.noPicture {
@@ -79,6 +72,26 @@
 		text-decoration: none;
 	}
 
+	#image_container {
+		display: block;
+		position: relative;
+		height: 170px;
+		width: 100%;
+	}
+
+	paper-ripple {
+	  color: var(--app-background-color);
+	}
+
+	#text_container {
+		padding: 16px;
+	}
+
+	iron-image {
+		height: 100%;
+		width: 100%;
+	}
+
 	@media (min-width: 940px) {
 		:host {
 			width: 45%;
@@ -95,20 +108,24 @@
 	<paper-card>
 		<div class="card-content">
 			<template is="dom-if" if="[[_hasPicture(data)]]">
+				<a id="image_container" href="/product/[[data.slug]]">
 				<iron-image
 				alt="Image du savon [[data.name]]"
 				placeholder="[[_grabDisplayPic(data, 'base64')]]"
 				sizing="cover"
 				preload src="[[_grabDisplayPic(data, 'url')]]"
-				fade>
-			</iron-image>
+				fade
+				></iron-image>
+			<paper-ripple></paper-ripple>
+		</a>
 		</template>
 		<template is="dom-if" if="[[!_hasPicture(data)]]">
 			<div class="noPicture"><iron-icon class="noImageIcon" icon="visibility-off"></iron-icon></div>
 		</template>
-
-		<div id="itemTitle">[[data.name]]</div>
-		<div id="itemDesc"></div>
+		<div id="text_container">
+			<div id="itemTitle">[[data.name]]</div>
+			<div id="itemDesc"></div>
+	</div>
 	</div>
 	<div class="card-actions bg-action">
 		<a href="/product/[[data.slug]]">

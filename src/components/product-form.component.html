@@ -89,7 +89,7 @@
                         </div>
 
                         <div class="row input-row">
-                              <capsule-input name="ingredients" label="Ingrédients" data="[[product.ingredients]]"></capsule-input>
+                              <capsule-input id="ingredients" name="ingredients" label="Ingrédients" data="[[product.ingredients]]"></capsule-input>
                         </div>
 
                         <div class="row input-row">
@@ -241,6 +241,14 @@ Polymer({
             this.fire('update-heading', {heading: name});
       },
 
+      _newProduct: function() {
+        return {
+          name: '',
+          standards: {},
+          ingredients: {}
+        }
+      },
+
       _getFormAction: function(newVal) {
             if ("create" == newVal.__queryParams.action) {
                   this.isNew = true;
@@ -264,6 +272,7 @@ Polymer({
             if(this.isNew) {
                   this.resetForm();
                   this.product = {name: ''};
+                  this.$.ingredients.reset();
                   this.$.standards.reset();
                   this._computeUploadPaths(false);
             } else {

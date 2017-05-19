@@ -2,6 +2,10 @@
 
 Shop-webapp is a single page progressive web app created - in the first place - for an artisan selling handmade soaps.
 
+Lighthouse score :
+
+![ScreenShot](https://firebasestorage.googleapis.com/v0/b/savon-1df9a.appspot.com/o/internal%2FScreen%20Shot%202017-05-19%20at%2016.34.10.png?alt=media&token=4a8c034c-ec8c-48d0-b557-9fab6e6bf6bb)
+
 You can see the live version running here : [https://ptitcoinsavonnerie.fr](https://ptitcoinsavonnerie.fr).
 *Please note that the running app is only in french (but the whole code is in english), and it delivers only in France. We are not responsible for color choices.*
 

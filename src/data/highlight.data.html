@@ -24,6 +24,10 @@
       items: {
         type: Array,
         notify: true
+      },
+      max: {
+        type: Number,
+        value: 5
       }
     },
 
@@ -35,9 +39,9 @@
       if(!data) return;
       var _this = this;
       var buf = [];
-      data.forEach(function(item) {
+      data.forEach(function(item, index) {
         var banner = item.banner.pictures ? _this._getBanner(item) : null;
-        if(banner) {
+        if(banner && index < _this.max) {
           buf.push({
             id: item.$key,
             src: banner.url,

@@ -34,7 +34,7 @@
       }
 
       .actionsButtons {
-            min-width: 84px;
+            min-width: 120px;
       }
 
       [no-event] {
@@ -49,17 +49,17 @@
             <div id="list" hidden$="[[empty]]">
                   <template is="dom-repeat" items="[[data]]">
                         <div class="item">
-                              <div class="layout-horizontal grow">
+                              <div class="layout horizontal wrap">
                                     <iron-icon class="label" active$="[[item.active]]" icon="label"></iron-icon> [[item.name]]
                               </div>
-                              <div class="actionsButtons layout-horizontal end-justified color-action">
+                              <div class="actionsButtons layout horizontal end-justified">
 
                                     <a href="/product/[[item.slug]]" no-event$="[[!item.active]]" class="color-action">
                                           <paper-icon-button id="see[[index]]" disabled$="[[!item.active]]" icon="visibility"></paper-icon-button>
                                           <paper-tooltip for="see[[index]]" position="left">Voir le produit</paper-tooltip>
                                     </a>
 
-                                    <paper-icon-button disabled$="[[_canUpdateStock(item.stock, online)]]" id="stock[[index]]" data-index="[[index]]" on-tap="_stock" icon="store"></paper-icon-button>
+                                    <paper-icon-button class="color-action" disabled$="[[_canUpdateStock(item.stock, online)]]" id="stock[[index]]" data-index="[[index]]" on-tap="_stock" icon="store"></paper-icon-button>
                                     <paper-tooltip for="stock[[index]]" position="left">Gérer le stock</paper-tooltip>
 
                                     <a href="/product-form/[[item.$key]]?action=edit" no-event$="[[!online]]" class="color-action">

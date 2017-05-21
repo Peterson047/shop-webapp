@@ -30,7 +30,8 @@
 	paper-radio-button {
 		width: 160px;
 		--paper-radio-button-label-color: var(--filters-color);
-		--paper-radio-button-checked-color: var(--filters-color);
+		--paper-radio-button-checked-color: var(--app-primary-color);
+		--paper-radio-button-unchecked-color: var(--filters-color);
 		--paper-radio-button-unchecked-ink-color: var(--filters-color);
 		--paper-radio-button-checked-ink-color: var(--filters-color);
 	}
@@ -115,8 +116,6 @@
 		<paper-icon-button disabled$="[[!idFilterResetable]]" on-tap="_resetIdFilter" class="reset" icon="cancel"></paper-icon-button>
 		<paper-icon-button on-tap="_idFilter" icon="check" class="filter"></app-button>
 		</div>
-
-
 
 		<div class="container">
 			<date-input value="{{start}}" lt="[[end]]" label="Entre" id="start"></date-input>

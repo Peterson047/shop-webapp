@@ -42,8 +42,8 @@
 		transform: translateY(calc(-100% - 5px));
 	}
 
-	app-button:not(:last-of-type) {
-		margin-right: var(--app-space);
+	app-button:last-of-type {
+		margin-left: var(--app-space);
 	}
 
 	#controls {
@@ -54,6 +54,8 @@
 
 	#actions {
 		display: flex;
+		flex-wrap: wrap;
+		justify-content: flex-end;
 	}
 
 	#number {
@@ -146,7 +148,7 @@
 		state-filter="{{stateFilter}}"></order-list-filters>
 
 		<div id="controls">
-			<div id="number" class="color-accent">[[number]]</div>
+			<div id="number" class="color-accent">[[number]] [[_getCurrentDisplay(stateFilter, fragments)]]</div>
 			<div id="actions">
 				<app-button online="[[online]]" disabled$="[[!online]]" class="color-secondary bg-action" on-tap="_getCSV" icon="cloud-download">CSV</app-button>
 				<app-button class="color-secondary bg-action" on-tap="_showFilters" icon="filter-list">Filtres</app-button>
@@ -226,6 +228,10 @@ Polymer({
 				size: null
 			}
 		};
+	},
+
+	_getCurrentDisplay: function(state, frags) {
+		return frags[state].display
 	},
 
 	_pickOrders: function(stateFilter, idFilter, dateFilter) {

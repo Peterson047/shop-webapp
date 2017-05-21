@@ -181,6 +181,7 @@ Polymer({
 
 	_getCacheKey: function(route) {
 		if(route.__queryParams.cachekey) return route.__queryParams.cachekey;
+		else return 'orders'
 	},
 
 	_onUserChanges: function (incomingUser) {

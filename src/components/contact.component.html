@@ -4,6 +4,7 @@
 <link rel="import" href="../../bower_components/iron-icons/maps-icons.html">
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../bower_components/paper-fab/paper-fab.html">
 <link rel="import" href="../../bower_components/paper-tooltip/paper-tooltip.html">
 
 <link rel="import" href="date.component.html">
@@ -73,6 +74,14 @@
 	#copy {
 		min-width: 40px;
 	}
+
+	#facebook {
+		background-color: #3B5999;
+		position: absolute;
+		top: -28px;
+		right: -28px;
+		z-index: 10;
+	}
 	</style>
 
 	<data-source path="/inactivity_periods" cache-key="inactivity-periods" output="{{ips}}"></data-source>
@@ -81,6 +90,9 @@
 	<days-data id="days" json="[[schedules]]" array="{{openDays}}"></days-data>
 
 	<div class="tile">
+<a href="https://www.facebook.com/ptitcoinsavonnerie" target="_blank">
+		<paper-fab id="facebook" src="../../images/providers/facebook.svg"></paper-fab></a>
+		<paper-tooltip for="facebook" position="top">Nous suivre sur Facebook</paper-tooltip>
 
 		<div class="layout vertical bg-light-grey" id="mapContainer">
 			<template is="dom-if" if="[[online]]">
@@ -114,79 +126,87 @@
 			</div>
 			<paper-tooltip for="copy" position="bottom">Copier l'addresse</paper-tooltip>
 
-			L'atelier est ouvert le :
-			<div class="weekContainer layout horizontal wrap">
-				<template is="dom-repeat" items="[[openDays]]" as="schedule">
-					<div class="dayContainer">
-						<div class="font-bold color-accent">[[schedule.day]]</div>
-						<ul>
-							<template is="dom-repeat" items="[[schedule.slices]]" as="slice">
-								<li>de [[slice.start]] à [[slice.end]]</li>
-							</template>
-						</ul>
-					</div>
-				</template>
-			</div>
+			<template is="dom-if" if="[[openDays.length]]">
+				L'atelier est ouvert le :
+				<div class="weekContainer layout horizontal wrap">
+					<template is="dom-repeat" items="[[openDays]]" as="schedule">
+						<div class="dayContainer">
+							<div class="font-bold color-accent">[[schedule.day]]</div>
+							<ul>
+								<template is="dom-repeat" items="[[schedule.slices]]" as="slice">
+									<li>de [[slice.start]] à [[slice.end]]</li>
+								</template>
+							</ul>
+						</div>
+					</template>
+				</div>
+			</template>
+
+			<template is="dom-if" if="[[!openDays.length]]">
+				L'atelier n'est actuellement pas ouvert au public.
+			</template>
 
 			<dashed-title icon="mail">Contact</dashed-title>
-			<p>Si vous avez des questions à propos de la boutique, du site, de nos méthodes de production, ou encore des remarques, n'hésitez pas à nous écrire à
-				<a class="color-link" href="mailto:contact@[[appData.domain]]">contact@[[appData.domain]]</a> !</p>
-			</div>
+			<p>
+				Si vous avez des questions à propos de la boutique, du site, de mes méthodes de production ou encore des remarques, n'hésitez pas à m'écrire à
+				<a class="color-link" href="mailto:contact@[[appData.domain]]">contact@[[appData.domain]]</a> !
+			</p>
 		</div>
+	</div>
 
-	</template>
-	<script>
-	'use strict';
-	Polymer({
-		is: 'app-contact',
-		behaviors: [window.ClipboardBehavior, window.DataPipeBehavior],
-		properties: {
-			mapLoading: {
-				type: Boolean,
-				value: true
-			},
-			appData: Object,
-			online: Boolean
+</template>
+<script>
+'use strict';
+Polymer({
+	is: 'app-contact',
+	behaviors: [window.ClipboardBehavior, window.DataPipeBehavior],
+	properties: {
+		mapLoading: {
+			type: Boolean,
+			value: true
 		},
+		appData: Object,
+		online: Boolean
+	},
 
-		ready: function() {
-			var map = this.$.mapContainer;
-			var _this = this;
-			map.addEventListener('google-map-ready', function(e) {
-				_this.mapLoading = false;
-			});
-		},
-		_copyAddress: function() {
-			this.clipboardCopy(this.$.address);
-		},
+	ready: function() {
+		var map = this.$.mapContainer;
+		var _this = this;
+		map.addEventListener('google-map-ready', function(e) {
+			_this.mapLoading = false;
+		});
+	},
+	_copyAddress: function() {
+		this.clipboardCopy(this.$.address);
+	},
 
-		_showWarning: function(ips) {
+	_showWarning: function(ips) {
 
-			var now = Date.now();
+		var now = Date.now();
 
-			this.displayedIp = false;
-			var closestStart;
-			var closestEnd;
+		this.displayedIp = false;
+		var closestStart;
+		var closestEnd;
 
-			for(var key in ips) {
-				var startIp = ips[key].start;
+		for(var key in ips) {
+			var startIp = ips[key].start;
 
-				var endIp = ips[key].end;
+			var endIp = ips[key].end;
 
-				if(!this.displayedIp && ( startIp > now || endIp > now ) ) {
-					this.displayedIp = ips[key];
-					closestStart = startIp;
-					closestEnd = endIp;
-				}
-				else if( ( startIp > now || endIp > now ) && ( startIp < closestStart || endIp < closestEnd ) ) {
-					this.displayedIp = ips[key];
-					closest = startIp;
-				}
+			if(!this.displayedIp && ( startIp > now || endIp > now ) ) {
+				this.displayedIp = ips[key];
+				closestStart = startIp;
+				closestEnd = endIp;
 			}
+			else if( ( startIp > now || endIp > now ) && ( startIp < closestStart || endIp < closestEnd ) ) {
+				this.displayedIp = ips[key];
+				closest = startIp;
+			}
+		}
 
-			return this.displayedIp = ips[key];
-		},
+		return this.displayedIp = ips[key];
+	},
 
-	});
-	</script>
+});
+</script>
 </dom-module>

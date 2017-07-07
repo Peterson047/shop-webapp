@@ -15,21 +15,18 @@
       }
 
       h2 {
-            margin: 10px 0;
+            margin: 0;
       }
 
       #header {
-            height: var(--app-card-header-height, 160px);
+            height: var(--app-card-header-height, 180px);
             width: 100%;
             background-color: var(--app-card-heading-background-color, white);
             color: var(--app-card-heading-color, black);
             display: flex;
             flex-direction: column;
             align-items: center;
-      }
-
-      #header.padding-top {
-            padding-top: var(--app-space);
+            justify-content: space-around;
       }
 
       iron-icon {
@@ -38,8 +35,9 @@
       }
 
       iron-image {
-            height: 100%;
-            width: 100%;
+          height: 100%;
+          width: 100%;
+          @apply --app-card-image;
       }
 
       #text {
@@ -52,18 +50,20 @@
       }
       </style>
 
-      <div id="header" class$="[[_needPadding(icon)]]">
+      <div id="header">
             <template is="dom-if" if="[[icon]]">
                   <iron-icon icon="[[icon]]"></iron-icon>
-                  <h2>[[heading]]</h2>
             </template>
             <template is="dom-if" if="[[image]]">
                   <iron-image
                   placeholder="[[placeholder]]"
-                  sizing="cover"
+                  sizing="[[sizing]]"
                   preload src="[[image]]"
                   alt="[[alt]]"
                   fade></iron-image>
+            </template>
+            <template is="dom-if" if="[[heading]]">
+                <h2>[[heading]]</h2>
             </template>
       </div>
       <div id="text">
@@ -77,15 +77,21 @@
 Polymer({
       is: 'app-card',
       properties: {
-            icon: String,
-            image: String,
+            icon: {
+                type: String,
+                value: null
+            },
+            image: {
+                type: String,
+                value: null
+            },
+            sizing: {
+                type: String,
+                value: 'cover'
+            },
             placeholder: String,
             heading: String,
             alt: String
-      },
-
-      _needPadding: function(icon) {
-            return 'padding-top';
       }
 });
 </script>

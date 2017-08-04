@@ -1,6 +1,6 @@
 # Shop-Webapp
 
-Shop-webapp is a single page progressive web app created - in the first place - for an artisan selling handmade soaps.
+Shop-webapp is a single page progressive web app created for a soap factory.
 
 Lighthouse score :
 

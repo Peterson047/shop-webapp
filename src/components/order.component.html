@@ -105,6 +105,10 @@
 		<dashed-title icon="maps:local-shipping">Livraison</dashed-title>
 
 		<p class="noMarginBot">
+			<template is="dom-if" if="[[_getDelivery(data, 'onSite')]]">
+				Retrait à l'atelier.
+			</template>
+
 			<template is="dom-if" if="[[_getDelivery(data, 'planned')]]">
 				Livraison prévue pour le <app-date string="[[data.delivery.date]]"></app-date>.
 			</template>
@@ -259,15 +263,18 @@ Polymer({
 		if(!order) return;
 
 		var deliveryDate = order.delivery && order.delivery.date;
+		var onSite = order.delivery && order.delivery.onSite
 		var status = order.status;
 		var payment = (order.status) ? status.payment: null;
 
 		switch(delivery) {
+			case 'onSite':
+			return onSite;
 			case 'planned':
 			return deliveryDate && payment !== 'refunded';
 			break;
 			case 'estimated':
-			return !deliveryDate && payment !== 'refunded';
+			return !onSite && !deliveryDate && payment !== 'refunded';
 			break;
 			case 'refunded':
 			return payment === 'refunded';

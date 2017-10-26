@@ -3,7 +3,6 @@
 
 <link rel="import" href="../behaviors/list-animation.behavior.html">
 
-<link rel="import" href="data-source.component.html">
 <link rel="import" href="loading-layer.component.html">
 <link rel="import" href="event-tile.component.html">
 
@@ -16,7 +15,6 @@
 		display: flex;
 		height: 100%;
 		width: 100%;
-		min-height: var(--app-section-min-height);
 		position: relative;
 		overflow: hidden;
 	}
@@ -55,25 +53,16 @@
 	}
 
 	</style>
-
-	<api-call id="eventsCall" uri="[[appData.backend]]/facebook/upcoming_events" no-fbt-header method="GET" loading="{{loading}}" last-response="{{data}}"></api-call>
-
-	<app-indexeddb-mirror
-	key="events"
-	data="{{data.data}}"
-	persisted-data="{{persistedData}}"
-	></app-indexeddb-mirror>
-
 	<div id="list" class="container">
-		<template is="dom-repeat" items="[[persistedData]]">
+		<template is="dom-repeat" items="[[data]]">
 			<event-tile class="item" data=[[item]]></event-tile>
 		</template>
-		<template is="dom-if" if="[[_hasEvents(persistedData)]]">
+		<template is="dom-if" if="[[_hasEvents(data)]]">
 			<event-tile filler></event-tile>
 			<event-tile filler></event-tile>
 		</template>
-		<template is="dom-if" if="[[!_hasEvents(persistedData)]]">
-			<paper-card class="item" id="noEventTile" heading="Aucun évènement prévu...">
+		<template is="dom-if" if="[[!_hasEvents(data)]]">
+			<paper-card class="item" id="noEventTile" heading="Aucun évènement à venir...">
 				<div class="card-content">
 						<div>...pour le moment !<br> Mais n'hésitez pas à repasser !</div>
 						<iron-icon icon="social:mood"></iron-icon>
@@ -95,29 +84,10 @@ Polymer({
 		data: {
 			type: Object,
 			value: null,
-		},
-
-		online: {
-			type: Boolean,
-			observer: '_onlineChanges',
-		},
-
-		appData: Object,
+		}
 	},
 
 	behaviors: [window.ListAnimationBehavior],
-
-	fetchEvents: function () {
-		if (false !== this.online) {
-			this.$.eventsCall.request();
-		}
-	},
-
-	_onlineChanges: function (newVal, oldVal) {
-		if (newVal && oldVal === false) {
-			this.fetchEvents();
-		}
-	},
 
 	_hasEvents: function (events) {
 		return events && events.length;

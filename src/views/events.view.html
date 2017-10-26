@@ -1,6 +1,9 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/app-storage/app-indexeddb-mirror/app-indexeddb-mirror.html">
 
 <link rel="import" href="../components/section.component.html">
+<link rel="import" href="../components/api-call.component.html">
+
 <link rel="import" href="../components/event-list.component.html">
 
 <link rel="import" href="../behaviors/page.behavior.html">
@@ -15,8 +18,20 @@
       }
       </style>
 
-      <app-section back="true" class="simpleSpace" heading="Évènements" main-background="--app-section-header-background-color" fill-background="--app-section-fill-color">
-            <event-list id="eventList" online="[[online]]" app-data="[[appData]]"></event-list>
+      <api-call id="eventsCall" uri="[[appData.backend]]/facebook/upcoming_events" no-fbt-header method="GET" loading="{{loading}}" last-response="{{data}}"></api-call>
+
+	<app-indexeddb-mirror
+	key="events"
+	data="{{data.data}}"
+	persisted-data="{{persistedData}}"
+	></app-indexeddb-mirror>
+
+      <app-section back="true" class="simpleSpace" heading="Évènements à venir" main-background="--app-section-header-background-color" fill-background="--app-section-fill-color">
+            <event-list id="eventList" open data="[[persistedData.open]]"></event-list>
+      </app-section>
+
+      <app-section class="simpleSpace" heading="Évènements des 6 derniers mois" title-color="--app-white" main-background="--app-dark-grey" fill-background="--app-section-fill-color">
+            <event-list id="eventList" closed data="[[persistedData.closed]]"></event-list>
       </app-section>
 
 </template>
@@ -45,8 +60,14 @@ Polymer({
       },
 
       _onSelected: function () {
-            this.$.eventList.fetchEvents();
-      }
+            this.fetchEvents();
+      },
+
+      fetchEvents: function () {
+		if (false !== this.online) {
+			this.$.eventsCall.request();
+		}
+	}
 });
 </script>
 </dom-module>

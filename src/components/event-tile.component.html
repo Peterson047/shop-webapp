@@ -77,7 +77,7 @@
 	}
 	</style>
 
-	<paper-card heading="[[data.name]]">
+	<paper-card heading="[[_computeHeading(data.name, closed)]]">
 		<div class="card-content">
 			<div id="itemDesc"></div>
 			<div id="rangeDate">
@@ -108,6 +108,10 @@ Polymer({
 	properties: {
 		data: {
 			type: Object,
+		},
+		closed: {
+			type: Boolean,
+			value: false
 		}
 	},
 
@@ -123,6 +127,13 @@ Polymer({
 			})
 			Polymer.RenderStatus.afterNextRender(this.$.itemDesc, this._ellipsizeTextBox.bind(this));
 		}
+	},
+
+	_computeHeading: function(name, closed){
+		var res = '';
+		if(closed) res += "TERMINE - ";
+		res += name;
+		return res;
 	},
 
 	_ellipsizeTextBox: function () {

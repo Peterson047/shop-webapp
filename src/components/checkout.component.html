@@ -121,11 +121,17 @@ Polymer({
             },
       },
 
-      _checkUserEmail: function() {
-            if(!this.user.emailVerified) {
+      _userEmailIsVerified: function() {
+            var _this = this;
+            return firebase.auth().currentUser.reload()
+            .then(function(response) {
+                  return firebase.auth().currentUser.emailVerified;
+            })
+      },
 
-                  var _this = this;
-                  var send = function() {
+      _promptUserToVerifyEmail: function(){
+            var _this = this;
+            var send = function() {
                         firebase.auth().currentUser.sendEmailVerification().then(function() {
                               _this.showToaster({
                                     text: 'Email de confirmation envoyé',
@@ -141,37 +147,40 @@ Polymer({
                         });
                   };
 
-                  this.showToaster({
-                        text: "L'adresse email "+this.user.email+" n'est pas vérifiée.",
-                        state: false,
-                        actions: [
-                              {
-                                    text: "Changer mon email",
-                                    icon: "mail",
-                                    fn: this.goTo.bind(this, '/user/infos')
-                              },
-                              {
-                                    text: "Renvoyer un email de confirmation",
-                                    icon: "send",
-                                    fn: send
-                              }
-                        ]
-                  });
-
-                  return false;
-            } else return true;
+            this.showToaster({
+                  text: "L'adresse email "+this.user.email+" n'est pas vérifiée.",
+                  state: false,
+                  actions: [
+                        {
+                              text: "Changer mon email",
+                              icon: "mail",
+                              fn: this.goTo.bind(this, '/user/infos')
+                        },
+                        {
+                              text: "Renvoyer un email de confirmation",
+                              icon: "send",
+                              fn: send
+                        }
+                  ]
+            });
       },
 
       _submit: function() {
+            var _this = this;
+            if(!this.user || !this.validateForm()) return false;
+            this.loading = true;
+            this._userEmailIsVerified()
+            .then(function(userEmailIsVerified){
+                  if(!userEmailIsVerified) {
+                        _this.loading = false;
+                        return _this._promptUserToVerifyEmail();
+                  }
+                  var data = _this.$.form.serialize();
+                  data.cart = _this.cart;
+                  _this.preventCartNotifications();
+                  _this.$.placeCall.request(data);
 
-            var ok = this.validateForm();
-            if(this.user && this._checkUserEmail() && ok) {
-                  var data = this.$.form.serialize();
-                  data.cart = this.cart;
-                  this.loading = true;
-                  this.preventCartNotifications();
-                  this.$.placeCall.request(data);
-            }
+            })
       },
 
       _handleResponse: function(callRes) {

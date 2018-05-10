@@ -51,7 +51,7 @@
     "web-component-tester": "^4.0.0"
   },
   "resolutions": {
-    "app-storage": "^0.10.0",
+    "app-storage": "1 - 2",
     "iron-icons": "^1.2.0"
   }
 }

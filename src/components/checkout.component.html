@@ -124,7 +124,7 @@ Polymer({
       _userEmailIsVerified: function() {
             var _this = this;
             return firebase.auth().currentUser.reload()
-            .then(function(response) {
+            .then(function() {
                   return firebase.auth().currentUser.emailVerified;
             })
       },
@@ -170,12 +170,13 @@ Polymer({
             if(!this.user || !this.validateForm()) return false;
             this.loading = true;
             this._userEmailIsVerified()
-            .then(function(userEmailIsVerified){
-                  if(!userEmailIsVerified) {
+            .then(function(verified){
+                  if(!verified) {
                         _this.loading = false;
                         return _this._promptUserToVerifyEmail();
                   }
                   var data = _this.$.form.serialize();
+                  console.log(data)
                   data.cart = _this.cart;
                   _this.preventCartNotifications();
                   _this.$.placeCall.request(data);

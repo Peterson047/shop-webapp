@@ -90,25 +90,28 @@
 	<days-data id="days" json="[[schedules]]" array="{{openDays}}"></days-data>
 
 	<div class="tile">
-<a href="https://www.facebook.com/ptitcoinsavonnerie" target="_blank">
+		<a href="https://www.facebook.com/ptitcoinsavonnerie" target="_blank">
 		<paper-fab id="facebook" src="../../images/providers/facebook.svg"></paper-fab></a>
 		<paper-tooltip for="facebook" position="top">Nous suivre sur Facebook</paper-tooltip>
-
 		<div class="layout vertical bg-light-grey" id="mapContainer">
 			<template is="dom-if" if="[[online]]">
 				<loading-layer transparent show="[[mapLoading]]"></loading-layer>
 				<google-map map={{gMap}} zoom="8" api-key="AIzaSyA8644jA0nIptc9fvg-n-TVqM0DAuvLXM4" latitude="48.788697" longitude="2.497371" fit-to-markers disable-zoom>
-					<google-map-marker title="ATELIER / MAGASIN" latitude="48.788697" longitude="2.497371"></google-map-marker>
 					<template is="dom-repeat" items="[[retailLocations]]" as="location">
 							<google-map-marker
 								mouse-events
 								latitude="[[location.latitude]]"
 								longitude="[[location.longitude]]"
+								icon="[[location.icon]]"
 								>
 								<div style="width: 300px">
 										<h3 style="color: #758150">[[location.title]]</h3>
-										<a target="_blank" href="[[location.url]]">Voir le site</a>
-										<div>[[location.schedule]]</div>
+										<div>[[location.description]]</div>
+										<div>[[location.street]]</div>
+										<div>[[location.city]]</div>
+										<template is="dom-if" if="[[location.url]]">
+											<a target="_blank" href="[[location.url]]">Voir le site</a>
+										</template>
 								</div>
 							</google-map-marker>
 					</template>
@@ -184,147 +187,201 @@ Polymer({
 			type: Array,
 			value: [
 				{
+					title: 'Un Petit Coin de Savonnerie',
+					description: 'Atelier & Magasin',
+					icon: {
+						url: '/images/logo/logo_s_180x86_2x.png',
+						scaledSize: {width: 110, height: 53}
+					},
+					street: "4 bis avenue des Sorbiers",
+					city: "94210 La Varenne Saint-Hilaire",
+					latitude: 48.788697,
+					longitude: 2.497371
+				},
+				{
 					title: 'Altermarché',
 					url: 'http://www.altermarché.fr',
+					street: "52 avenue Jeanne d'Arc",
+					city: "94100 Saint-Maur des Fossés",
 					latitude: 48.7939262,
 					longitude: 2.4985397
 				},
 				{
 					title: 'Le Fermier',
 					url: 'https://www.lefermierbio.fr',
+					street: "131 Boulevard de Créteil",
+					city: "94100 Saint-Maur-des-Fossés",
 					latitude: 48.7976976,
 					longitude: 2.4883604
 				},
 				{
 					title: 'Ruche Saint-Maur-des Fossés / La Varenne',
 					url: 'https://laruchequiditoui.fr/fr',
-					schedule: 'Samedi de 11:00 à 12:30',
+					description: 'Samedi de 11:00 à 12:30',
+					street: '42 rue St Hilaire',
+					city: '94210 Saint-Maur-des-Fossés',
 					latitude: 48.7898084,
 					longitude: 2.5096567
 				},
 				{
 					title: 'Ruche Saint-Maur-des Fossés / Saint-Maur Créteil',
 					url: 'https://laruchequiditoui.fr/fr',
-					schedule: 'Mercredi de 17:30 à 19:30',
+					description: 'Mercredi de 17:30 à 19:30',
+					street: "20 rue d'Alsace-Lorraine",
+					city: '94100 Saint-Maur-des-Fossés',
 					latitude: 48.8052503,
 					longitude: 2.4725218
 				},
 				{
 					title: 'Ruche Maisons-Alfort',
 					url: 'https://laruchequiditoui.fr/fr',
-					schedule: 'Jeudi de 18:30 à 20:30',
+					description: 'Jeudi de 18:30 à 20:30',
+					street: "99 avenue du Général Leclerc",
+					city: '94700 Maisons-Alfort',
 					latitude: 48.8110561,
 					longitude: 2.4292664
 				},
 				{
 					title: 'Ruche Champigny-sur-Marne',
 					url: 'https://laruchequiditoui.fr/fr',
-					schedule: 'Jeudi de 18:00 à 19:30',
+					description: 'Jeudi de 18:00 à 19:30',
+					street: "25 Rue Maurice Pirolley",
+					city: '94500 Champigny-sur-Marne',
 					latitude: 48.8201624,
 					longitude: 2.4897105
 				},
 				{
 					title: 'Ruche Montreuil / Bas-Montreuil',
 					url: 'https://laruchequiditoui.fr/fr',
-					schedule: 'Samedi de 10:30 à 12:30',
+					description: 'Samedi de 10:30 à 12:30',
+					street: "34 rue des Fédérés",
+					city: '93100 Montreuil',
 					latitude: 48.8522192,
 					longitude: 2.4296568
 				},
 				{
 					title: 'Ruche Vincennes',
 					url: 'https://laruchequiditoui.fr/fr',
-					schedule: 'Jeudi de 18:00 à 19:30',
+					description: 'Jeudi de 18:00 à 19:30',
+					street: "16 Avenue Georges Clémenceau",
+					city: '94300 Vincennes',
 					latitude: 48.84867,
 					longitude: 2.4208518
 				},
 				{
 					title: 'Ruche Paris 04 / Pavillon de l’Arsenal',
 					url: 'https://laruchequiditoui.fr/fr',
-					schedule: 'Samedi de 11:00 à 13:00',
+					description: 'Samedi de 11:00 à 13:00',
+					street: "21 boulevard Morland",
+					city: '75004 Paris',
 					latitude: 48.8503719,
 					longitude: 2.3595193
 				},
 				{
 					title: 'Ruche Paris 11 / Oberkampf',
 					url: 'https://laruchequiditoui.fr/fr',
-					schedule: 'Mardi de 18:00 à 20:00',
+					description: 'Mardi de 18:00 à 20:00',
+					street: "4 cité Griset",
+					city: '75011 Paris 11',
 					latitude: 48.8662758,
 					longitude: 2.3770595
 				},
 				{
 					title: 'Ruche Paris 17 / Gare du Pont Cardinet',
 					url: 'https://laruchequiditoui.fr/fr',
-					schedule: 'Mardi de 18:00 à 20:00',
+					description: 'Mardi de 18:00 à 20:00',
+					street: "145, rue Cardinet",
+					city: '75017 Paris',
 					latitude: 48.8877643,
 					longitude: 2.3119154
 				},
 				{
 					title: 'Ruche Paris 17 / Keller Williams',
 					url: 'https://laruchequiditoui.fr/fr',
-					schedule: 'Samedi de 11:30 à 13:00',
+					description: 'Samedi de 11:30 à 13:00',
+					street: "80 rue Jouffroy d'Abbans",
+					city: '75017 Paris',
 					latitude: 48.8836288,
 					longitude: 2.3017978
 				},
 				{
 					title: 'Ruche Ozoir la Ferrière',
 					url: 'https://laruchequiditoui.fr/fr',
-					schedule: 'Mercredi de 18:00 à 20:00',
+					description: 'Mercredi de 18:00 à 20:00',
+					street: "MAIRIE - Ancienne salle des mariages",
+					city: '43 Avenue du Général de Gaulle',
 					latitude: 48.7618989,
 					longitude: 2.6711423
 				},
 				{
 					title: 'Ruche Pontault-Combault',
 					url: 'https://laruchequiditoui.fr/fr',
-					schedule: 'Mercredi de 18:00 à 19:45',
+					description: 'Mercredi de 18:00 à 19:45',
+					street: "4 Rue de l'Orme au Charron",
+					city: '77340 Pontault-Combault',
 					latitude: 48.799825,
 					longitude: 2.607501
 				},
 				{
 					title: 'Ruche Noisiel / Ferme du Buisson',
 					url: 'https://laruchequiditoui.fr/fr',
-					schedule: 'Samedi de 15:00 à 16:30',
+					description: 'Samedi de 15:00 à 16:30',
+					street: "Allée de la ferme",
+					city: '77186 Noisiel',
 					latitude: 48.8448099,
 					longitude: 2.6228338
 				},
 				{
 					title: 'Ruche Réau',
 					url: 'https://laruchequiditoui.fr/fr',
-					schedule: 'Vendredi de 18:00 à 20:00',
+					description: 'Vendredi de 18:00 à 20:00',
+					street: "Ferme de la Carrière",
+					city: "81 rue d'Ourdy",
 					latitude: 48.6088103,
 					longitude: 2.6193277
 				},
 				{
 					title: 'Ruche Chailly-en-Bière',
 					url: 'https://laruchequiditoui.fr/fr',
-					schedule: 'Jeudi de 18:00 à 20:00',
+					description: 'Jeudi de 18:00 à 20:00',
+					street: "Ferme chaillotine - 82 route de paris",
+					city: "77930 Chailly-en-Bière",
 					latitude: 48.4765377,
 					longitude: 2.5973822
 				},
 				{
 					title: 'Locavor de Santeny',
 					url: 'https://locavor.fr/',
-					schedule: 'Samedi de 09:30 à 11:00',
+					description: 'Samedi de 09:30 à 11:00',
+					street: "Espace Montanglos - 3 route de Marolles",
+					city: "94440 Santeny",
 					latitude: 48.7268485,
 					longitude: 2.5688174
 				},
 				{
 					title: 'Locavor de Brunoy',
 					url: 'https://locavor.fr/',
-					schedule: 'Samedi de 11:00 à 12:30',
+					description: 'Samedi de 11:00 à 12:30',
+					street: "51 rue du réveillon",
+					city: "91800 Brunoy",
 					latitude: 48.7032644,
 					longitude: 2.49634014
 				},
 				{
 					title: 'Locavor de Varennes-Jarcy',
 					url: 'https://locavor.fr/',
-					schedule: 'Samedi de 10:00 à 12:00',
+					description: 'Samedi de 10:00 à 12:00',
+					street: "14 rue de la Libération",
+					city: "91480 Varennes-Jarcy",
 					latitude: 48.6771358,
 					longitude: 2.5555527
 				},
 				{
 					title: 'Locavor de Nandy',
 					url: 'https://locavor.fr/',
-					schedule: 'Vendredi de 18:00 à 20:00',
+					description: 'Vendredi de 18:00 à 20:00',
+					street: "Rue Robert Cousin",
+					city: "77176 Nandy",
 					latitude: 48.582935,
 					longitude: 2.5654577
 				}

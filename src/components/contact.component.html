@@ -97,8 +97,21 @@
 		<div class="layout vertical bg-light-grey" id="mapContainer">
 			<template is="dom-if" if="[[online]]">
 				<loading-layer transparent show="[[mapLoading]]"></loading-layer>
-				<google-map zoom="11" api-key="AIzaSyA8644jA0nIptc9fvg-n-TVqM0DAuvLXM4" latitude="48.788697" longitude="2.497371" fit-to-markers disable-zoom>
+				<google-map map={{gMap}} zoom="8" api-key="AIzaSyA8644jA0nIptc9fvg-n-TVqM0DAuvLXM4" latitude="48.788697" longitude="2.497371" fit-to-markers disable-zoom>
 					<google-map-marker title="ATELIER / MAGASIN" latitude="48.788697" longitude="2.497371"></google-map-marker>
+					<template is="dom-repeat" items="[[retailLocations]]" as="location">
+							<google-map-marker
+								mouse-events
+								latitude="[[location.latitude]]"
+								longitude="[[location.longitude]]"
+								>
+								<div style="width: 300px">
+										<h3 style="color: #758150">[[location.title]]</h3>
+										<a target="_blank" href="[[location.url]]">Voir le site</a>
+										<div>[[location.schedule]]</div>
+								</div>
+							</google-map-marker>
+					</template>
 				</google-map>
 			</template>
 			<template is="dom-if" if="[[!online]]">
@@ -166,7 +179,157 @@ Polymer({
 			value: true
 		},
 		appData: Object,
-		online: Boolean
+		online: Boolean,
+		retailLocations: {
+			type: Array,
+			value: [
+				{
+					title: 'Altermarché',
+					url: 'http://www.altermarché.fr',
+					latitude: 48.7939262,
+					longitude: 2.4985397
+				},
+				{
+					title: 'Le Fermier',
+					url: 'https://www.lefermierbio.fr',
+					latitude: 48.7976976,
+					longitude: 2.4883604
+				},
+				{
+					title: 'Ruche Saint-Maur-des Fossés / La Varenne',
+					url: 'https://laruchequiditoui.fr/fr',
+					schedule: 'Samedi de 11:00 à 12:30',
+					latitude: 48.7898084,
+					longitude: 2.5096567
+				},
+				{
+					title: 'Ruche Saint-Maur-des Fossés / Saint-Maur Créteil',
+					url: 'https://laruchequiditoui.fr/fr',
+					schedule: 'Mercredi de 17:30 à 19:30',
+					latitude: 48.8052503,
+					longitude: 2.4725218
+				},
+				{
+					title: 'Ruche Maisons-Alfort',
+					url: 'https://laruchequiditoui.fr/fr',
+					schedule: 'Jeudi de 18:30 à 20:30',
+					latitude: 48.8110561,
+					longitude: 2.4292664
+				},
+				{
+					title: 'Ruche Champigny-sur-Marne',
+					url: 'https://laruchequiditoui.fr/fr',
+					schedule: 'Jeudi de 18:00 à 19:30',
+					latitude: 48.8201624,
+					longitude: 2.4897105
+				},
+				{
+					title: 'Ruche Montreuil / Bas-Montreuil',
+					url: 'https://laruchequiditoui.fr/fr',
+					schedule: 'Samedi de 10:30 à 12:30',
+					latitude: 48.8522192,
+					longitude: 2.4296568
+				},
+				{
+					title: 'Ruche Vincennes',
+					url: 'https://laruchequiditoui.fr/fr',
+					schedule: 'Jeudi de 18:00 à 19:30',
+					latitude: 48.84867,
+					longitude: 2.4208518
+				},
+				{
+					title: 'Ruche Paris 04 / Pavillon de l’Arsenal',
+					url: 'https://laruchequiditoui.fr/fr',
+					schedule: 'Samedi de 11:00 à 13:00',
+					latitude: 48.8503719,
+					longitude: 2.3595193
+				},
+				{
+					title: 'Ruche Paris 11 / Oberkampf',
+					url: 'https://laruchequiditoui.fr/fr',
+					schedule: 'Mardi de 18:00 à 20:00',
+					latitude: 48.8662758,
+					longitude: 2.3770595
+				},
+				{
+					title: 'Ruche Paris 17 / Gare du Pont Cardinet',
+					url: 'https://laruchequiditoui.fr/fr',
+					schedule: 'Mardi de 18:00 à 20:00',
+					latitude: 48.8877643,
+					longitude: 2.3119154
+				},
+				{
+					title: 'Ruche Paris 17 / Keller Williams',
+					url: 'https://laruchequiditoui.fr/fr',
+					schedule: 'Samedi de 11:30 à 13:00',
+					latitude: 48.8836288,
+					longitude: 2.3017978
+				},
+				{
+					title: 'Ruche Ozoir la Ferrière',
+					url: 'https://laruchequiditoui.fr/fr',
+					schedule: 'Mercredi de 18:00 à 20:00',
+					latitude: 48.7618989,
+					longitude: 2.6711423
+				},
+				{
+					title: 'Ruche Pontault-Combault',
+					url: 'https://laruchequiditoui.fr/fr',
+					schedule: 'Mercredi de 18:00 à 19:45',
+					latitude: 48.799825,
+					longitude: 2.607501
+				},
+				{
+					title: 'Ruche Noisiel / Ferme du Buisson',
+					url: 'https://laruchequiditoui.fr/fr',
+					schedule: 'Samedi de 15:00 à 16:30',
+					latitude: 48.8448099,
+					longitude: 2.6228338
+				},
+				{
+					title: 'Ruche Réau',
+					url: 'https://laruchequiditoui.fr/fr',
+					schedule: 'Vendredi de 18:00 à 20:00',
+					latitude: 48.6088103,
+					longitude: 2.6193277
+				},
+				{
+					title: 'Ruche Chailly-en-Bière',
+					url: 'https://laruchequiditoui.fr/fr',
+					schedule: 'Jeudi de 18:00 à 20:00',
+					latitude: 48.4765377,
+					longitude: 2.5973822
+				},
+				{
+					title: 'Locavor de Santeny',
+					url: 'https://locavor.fr/',
+					schedule: 'Samedi de 09:30 à 11:00',
+					latitude: 48.7268485,
+					longitude: 2.5688174
+				},
+				{
+					title: 'Locavor de Brunoy',
+					url: 'https://locavor.fr/',
+					schedule: 'Samedi de 11:00 à 12:30',
+					latitude: 48.7032644,
+					longitude: 2.49634014
+				},
+				{
+					title: 'Locavor de Varennes-Jarcy',
+					url: 'https://locavor.fr/',
+					schedule: 'Samedi de 10:00 à 12:00',
+					latitude: 48.6771358,
+					longitude: 2.5555527
+				},
+				{
+					title: 'Locavor de Nandy',
+					url: 'https://locavor.fr/',
+					schedule: 'Vendredi de 18:00 à 20:00',
+					latitude: 48.582935,
+					longitude: 2.5654577
+				}
+			]
+		}
 	},
 
 	ready: function() {
@@ -175,7 +338,19 @@ Polymer({
 		map.addEventListener('google-map-ready', function(e) {
 			_this.mapLoading = false;
 		});
+		
+		map.addEventListener('google-map-marker-mouseover', function(e) {
+			var markers = Array.from(map.querySelectorAll('google-map-marker'));
+			var currentMarker = e.target;
+			markers.forEach(function(marker) {
+				if(currentMarker !== marker && marker.info) {
+					marker.info.close(_this.gMap, marker.marker);
+				}
+			});
+			currentMarker.info.open(_this.gMap, currentMarker.marker);
+		});
 	},
+
 	_copyAddress: function() {
 		this.clipboardCopy(this.$.address);
 	},

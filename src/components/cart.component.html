@@ -232,7 +232,7 @@ Polymer({
       },
 
       deleteItem: function (e) {
-            var target = Polymer.dom(e).rootTarget;
+            var target = e.currentTarget;
             if (target) {
                   var hash = this.displayItems[target.index].$key;
                   this.setItemQuantity(hash, -this.displayItems[target.index].quantity)

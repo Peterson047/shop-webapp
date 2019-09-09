@@ -72,7 +72,7 @@ Polymer({
       behaviors: [window.DataPipeBehavior, window.ToasterControlBehavior],
 
       _isChecked: function(schedules, day) {
-            if(!schedules ) return false;
+            if(!schedules) return false;
             return schedules[day];
       },
 
@@ -82,7 +82,6 @@ Polymer({
                   var checkbox = Polymer.dom(e).rootTarget;
                   if(!checkbox) return;
                   var day = checkbox.dataset.day;
-
                   if(checkbox.checked) {
                         if(!this.schedules[day]) {
                               this.schedules[day] = {

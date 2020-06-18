@@ -309,7 +309,7 @@ Polymer({
 			})
 		} else {
 			this.showToaster({
-				text: res.error,
+				text: res.error || JSON.stringify(res),
 				state: false,
 				actions: []
 			})

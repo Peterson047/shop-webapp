@@ -204,7 +204,7 @@ Polymer({
                   }
             } else {
                   this.showToaster({
-                        text: response.error,
+                        text: response.error || JSON.stringify(response),
                         state: false,
                         actions: []
                   })

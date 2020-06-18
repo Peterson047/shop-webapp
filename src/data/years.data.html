@@ -24,7 +24,7 @@
       var from = (this.from === 'now') ? new Date().getFullYear() : parseInt(this.from);
       if(isNaN(from)) return console.error('from is NaN');
       for(var i = 0; i <= this.plus; i++) {
-        this.push('years', (from + i));
+        this.push('years', (from + i).toString());
       }
     }
 

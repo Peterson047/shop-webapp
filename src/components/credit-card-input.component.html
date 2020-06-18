@@ -78,12 +78,23 @@ Polymer({
 	is: 'credit-card-input',
 	behaviors: [window.ComplexInputBehavior],
 	attached: function() {
-
+		var _this = this;
 		this._setDefaultMonth();
 		this._setDefaultYear();
-
+		this.interval = setInterval(function() {
+			if (_this.$.expMonth.value !== _this.data.expMonth) {
+				_this.data.expMonth = _this.$.expMonth.value;
+			}
+			if (_this.$.expYear.value !== _this.data.expYear) {
+				_this.data.expYear = _this.$.expYear.value;
+			}
+		}, 800);
 		this.$.monthsTemplate.addEventListener("dom-change", this._setDefaultMonth.bind(this));
 		this.$.yearsTemplate.addEventListener("dom-change", this._setDefaultYear.bind(this));
+	},
+
+	detached: function() {
+		clearInterval(this.interval);
 	},
 
 	_setDefaultMonth: function() {

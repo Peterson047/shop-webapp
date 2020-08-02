@@ -10,72 +10,77 @@
 
 <dom-module id="legal-notices-view">
 	<template>
-	<style include="tile-style page-style colors-style">
-	:host {
-		display: block;
-	}
+		<style include="tile-style page-style colors-style">
+			:host {
+				display: block;
+			}
+		</style>
 
-	</style>
+		<app-section back="true" heading="Mentions légales" main-background="--app-section-header-background-color"
+			fill-background="--app-section-fill-color">
+			<div class="tile keepMinimalSpace">
+				<h3>UN P’TIT COIN D’SAVONNERIE</h3>
 
-	<app-section back="true" heading="Mentions légales" main-background="--app-section-header-background-color" fill-background="--app-section-fill-color">
-		<div class="tile keepMinimalSpace">
-			<h3>UN P’TIT COIN D’SAVONNERIE</h3>
+				<ul>
+					<li>
+						Entreprise individuelle d’Annelies Christine DOUHARD, statut micro entrepreneur depuis le 21
+						mars 2017.
+					</li>
+					<li>
+						Adresse de fabrication : 4 bis avenue des Sorbiers F-94210 – La Varenne Saint Hilaire
+					</li>
+					<li>
+						Tél : 06 37 45 56 33
+					</li>
+					<li>
+						Email : <a href="mailto: contact@ptitcoinsavonnerie.fr">contact@ptitcoinsavonnerie.fr</a>
+					</li>
+					<li>
+						N°SIRET 37970771400026
+					</li>
+					<li>
+						Code APE 2042Z
+					</li>
+					<li>
+						N° TVA intracommunautaire FR65379707714, Franchise de TVA (article 293B du code général des
+						impôts)
+					</li>
+					<li>
+						N° d’enregistrement au Répertoire des Métiers : 379707714 RM94
+					</li>
+					<li>
+						N° d’enregistrement de la déclaration simplifiée à la CNIL : 2054806 v O
+					</li>
+					<li>
+						Responsable du site : Annelies Christine Douhard
+					</li>
+					<li>
+						Hébergeur du site : firebase hosting
+					</li>
+				</ul>
+			</div>
+		</app-section>
+	</template>
+	<script>
+		'user strict';
+		Polymer({
+			is: 'legal-notices-view',
 
-			<ul>
-				<li>
-					Entreprise individuelle d’Annelies Christine DOUHARD depuis le 21 mars 2017.
-				</li>
-				<li>
-					Adresse de fabrication : 4 bis avenue des Sorbiers F-94210 – La Varenne Saint Hilaire
-				</li>
-				<li>
-					Tél : 06 37 45 56 33
-				</li>
-				<li>
-					Mail : contact@ptitcoinsavonnerie.fr
-				</li>
-				<li>
-					N°SIRET 37970771400026
-				</li>
-				<li>
-					Code APE 2042Z
-				</li>
-				<li>
-					N° d’enregistrement au Répertoire des Métiers : 379707714 RM94
-				</li>
-				<li>
-					N° d’enregistrement de la déclaration simplifiée à la CNIL : 2054806 v O
-				</li>
-				<li>
-					Responsable du site : Annelies Christine Douhard
-				</li>
-				<li>
-					Hébergeur du site : firebase hosting
-				</li>
-			</ul>
-		</div>
-	</app-section>
-</template>
-<script>
-'user strict';
-Polymer({
-	is: 'legal-notices-view',
+			properties: {
+				pageData: {
+					type: Object,
+					computed: '_computePageData(appData)'
+				},
+			},
 
-	properties: {
-		pageData: {
-			type: Object,
-			computed: '_computePageData(appData)'
-		},
-	},
+			behaviors: [window.PageBehavior],
 
-	behaviors: [window.PageBehavior],
-
-	_computePageData: function(appData) {
-		return {
-			title: 'Mentions légales',
-			description: "Mentions légales de "+appData.name+"."
-		}
-	},
-});
-</script>
+			_computePageData: function (appData) {
+				return {
+					title: 'Mentions légales',
+					description: "Mentions légales de " + appData.name + "."
+				}
+			},
+		});
+	</script>
 </dom-module>

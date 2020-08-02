@@ -16,177 +16,198 @@
 
 <dom-module id="home-view">
     <template>
-    <style include="tile-style font-style page-style colors-style">
-    :host {
-        display: block;
-    }
+        <style include="tile-style font-style page-style colors-style">
+            :host {
+                display: block;
+            }
 
-    app-carousel {
-        display: flex;
-        width: 100%;
-        height: 320px;
-        margin-left: auto;
-        margin-right: auto;
-        box-shadow: 0px 2px 5px 0px rgba(0,0,0,0.16),0px 2px 5px 0px rgba(0,0,0,0.23);
-        z-index: 1;
-        --carousel-border-radius: 3px;
-    }
+            app-carousel {
+                display: flex;
+                width: 100%;
+                height: 320px;
+                margin-left: auto;
+                margin-right: auto;
+                box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.16), 0px 2px 5px 0px rgba(0, 0, 0, 0.23);
+                z-index: 1;
+                --carousel-border-radius: 3px;
+            }
 
-    .containerCards {
-        margin-left: auto;
-        margin-right: auto;
+            .containerCards {
+                margin-left: auto;
+                margin-right: auto;
 
-        display: flex;
-        justify-content: space-between;
-        flex-wrap: wrap;
+                display: flex;
+                justify-content: space-between;
+                flex-wrap: wrap;
 
-        z-index: 1;
-    }
+                z-index: 1;
+            }
 
-    app-card, paper-card {
-        flex-shrink: 0;
-        flex-grow: 1;
-        margin-top: 10px;
-        width: 300px;
+            app-card,
+            paper-card {
+                flex-shrink: 0;
+                flex-grow: 1;
+                margin-top: 10px;
+                width: 300px;
 
-        margin-left: 10px;
-        margin-right: 10px;
+                margin-left: 10px;
+                margin-right: 10px;
 
-        overflow: hidden;
-        position: relative;
-    }
+                overflow: hidden;
+                position: relative;
+            }
 
-    .card-bio {
-        --app-card-heading-color: #CDDC39;
-    }
+            .card-bio {
+                --app-card-heading-color: #CDDC39;
+            }
 
-    .card-friendly {
-        --app-card-heading-color: #FFC107;
-        --app-card-image: {
-            height: 124px;
-        };
-    }
+            .card-friendly {
+                --app-card-heading-color: #FFC107;
 
-    .card-sapo {
-        --app-card-heading-color: #00BCD4;
-    }
+                --app-card-image: {
+                    height: 124px;
+                }
 
-    #who {
-        --app-card-header-height: 320px;
-    }
+                ;
+            }
 
-    .video {
-      width: 100%;
-      height: 500px;
-    }
-    </style>
+            .card-sapo {
+                --app-card-heading-color: #00BCD4;
+            }
 
-    <highlight-data items="{{highlighted}}"></highlight-data>
+            #who {
+                --app-card-header-height: 320px;
+            }
 
-    <app-section heading="Savons, Baumes & Déodorants" main-background="--app-section-header-background-color" fill-background="--app-section-fill-color">
-        <app-carousel products="[[highlighted]]"></app-carousel>
-    </app-section>
+            .video {
+                width: 100%;
+                height: 500px;
+            }
+        </style>
 
-    <app-section id="media" heading="Découvrez le processus de création des savons !" title-color="--app-white" main-background="--app-dark-grey" fill-background="--app-section-fill-color">
-      <iframe class="video" src="https://www.youtube.com/embed/g3-t8eo5PN0" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>    </app-section>
+        <highlight-data items="{{highlighted}}"></highlight-data>
 
-    <app-section id="business" heading="Savons naturels et bio faits main !" main-background="--app-section-header-background-color" fill-background="--app-section-fill-color">
-        <div class="containerCards">
-            <app-card
-            class="card-friendly"
-            heading="Bio et écologiques"
-            image="https://firebasestorage.googleapis.com/v0/b/savon-1df9a.appspot.com/o/images%2Fnature_progres_logo.jpg?alt=media&token=382f8fca-db04-46cf-bc78-654978b8e710"
-            sizing="auto">
-            <p>
-                Je fabrique mes produits avec des huiles végétales et essentielles bio. Tous mes produits sont :
-                <ul>
-                    <li>SANS conservateur</li>
-                    <li>SANS parfum de synthèse</li>
-                    <li>SANS colorant artificiel</li>
-                    <li>SANS huile de palme</li>
-                </ul>
-            </p>
-        </app-card>
+        <app-section heading="Savons, Baumes & Déodorants" main-background="--app-section-header-background-color"
+            fill-background="--app-section-fill-color">
+            <app-carousel products="[[highlighted]]"></app-carousel>
+        </app-section>
 
-        <app-card class="card-sapo" heading="Saponifiés à froid"
-        image="https://firebasestorage.googleapis.com/v0/b/savon-1df9a.appspot.com/o/images%2Fsapo.JPG?alt=media&token=0ea0429f-3da6-44e3-b9e7-3cc1516b5892"
-        sizing="contain">
-        <p>
-            Je fais partie des quelques savonniers en France qui transforment les huiles végétales en savon sans utiliser d’huile de palme.
-        </p>
-        <p>
-            La saponification à froid préserve les qualités des huiles végétales et permet de garder dans le savon
-            la glycérine issue de la saponification. La glycérine donne au savon sa propriété hydratante exceptionnelle.
-        </p>
+        <app-section id="media" heading="Découvrez le processus de création des savons !" title-color="--app-white"
+            main-background="--app-dark-grey" fill-background="--app-section-fill-color">
+            <iframe class="video" src="https://www.youtube.com/embed/g3-t8eo5PN0" frameborder="0"
+                allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen></iframe> </app-section>
 
-    </app-card>
+        <app-section id="business" heading="Savons bio saponifiés à froid !"
+            main-background="--app-section-header-background-color" fill-background="--app-section-fill-color">
+            <div class="containerCards">
+                <app-card class="card-friendly" heading="Bio et écologiques"
+                    image="https://firebasestorage.googleapis.com/v0/b/savon-1df9a.appspot.com/o/images%2Fnature_progres_logo.jpg?alt=media&token=382f8fca-db04-46cf-bc78-654978b8e710"
+                    link="https://www.natureetprogres.org/" sizing="auto">
+                    <p>
+                        Je fabrique mes produits avec des huiles végétales et essentielles bio. Tous mes produits sont :
+                    <ul>
+                        <li>SANS conservateur</li>
+                        <li>SANS parfum de synthèse</li>
+                        <li>SANS colorant artificiel</li>
+                        <li>SANS huile de palme</li>
+                    </ul>
+                    </p>
+                </app-card>
 
-    <app-card class="card-bio" heading="Vegan" icon="app-icons:earth">
-        <p>
-            Mes produits ne contiennent aucun ingrédient d’origine animale.
-        </p>
-        <p>
-            Ils ne sont pas testés sur les animaux et sont respectueux du vivant et de l’environnement.
-        </p>
-    </app-card>
+                <app-card class="card-sapo" heading="Saponifiés à froid"
+                    image="https://firebasestorage.googleapis.com/v0/b/savon-1df9a.appspot.com/o/images%2Fsapo.JPG?alt=media&token=0ea0429f-3da6-44e3-b9e7-3cc1516b5892"
+                    sizing="contain">
+                    <p>
+                        Je fais partie des quelques savonniers en France qui transforment les huiles végétales en savon
+                        sans utiliser d’huile de palme.
+                    </p>
+                    <p>
+                        La saponification à froid préserve les qualités des huiles végétales et permet de garder dans le
+                        savon
+                        la glycérine issue de la saponification. La glycérine donne au savon sa propriété hydratante
+                        exceptionnelle.
+                    </p>
 
-</div>
-</app-section>
+                </app-card>
 
-<app-section id="workshop" heading="Comment est née la savonnerie ?" title-color="--app-white" main-background="--app-dark-grey" fill-background="--app-section-fill-color">
-    <div class="containerCards">
-        <app-card id="who"
-        alt="Photo de la savonnerie"
-        image="https://firebasestorage.googleapis.com/v0/b/savon-1df9a.appspot.com/o/images%2FPRESENTATION%200350%20R3-min.jpg?alt=media&token=c7ab607d-45e3-434c-b066-c35eab0b4c9d"
-        placeholder="data:image/jpeg;base64,/9j/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAADAAoDASIAAhEBAxEB/8QAFgABAQEAAAAAAAAAAAAAAAAAAAUG/8QAHRAAAwACAgMAAAAAAAAAAAAAAQIDAAQRcQUhQf/EABQBAQAAAAAAAAAAAAAAAAAAAAX/xAAXEQADAQAAAAAAAAAAAAAAAAAAAQIx/9oADAMBAAIRAxEAPwCL4iM6tEUUMtNebuPhIXkHjs5mdrbrLatNCgVXKgGan0D1jGEzoq0f/9k=">
-        <p>
-            Il y a quelques années, cherchant un produit naturel et sain qui lave sans dessécher la peau, j’ai découvert la saponification à
-            froid. Des savons faits main à la maison - ce fut une révélation !
-        </p>
-        <div class="color-primary font-big font-bold">DOUX et FAIT MAIN !</div>
-        <p>J’ai commencé à fabriquer mes savons pour la famille et les amis et me suis formée auprès de Leanne & Sylvain Chevallier,
-            pionniers de la saponification à froid en France. En parallèle, j’ai peaufiné mes formules et cherché les ingrédients les plus
-            sains et écologiques possibles.
-        </p>
-        <div class="color-primary font-big font-bold">BIO et ECOLOGIQUES !</div>
-        <p>
-            Début 2017 j’ai décidé de faire de ma passion mon métier en créant un petit atelier de savonnerie et en privilégiant
-            toujours la qualité des ingrédients : huiles végétales et essentielles bio. Le zéro emballage est possible si vous venez
-            chercher les savons à la savonnerie !
+                <app-card class="card-bio" heading="AMAP Les Fanes de St Maur"
+                    link="https://trucdesaintmaur.wordpress.com/"
+                    image="https://firebasestorage.googleapis.com/v0/b/savon-1df9a.appspot.com/o/images%2FLogo_truc_2_rond.png?alt=media&token=9517e363-6f1d-42c7-98d1-f199442fc0c8">
+                    <p>
+                        Je privilégie la vente locale en circuit court et vise le zéro déchet :
+                    <ul>
+                        <li>A l'atelier de savonnerie</li>
+                        <li>Dans les AMAP</li>
+                        <li>A la ruche qui dit oui</li>
+                        <li>Dans les Locavor</li>
+                        <li>Dans les magasins vrac locaux</li>
+                    </ul>
+                    </p>
+                </app-card>
+            </div>
+        </app-section>
 
-            <!-- Je suis en train d'effectuer les démarches pour obtenir la mention <a class="color-link" target="_blank" href="http://natureetprogres.org">Nature & Progrès</a>. -->
-        </p>
-        <div class="color-primary font-big font-bold">VEGAN et LOCAL !</div>
-        <p>
-            J’ai fait le choix d’utiliser exclusivement des matières grasses d’origine végétale que la nature nous offre en si grande
-            variété. Je fabrique tous les produits dans mon atelier en région parisienne. La vente est avant tout locale et toujours
-            directe, du producteur au consommateur.
-        </p>
-    </app-card>
-</div>
-</app-section>
+        <app-section id="workshop" heading="Comment est née la savonnerie ?" title-color="--app-white"
+            main-background="--app-dark-grey" fill-background="--app-section-fill-color">
+            <div class="containerCards">
+                <app-card id="who" alt="Photo de la savonnerie"
+                    image="https://firebasestorage.googleapis.com/v0/b/savon-1df9a.appspot.com/o/images%2FPRESENTATION%200350%20R3-min.jpg?alt=media&token=c7ab607d-45e3-434c-b066-c35eab0b4c9d"
+                    placeholder="data:image/jpeg;base64,/9j/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAADAAoDASIAAhEBAxEB/8QAFgABAQEAAAAAAAAAAAAAAAAAAAUG/8QAHRAAAwACAgMAAAAAAAAAAAAAAQIDAAQRcQUhQf/EABQBAQAAAAAAAAAAAAAAAAAAAAX/xAAXEQADAQAAAAAAAAAAAAAAAAAAAQIx/9oADAMBAAIRAxEAPwCL4iM6tEUUMtNebuPhIXkHjs5mdrbrLatNCgVXKgGan0D1jGEzoq0f/9k=">
+                    <p>
+                        Il y a quelques années, cherchant un produit naturel et sain qui lave sans dessécher la peau,
+                        j’ai découvert la saponification à
+                        froid. Des savons faits main à la maison - ce fut une révélation !
+                    </p>
+                    <div class="color-primary font-big font-bold">DOUX et FAIT MAIN !</div>
+                    <p>J’ai commencé à fabriquer mes savons pour la famille et les amis et me suis formée auprès de
+                        Leanne & Sylvain Chevallier,
+                        pionniers de la saponification à froid en France. En parallèle, j’ai peaufiné mes formules et
+                        cherché les ingrédients les plus
+                        sains et écologiques possibles.
+                    </p>
+                    <div class="color-primary font-big font-bold">BIO et ECOLOGIQUES !</div>
+                    <p>
+                        Début 2017 j’ai décidé de faire de ma passion mon métier en créant un petit atelier de
+                        savonnerie et en privilégiant
+                        toujours la qualité des ingrédients : huiles végétales et essentielles bio. Le zéro emballage
+                        est possible si vous venez
+                        chercher les savons à la savonnerie !
 
-</template>
-<script>
-'user strict';
-Polymer({
-    is: 'home-view',
+                        <!-- Je suis en train d'effectuer les démarches pour obtenir la mention <a class="color-link" target="_blank" href="http://natureetprogres.org">Nature & Progrès</a>. -->
+                    </p>
+                    <div class="color-primary font-big font-bold">VEGETAL et LOCAL !</div>
+                    <p>
+                        J’ai fait le choix d’utiliser exclusivement des matières grasses d’origine végétale que la
+                        nature nous offre en si grande
+                        variété. Je fabrique tous les produits dans mon atelier en région parisienne. La vente est avant
+                        tout locale et directe, du producteur au consommateur.
+                    </p>
+                </app-card>
+            </div>
+        </app-section>
 
-    properties: {
-        pageData: {
-            type: Object,
-            computed: '_computePageData(appData)'
-        }
-    },
+    </template>
+    <script>
+        'user strict';
+        Polymer({
+            is: 'home-view',
 
-    _computePageData: function(appData) {
-        return {
-            title: 'Accueil',
-            description: appData.name+" vous propose toute une gamme de savons biologiques, végan et artisanaux, en accord avec votre corps et l'environnement."
-        }
-    },
+            properties: {
+                pageData: {
+                    type: Object,
+                    computed: '_computePageData(appData)'
+                }
+            },
 
-    behaviors: [window.PageBehavior],
-});
-</script>
+            _computePageData: function (appData) {
+                return {
+                    title: 'Accueil',
+                    description: appData.name + " vous propose toute une gamme de savons biologiques, végan et artisanaux, en accord avec votre corps et l'environnement."
+                }
+            },
+
+            behaviors: [window.PageBehavior],
+        });
+    </script>
 </dom-module>
